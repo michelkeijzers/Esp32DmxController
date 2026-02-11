@@ -1,0 +1,101 @@
+@startuml
+
+title Architecture
+
+legend right
+    |= Color |= Meaning |
+    |<back:LightBlue>                   | Manually optimized / Compiles |
+    |<back:Grey>                   | Future |
+    
+endlegend 
+
+class Main  { }
+
+class DmxController {}
+Main --> DmxController
+
+class RTosTask <<abstract>> #LightBlue 
+{
+    +RtosTask()
+    +~RtosTask(
+    +init() : esp_err_t
+    taskEntry()
+    getTaskHandle()
+    getEventQueue()
+    isInitialized()
+}
+
+class DmxPresetChanger { }
+class DmxPresets <<Data>> { }
+DmxPresetChanger *-- DmxPresets
+class DmxPreset <<Data>> {}
+DmxPresets *--"2..20" DmxPreset
+DmxController *-- DmxPresetChanger : Task
+DmxPresets --> NvsStorage : segment \n 'DMX Presets'
+
+class OscHandler #Grey {}
+DmxController *-- OscHandler : Task
+
+class ArtNetSender { }
+DmxController *-- ArtNetSender : Task
+ArtNetSender --> DmxPreset : Access   
+
+class FootSwitch #LightBlue {}
+DmxController *-- FootSwitch : Task
+FootSwitch --> NvsStorage : Segment \n 'Foot Switch'
+FootSwitch --|> RTosTask
+
+class SevenSegmentDisplay #LightBlue {}
+DmxController *--- SevenSegmentDisplay : Task
+SevenSegmentDisplay --|> RTosTask
+
+class WebServer {}
+DmxController *-- WebServer : Task
+WebServer --> FootSwitch : Access
+WebServer --> DmxPresets : Access
+
+@enduml
+
+
+@startuml 
+title Foot Switch State Machine
+
+[*] --> BOOT
+BOOT --> OTA_CHECK : Current State == \n Pressed
+BOOT --> NORMAL_OPERATION : Current State == \n Released
+OTA_CHECK --> OTA : Long Press \ OTA Update
+OTA_CHECK --> NORMAL_OPERATION : Short Press | Next Preset
+OTA --> [*] : Reboot after OTA
+
+NORMAL_OPERATION --> NORMAL_OPERATION: Short Press | Next Preset, \n Long Press | Previous Preset
+
+@enduml 
+
+@startuml 
+title NVS Storage
+
+class NvsStorage
+
+class DmxPresets
+{
+    int CurrentPreset
+    int NumberOfPresets
+    int Preset_0_Universe_0[512]
+    int Preset_0_Universe_1[512]
+    ...
+    int Preset_19_Universe_0[512]
+    int Preset_19_Universe_1[512]
+}
+
+
+NvsStorage *-- DmxPresets : Segment \n 'DMX Presets'
+class FootSwitch
+{
+    int LongPressMs
+    bool Polarity
+}
+
+NvsStorage *-- FootSwitch : Segment \n 'Foot Switch'
+
+@enduml
+

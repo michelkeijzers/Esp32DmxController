@@ -1,0 +1,216 @@
+#root {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0;
+}
+
+header h1 {
+  margin-bottom: 0.5rem;
+  color: #646cff;
+}
+
+header p {
+  color: #888;
+  font-size: 1.1rem;
+}
+
+main {
+  width: 100%;
+}
+
+.preset-selector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #3a3a3a;
+  border-radius: 8px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.config-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #3a3a3a;
+  border-radius: 8px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.config-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.config-button:hover {
+  background: #747bff;
+}
+
+.config-button:active {
+  background: #535ac5;
+}
+
+.preset-selector label {
+  color: #999;
+  font-weight: 500;
+}
+
+.preset-adjust-button {
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  background: #646cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.preset-adjust-button:hover:not(:disabled) {
+  background: #535bf2;
+}
+
+.preset-adjust-button:disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.preset-count-display {
+  color: #646cff;
+  font-weight: 600;
+  font-size: 1.2rem;
+  min-width: 30px;
+  text-align: center;
+}
+
+.esp32-config {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #3a3a3a;
+  border-radius: 8px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  flex-wrap: wrap;
+}
+
+.esp32-config label {
+  color: #999;
+  font-weight: 500;
+}
+
+.esp32-ip-display {
+  color: #646cff;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: 'Courier New', monospace;
+}
+
+.esp32-config input[type="text"] {
+  width: 150px;
+  padding: 0.5rem;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 1rem;
+  text-align: center;
+  font-family: 'Courier New', monospace;
+}
+
+.esp32-config input[type="text"]:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.send-status {
+  color: #646cff;
+  font-weight: 500;
+  font-size: 0.9rem;
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.send-status-error {
+  color: #ff0000;
+}
+
+.send-all-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-all-button:hover {
+  background: #747bff;
+}
+
+.send-all-button:active {
+  background: #535ac5;
+}
+
+.load-all-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.load-all-button:hover {
+  background: #747bff;
+}
+
+.load-all-button:active {
+  background: #535ac5;
+}
+
+.presets-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

@@ -1,0 +1,208 @@
+.preset-list {
+  width: 100%;
+}
+
+.preset-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+}
+
+.preset-item {
+  background: #3a3a3a;
+  border: 1px solid #333;
+  border-top: none;
+  border-radius: 0;
+  padding: 0.6rem 1rem;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.preset-item:first-child {
+  border-top: 1px solid #333;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.preset-item:last-child {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.preset-item h3 {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preset-number-list {
+  color: #999;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.preset-name-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #646cff;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.25rem;
+  margin: 0;
+  font-family: inherit;
+  cursor: text;
+}
+
+.preset-name-input:focus {
+  outline: none;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.preset-name-input::placeholder {
+  color: #555;
+}
+
+.preset-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.move-button {
+  background: transparent;
+  color: #999;
+  border: 1px solid #555;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+  min-width: 30px;
+}
+
+.move-button:hover:not(:disabled) {
+  background: #646cff;
+  color: white;
+  border-color: #646cff;
+}
+
+.move-button:disabled {
+  color: #444;
+  border-color: #444;
+  cursor: not-allowed;
+}
+
+.insert-button {
+  background: transparent;
+  color: #646cff;
+  border: 1px solid #646cff;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.insert-button:hover:not(:disabled) {
+  background: #646cff;
+  color: white;
+}
+
+.insert-button:disabled {
+  color: #444;
+  border-color: #444;
+  cursor: not-allowed;
+}
+
+.delete-button {
+  background: transparent;
+  color: #999;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.delete-button:hover {
+  background: #ff0000;
+  color: white;
+}
+
+.preset-item:hover {
+  background: #4a4a4a;
+}
+
+.preset-item h3 {
+  margin: 0;
+  color: #646cff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.preset-item-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.edit-button {
+  flex: 1;
+  background: #4a4a4a;
+  color: white;
+  border: 1px solid #646cff;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-button:hover {
+  background: #646cff;
+  border-color: #747bff;
+}
+
+.send-button-small {
+  flex: 1;
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-button-small:hover {
+  background: #747bff;
+}
+
+.send-button-small:active {
+  background: #535ac5;
+}
+
+@media (max-width: 768px) {
+  .preset-grid {
+    grid-template-columns: 1fr;
+  }
+}

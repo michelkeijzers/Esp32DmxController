@@ -1,0 +1,217 @@
+.preset-card {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.preset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.preset-header h2 {
+  margin: 0;
+  color: #646cff;
+}
+
+.send-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.send-button:hover {
+  background: #747bff;
+}
+
+.send-button:active {
+  background: #535ac5;
+}
+
+.preset-card h2 {
+  margin-top: 0;
+  color: #646cff;
+}
+
+.preset-info {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.preset-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.preset-section h3 {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #999;
+}
+
+.values-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: #0a0a0a;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.value {
+  background: #2a2a2a;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.index {
+  color: #646cff;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.value-number {
+  color: #fff;
+  font-weight: 500;
+}
+
+.value-input {
+  width: 50px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #fff;
+  padding: 0.2rem 0.3rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.value-input:focus {
+  outline: none;
+  border-color: #646cff;
+  background: #0a0a0a;
+}
+
+.value-input-small {
+  width: 45px;
+  background: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 3px;
+  color: #fff;
+  padding: 0.15rem 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.value-input-small:focus {
+  outline: none;
+  border-color: #646cff;
+  background: #0a0a0a;
+}
+
+/* Hide number input spinners */
+.value-input::-webkit-inner-spin-button,
+.value-input::-webkit-outer-spin-button,
+.value-input-small::-webkit-inner-spin-button,
+.value-input-small::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.value-input,
+.value-input-small {
+  appearance: textfield;
+}
+
+.more {
+  color: #646cff;
+  font-style: italic;
+  align-self: center;
+}
+
+.full-data {
+  margin-top: 1rem;
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+}
+
+.full-data summary {
+  cursor: pointer;
+  color: #646cff;
+  font-weight: 500;
+  user-select: none;
+}
+
+.full-data summary:hover {
+  color: #747bff;
+}
+
+.all-values {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #0a0a0a;
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.all-values h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #999;
+}
+
+.all-values h4:first-child {
+  margin-top: 0;
+}
+
+.values-grid-full {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.25rem;
+}
+
+.value-small {
+  background: #2a2a2a;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .preset-sections {
+    grid-template-columns: 1fr;
+  }
+}

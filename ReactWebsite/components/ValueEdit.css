@@ -1,0 +1,161 @@
+.value-edit {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.value-edit-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.value-edit-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: #646cff;
+  font-size: 1.5rem;
+}
+
+.value-edit-info {
+  color: #999;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.value-display {
+  background: #3a3a3a;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.value-display-number {
+  font-size: 4rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  color: #646cff;
+  margin-bottom: 0.5rem;
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.value-display-number.invalid {
+  color: #ff4444;
+}
+
+.value-display-label {
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.number-pad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.number-button {
+  background: #4a4a4a;
+  color: white;
+  border: 2px solid #555;
+  padding: 1.5rem;
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Courier New', monospace;
+}
+
+.number-button:hover {
+  background: #5a5a5a;
+  border-color: #646cff;
+}
+
+.number-button:active {
+  transform: scale(0.95);
+  background: #646cff;
+}
+
+.clear-button {
+  background: #ff6b6b;
+  border-color: #ff8787;
+  font-size: 1.2rem;
+}
+
+.clear-button:hover {
+  background: #ff5252;
+  border-color: #ff6b6b;
+}
+
+.backspace-button {
+  background: #ffa94d;
+  border-color: #ffc078;
+  font-size: 2rem;
+}
+
+.backspace-button:hover {
+  background: #ff9933;
+  border-color: #ffa94d;
+}
+
+.value-edit-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.cancel-button {
+  background: #4a4a4a;
+  color: white;
+  border: 2px solid #555;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-button:hover {
+  background: #5a5a5a;
+  border-color: #666;
+}
+
+.save-button {
+  background: #646cff;
+  color: white;
+  border: 2px solid #747bff;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #535bf2;
+  border-color: #646cff;
+}
+
+.save-button:disabled {
+  background: #333;
+  border-color: #444;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.value-edit-error {
+  text-align: center;
+  padding: 3rem;
+}
+
+.value-edit-error h2 {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,13 @@
+{
+    "idf.flashType": "JTAG",
+    "cSpell.customDictionaries": {
+        "custom-dictionary-workspace": {
+            "name": "custom-dictionary-workspace",
+            "path": "${workspaceFolder:Esp32Test}/.cspell/custom-dictionary-workspace.txt",
+            "addWords": true,
+            "scope": "workspace"
+        }
+    },
+    "idf.currentSetup": "C:\\Users\\i4studio\\esp\\v5.4.1\\esp-idf",
+    "C_Cpp.errorSquiggles": "disabled"
+}
