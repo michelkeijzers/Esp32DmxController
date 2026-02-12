@@ -66,7 +66,7 @@ SevenSegmentDisplay::~SevenSegmentDisplay()
 
 esp_err_t SevenSegmentDisplay::init(const gpio_num_t pins[8])
 {
-    if (RtosTask::init("SevenSegmentDisplayTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(DisplayEvent)) != ESP_OK)
+    if (RtosTask::init("SevenSegmentDisplayTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event)) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize SevenSegmentDisplayTask");
         return ESP_FAIL;
@@ -112,7 +112,7 @@ void SevenSegmentDisplay::taskEntry(void *param)
 
 void SevenSegmentDisplay::taskLoop()
 {
-    DisplayEvent event;
+    Event event;
     while (true)
     {
         if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)

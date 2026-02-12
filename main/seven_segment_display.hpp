@@ -16,7 +16,7 @@
 class SevenSegmentDisplay : public RtosTask
 {
 public:
-    struct DisplayEvent
+    struct Event
     {
         char character;
         bool dot;
@@ -26,8 +26,6 @@ public:
     ~SevenSegmentDisplay();
 
     esp_err_t init(const gpio_num_t pins[8]);
-
-    void taskEntry(void *param) override;
 
 private:
     enum Segment
@@ -65,5 +63,6 @@ private:
     // Example: 0b0111111 = digit "0" (a,b,c,d,e,f ON, g OFF)
 
     static const uint8_t digitPatterns_[];
+    void taskEntry(void *param) override;
     void taskLoop();
 };

@@ -14,7 +14,7 @@ class Main  { }
 class DmxController {}
 Main --> DmxController
 
-class RTosTask <<abstract>> #LightBlue 
+class RtosTask <<abstract>> #LightBlue 
 {
     +RtosTask()
     +~RtosTask(
@@ -32,6 +32,7 @@ class DmxPreset <<Data>> {}
 DmxPresets *--"2..20" DmxPreset
 DmxController *-- DmxPresetChanger : Task
 DmxPresets --> NvsStorage : segment \n 'DMX Presets'
+DmxPresetChanger --|> RtosTask
 
 class OscHandler #Grey {}
 DmxController *-- OscHandler : Task
@@ -43,11 +44,11 @@ ArtNetSender --> DmxPreset : Access
 class FootSwitch #LightBlue {}
 DmxController *-- FootSwitch : Task
 FootSwitch --> NvsStorage : Segment \n 'Foot Switch'
-FootSwitch --|> RTosTask
+FootSwitch --|> RtosTask
 
 class SevenSegmentDisplay #LightBlue {}
 DmxController *--- SevenSegmentDisplay : Task
-SevenSegmentDisplay --|> RTosTask
+SevenSegmentDisplay --|> RtosTask
 
 class WebServer {}
 DmxController *-- WebServer : Task
@@ -56,6 +57,40 @@ WebServer --> DmxPresets : Access
 
 @enduml
 
+@startuml
+
+title Message Queues Next/Prev Preset
+
+FootSwitch --> DmxController : Next/Previous Preset 
+DmxController --> DmxPresetChanger : Next/Previous Preset
+DmxPresetChanger --> DmxController : Preset to Send <nr, data>
+DmxController --> ArtNetSender : Send DMX Data <nr>
+ArtNetSender --> DmxController : DMX Data Sent <nr>
+DmxController --> SevenSegmentDisplay : Update Display <nr>
+
+@enduml
+
+@startuml
+
+title Message Queues Update Presets and Config
+
+WebServer --> DmxController : Update (config, presets)
+DmxController --> NVRAM : Save (config, presets)
+DmxController --> DmxPresetChanger : UpdatePresets (presets)
+DmxController --> FootSwitch : Update Config (config)
+NVRAM --> DmxController : Save Result (ok/nok)
+DmxController --> SevenSegmentDisplay : Show Save Result (ok/nok)
+
+@enduml
+
+@startuml 
+title OTA Update
+FootSwitch --> DmxController : OTA Request
+DmxController --> OTA : Start OTA Update
+OTA --> DmxController : OTA Update Result (ok/nok)
+DmxController --> SevenSegmentDisplay : Show OTA Result (ok/nok)
+
+@enduml 
 
 @startuml 
 title Foot Switch State Machine
@@ -78,7 +113,6 @@ class NvsStorage
 
 class DmxPresets
 {
-    int CurrentPreset
     int NumberOfPresets
     int Preset_0_Universe_0[512]
     int Preset_0_Universe_1[512]

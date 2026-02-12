@@ -1,50 +1,29 @@
 #include "dmx_preset_changer.hpp"
 #include <esp_log.h>
 
-static const char *TAG = "DmxPresetChanger";
+static const char *LOG_TAG = "DmxPresetChanger";
+static const int QUEUE_CAPACITY = 10;
+static const int TASK_PRIORITY = 5;
 
-DmxPresetChanger::DmxPresetChanger(DmxPresets *presets,
-                                   OSCSender *osc,
-                                   SevenSegmentDisplay *display,
-                                   ArtNetSender *artnet)
-    : dmxPresets_(presets), oscSender_(osc), display_(display), artnetSender_(artnet),
-      taskHandle_(nullptr), eventQueue_(nullptr)
+DmxPresetChanger::DmxPresetChanger()
+    : RtosTask()
 {
-    eventQueue_ = xQueueCreate(4, sizeof(EventType));
-    if (eventQueue_)
-    {
-        xTaskCreate(taskEntry, "DmxPresetChangerTask", 4096, this, 5, &taskHandle_);
-        ESP_LOGI(TAG, "DMX Preset Changer task started");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to create DmxPresetChanger event queue");
-    }
 }
 
 DmxPresetChanger::~DmxPresetChanger()
 {
-    if (taskHandle_)
-    {
-        vTaskDelete(taskHandle_);
-    }
-    if (eventQueue_)
-    {
-        vQueueDelete(eventQueue_);
-    }
 }
 
-void DmxPresetChanger::init()
+esp_err_t DmxPresetChanger::init()
 {
-    // TODO any initialization if needed
-}
-
-void DmxPresetChanger::postEvent(EventType event)
-{
-    if (eventQueue_)
+    if (RtosTask::init("DmxPresetChangerTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event)) != ESP_OK)
     {
-        xQueueSend(eventQueue_, &event, 0);
+        ESP_LOGE(LOG_TAG, "Failed to initialize DmxPresetChangerTask");
+        return ESP_FAIL;
     }
+
+    ESP_LOGI(LOG_TAG, "DmxPresetChanger task started");
+    return ESP_OK;
 }
 
 void DmxPresetChanger::taskEntry(void *param)
@@ -61,137 +40,13 @@ void DmxPresetChanger::taskLoop()
         {
             switch (event)
             {
-            case SHORT_PRESS:
-                handleShortPress();
+            case PREVIOUS_PRESET:
+                // TODO
                 break;
-            case LONG_PRESS:
-                handleLongPress();
+            case NEXT_PRESET:
+                // TODO
                 break;
             }
         }
-    }
-}
-
-void DmxPresetChanger::setDmxPresets(DmxPresets *presets)
-{
-    dmxPresets_ = presets;
-}
-
-void DmxPresetChanger::setOSCSender(OSCSender *osc)
-{
-    oscSender_ = osc;
-}
-
-void DmxPresetChanger::setDisplay(SevenSegmentDisplay *display)
-{
-    display_ = display;
-}
-
-void DmxPresetChanger::setArtNetSender(ArtNetSender *artnet)
-{
-    artnetSender_ = artnet;
-}
-
-void DmxPresetChanger::handleShortPress()
-{
-    if (!dmxPresets_)
-    {
-        ESP_LOGE(TAG, "No DMX presets configured");
-        return;
-    }
-
-    uint8_t newPreset = dmxPresets_->nextPreset();
-    ESP_LOGI(TAG, "Short press: Next preset - Preset %d", newPreset);
-
-    // Update display
-    updateDisplay();
-
-    // Send OSC message for preset change
-    if (oscSender_)
-    {
-        oscSender_->sendMessage("/dmx/preset", static_cast<int32_t>(newPreset));
-        ESP_LOGD(TAG, "OSC message sent: /dmx/preset %d", newPreset);
-    }
-
-    // Send DMX data via Art-Net
-    sendCurrentPresetToArtNet();
-}
-
-void DmxPresetChanger::handleLongPress()
-{
-    if (!dmxPresets_)
-    {
-        ESP_LOGE(TAG, "No DMX presets configured");
-        return;
-    }
-
-    uint8_t newPreset = dmxPresets_->previousPreset();
-    ESP_LOGI(TAG, "Long press: Previous preset - Preset %d", newPreset);
-
-    // Update display
-    updateDisplay();
-
-    // Send OSC message for preset change
-    if (oscSender_)
-    {
-        oscSender_->sendMessage("/dmx/preset", static_cast<int32_t>(newPreset));
-        ESP_LOGD(TAG, "OSC message sent: /dmx/preset %d", newPreset);
-    }
-
-    // Send DMX data via Art-Net
-    sendCurrentPresetToArtNet();
-}
-
-void DmxPresetChanger::updateDisplay()
-{
-    if (!display_ || !dmxPresets_)
-    {
-        return;
-    }
-
-    uint8_t currentPreset = dmxPresets_->getCurrentPresetIndex();
-
-    // Display logic: if preset >= 10, show (preset-10) with decimal point
-    uint8_t displayDigit = currentPreset;
-    bool showDecimalPoint = false;
-
-    if (currentPreset >= 10)
-    {
-        displayDigit = currentPreset - 10;
-        showDecimalPoint = true;
-    }
-
-    // TODO display_->displayDigit(displayDigit, showDecimalPoint);
-    ESP_LOGD(TAG, "Display updated: digit=%d, decimal_point=%d", displayDigit, showDecimalPoint);
-}
-
-void DmxPresetChanger::sendCurrentPresetToArtNet()
-{
-    if (!artnetSender_ || !dmxPresets_)
-    {
-        return;
-    }
-
-    uint8_t currentPreset = dmxPresets_->getCurrentPresetIndex();
-    const DmxPreset *preset = dmxPresets_->getPreset(currentPreset);
-
-    if (!preset)
-    {
-        ESP_LOGE(TAG, "Failed to get preset %d", currentPreset);
-        return;
-    }
-
-    // Send both universes
-    esp_err_t ret = artnetSender_->sendUniverses(
-        preset->getUniverseData(0), DMX_UNIVERSE_SIZE,
-        preset->getUniverseData(1), DMX_UNIVERSE_SIZE);
-
-    if (ret == ESP_OK)
-    {
-        ESP_LOGI(TAG, "Sent preset %d to Art-Net", currentPreset);
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to send preset %d to Art-Net", currentPreset);
     }
 }

@@ -5,7 +5,8 @@
 #include <cstring>
 
 // DMX Universe size
-#define DMX_UNIVERSE_SIZE 512
+const uint16_t DMX_UNIVERSE_SIZE = 512;
+const uint8_t MAX_NR_OF_PRESETS = 20;
 
 class DmxPreset
 {

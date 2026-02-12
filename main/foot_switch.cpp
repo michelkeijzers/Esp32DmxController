@@ -6,17 +6,17 @@
 #include <driver/gpio.h>
 #include <freertos/queue.h>
 
-static QueueHandle_t foot_switch_interrupt_event_queue = nullptr;
+static QueueHandle_t interrupt_event_queue = nullptr;
 
 // ISR handler: minimal, just post event to queue
-static void IRAM_ATTR foot_switch_isr_handler(void *arg)
+static void IRAM_ATTR isr_handler(void *arg)
 {
     FootSwitch *footSwitch = static_cast<FootSwitch *>(arg);
     int level = gpio_get_level(footSwitch->getPin());
-    FootSwitch::FootSwitchInterruptEvent event;
-    event.type = (level == 0) ? FootSwitchInterruptEventType::PRESS : FootSwitchInterruptEventType::RELEASE;
+    FootSwitch::InterruptEvent event;
+    event.type = (level == 0) ? InterruptEventType::PRESS : InterruptEventType::RELEASE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xQueueSendFromISR(foot_switch_interrupt_event_queue, &event, &xHigherPriorityTaskWoken);
+    xQueueSendFromISR(interrupt_event_queue, &event, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken)
     {
         portYIELD_FROM_ISR();
@@ -45,7 +45,7 @@ FootSwitch::~FootSwitch()
 
 esp_err_t FootSwitch::init(gpio_num_t pinNum)
 {
-    if (RtosTask::init("FootSwitchTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(FootSwitchEvent)) != ESP_OK)
+    if (RtosTask::init("FootSwitchTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event)) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize FootSwitchTask");
         return ESP_FAIL;
@@ -69,8 +69,8 @@ esp_err_t FootSwitch::init(gpio_num_t pinNum)
     state_ = lastPinState ? State::OTA_CHECK : State::NORMAL_OPERATION;
 
     _pin = pinNum;
-    foot_switch_interrupt_event_queue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::FootSwitchInterruptEvent));
-    if (foot_switch_interrupt_event_queue == nullptr)
+    interrupt_event_queue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
+    if (interrupt_event_queue == nullptr)
     {
         ESP_LOGE(LOG_TAG, "Failed to create foot switch interrupt event queue");
         return ESP_FAIL;
@@ -82,7 +82,7 @@ esp_err_t FootSwitch::init(gpio_num_t pinNum)
         return ESP_FAIL;
     }
 
-    if (gpio_isr_handler_add(_pin, foot_switch_isr_handler, this) != ESP_OK)
+    if (gpio_isr_handler_add(_pin, isr_handler, this) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to add GPIO ISR handler");
         return ESP_FAIL;
@@ -99,17 +99,17 @@ void FootSwitch::taskEntry(void *param)
 
 void FootSwitch::taskLoop()
 {
-    FootSwitchInterruptEvent event;
+    InterruptEvent event;
     const int debounceDelayMs = 30; // Debounce delay in ms
     bool debouncedState = false;
     bool lastStableState = false;
     TickType_t lastDebounceTime = 0;
     while (true)
     {
-        if (xQueueReceive(foot_switch_interrupt_event_queue, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(interrupt_event_queue, &event, portMAX_DELAY) == pdTRUE)
         {
             TickType_t now = xTaskGetTickCount();
-            bool currentState = (event.type == FootSwitchInterruptEventType::PRESS);
+            bool currentState = (event.type == InterruptEventType::PRESS);
             if (currentState != lastStableState)
             {
                 lastDebounceTime = now;

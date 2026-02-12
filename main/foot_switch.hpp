@@ -5,7 +5,7 @@
 #include <freertos/timers.h>
 #include "rtos_task.hpp"
 
-enum FootSwitchInterruptEventType
+enum InterruptEventType
 {
     PRESS,
     RELEASE
@@ -14,12 +14,12 @@ enum FootSwitchInterruptEventType
 class FootSwitch : RtosTask
 {
 public:
-    struct FootSwitchInterruptEvent
+    struct InterruptEvent
     {
-        FootSwitchInterruptEventType type;
+        InterruptEventType type;
     };
 
-    struct FootSwitchEvent
+    struct Event
     {
         // TODO: configuring long press threshold, polarity etc
     };

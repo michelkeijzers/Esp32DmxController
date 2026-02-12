@@ -102,16 +102,18 @@ esp_err_t DmxController::init()
         printf("Failed to initialize OSC sender\n");
     }
     artnetSender = new ArtNetSender();
-    if (artnetSender->init(ARTNET_DEST_IP) == ESP_OK)
-    {
-        printf("Art-Net sender initialized to %s\n", ARTNET_DEST_IP);
-    }
-    else
+    if (artnetSender->init(ARTNET_DEST_IP) != ESP_OK)
     {
         printf("Failed to initialize Art-Net sender\n");
+        return ESP_FAIL;
     }
-    presetChanger = new DmxPresetChanger(dmxPresets, oscSender, display, artnetSender);
-    presetChanger->init();
+    presetChanger = new DmxPresetChanger();
+    if (presetChanger->init() != ESP_OK)
+    {
+        printf("Failed to initialize DMX preset changer\n");
+        return ESP_FAIL;
+    }
+
     footSwitch = new FootSwitch();
     if (footSwitch->init(FOOT_SWITCH_PIN) != ESP_OK)
     {

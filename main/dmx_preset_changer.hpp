@@ -12,46 +12,31 @@ extern "C"
 #include <freertos/task.h>
 #include <freertos/queue.h>
 }
+#include "rtos_task.hpp"
+#include "dmx_presets.hpp"
 
-class DmxPresetChanger
+class DmxPresetChanger : RtosTask
 {
 public:
     enum EventType
     {
-        SHORT_PRESS,
-        LONG_PRESS
+        PREVIOUS_PRESET,
+        NEXT_PRESET
     };
 
-    DmxPresetChanger(DmxPresets *presets = nullptr,
-                     OSCSender *osc = nullptr,
-                     SevenSegmentDisplay *display = nullptr,
-                     ArtNetSender *artnet = nullptr);
+    struct Event
+    {
+        EventType type;
+    };
+
+    DmxPresetChanger();
     ~DmxPresetChanger();
 
-    void init();
-
-    void setDmxPresets(DmxPresets *presets);
-    void setOSCSender(OSCSender *osc);
-    void setDisplay(SevenSegmentDisplay *display);
-    void setArtNetSender(ArtNetSender *artnet);
-
-    // Post an event to the task
-    void postEvent(EventType event);
+    esp_err_t init();
 
 private:
-    DmxPresets *dmxPresets_;
-    OSCSender *oscSender_;
-    SevenSegmentDisplay *display_;
-    ArtNetSender *artnetSender_;
+    DmxPresets dmxPresets_;
 
-    TaskHandle_t taskHandle_;
-    QueueHandle_t eventQueue_;
-
-    static void taskEntry(void *param);
+    void taskEntry(void *param) override;
     void taskLoop();
-
-    void handleShortPress();
-    void handleLongPress();
-    void updateDisplay();
-    void sendCurrentPresetToArtNet();
 };

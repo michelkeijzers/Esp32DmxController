@@ -12,60 +12,67 @@ extern "C"
 #include <freertos/task.h>
 #include <freertos/queue.h>
 }
+#include "rtos_task.hpp"
+#include "dmx_presets.hpp"
 
-class NVSStorage
+class NVSStorage : RtosTask
 {
 public:
     enum EventType
     {
-        STORE_STRING,
-        GET_STRING,
-        STORE_INT,
-        GET_INT,
-        STORE_BLOB,
-        GET_BLOB,
-        ERASE_KEY,
-        ERASE_ALL,
-        KEY_EXISTS,
-        GET_STATS
+        STORE_CONFIGURATION,
+        GET_CONFIGURATION,
+        STORE_PRESETS,
+        GET_PRESETS
     };
 
-    struct NvsEvent
+    struct ConfigurationEventData
+    {
+        bool switch_polarity_inverted;
+        uint16_t long_press_threshold_ms;
+    };
+
+    struct PresetEventData
+    {
+        uint8_t universe_1_data[512];
+        uint16_t universe_1_length;
+        uint8_t universe_2_data[512];
+        uint16_t universe_2_length;
+    };
+    struct PresetsEventData
+    {
+        uint8_t number_of_presets;
+        PresetEventData presets[MAX_NR_OF_PRESETS];
+    };
+
+    struct Event
     {
         EventType type;
-        void *arg1;
-        void *arg2;
-        void *arg3;
-        void *result;
+        union
+        {
+            ConfigurationEventData configurationData;
+            PresetsEventData presetsData;
+        } data;
     };
 
-    NVSStorage(const char *ns = "dmx_ctrl");
+    NVSStorage();
     ~NVSStorage();
 
     esp_err_t init();
 
-    // Post an event to the NVS task
-    void postEvent(const NvsEvent &event);
-
     // Synchronous wrappers (for compatibility)
-    esp_err_t storeString(const char *key, const char *value);
-    esp_err_t getString(const char *key, char *buffer, size_t buffer_size);
-    esp_err_t storeInt(const char *key, int32_t value);
-    esp_err_t getInt(const char *key, int32_t *value);
-    esp_err_t storeBlob(const char *key, const void *data, size_t length);
-    esp_err_t getBlob(const char *key, void *buffer, size_t buffer_size, size_t *length);
-    esp_err_t eraseKey(const char *key);
-    esp_err_t eraseAll();
-    esp_err_t keyExists(const char *key, bool *exists);
-    esp_err_t getStats(nvs_stats_t *stats);
+    esp_err_t storeConfiguration(const ConfigurationEventData &config);
+    esp_err_t getConfiguration(ConfigurationEventData &config);
+    esp_err_t storePresetsData(const PresetsEventData &presets);
+    esp_err_t getPresetsData(PresetsEventData &presets);
 
 private:
-    nvs_handle_t nvs_handle;
-    const char *namespace_name;
-    TaskHandle_t taskHandle_;
-    QueueHandle_t eventQueue_;
+    nvs_handle_t configuration_nvs_handle;
+    nvs_handle_t presets_nvs_handle;
+    const char *configuration_namespace_name;
+    const char *presets_namespace_name;
 
-    static void taskEntry(void *param);
+    void taskEntry(void *param) override;
     void taskLoop();
 };
 
