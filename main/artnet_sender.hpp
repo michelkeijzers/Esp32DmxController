@@ -16,8 +16,9 @@ extern "C"
 #include <freertos/task.h>
 #include <freertos/queue.h>
 }
+#include "rtos_task.hpp"
 
-class ArtNetSender
+class ArtNetSender : RtosTask
 {
 public:
     struct ArtNetHeader
@@ -39,7 +40,6 @@ public:
 
     enum EventType
     {
-        SEND_UNIVERSE,
         SEND_UNIVERSES
     };
 
@@ -50,16 +50,10 @@ public:
         {
             struct
             {
-                uint16_t universe;
-                const uint8_t *data;
-                uint16_t length;
-            } single;
-            struct
-            {
-                const uint8_t *universe1_data;
-                uint16_t len1;
-                const uint8_t *universe2_data;
-                uint16_t len2;
+                const uint8_t *universe_1_data;
+                uint16_t len_1;
+                const uint8_t *universe_2_data;
+                uint16_t len_2;
             } multi;
         } payload;
     };
@@ -69,25 +63,18 @@ public:
 
     esp_err_t init(const char *dest_ip, uint16_t dest_port = ARTNET_PORT);
 
-    // Post a send event to the task
-    void postSendEvent(const SendEvent &event);
-
     void close();
 
-    esp_err_t sendUniverses(const uint8_t *universe1_data, uint16_t len1,
-                            const uint8_t *universe2_data, uint16_t len2);
     esp_err_t sendUniverse(uint16_t universe, const uint8_t *data, uint16_t length);
+    esp_err_t sendUniverses(const uint8_t *universe_1_data, uint16_t len_1,
+                            const uint8_t *universe_2_data, uint16_t len_2);
 
 private:
     int sockfd_;
     struct sockaddr_in dest_addr_;
-    bool initialized_;
     uint8_t sequence_counter_;
 
-    TaskHandle_t taskHandle_;
-    QueueHandle_t eventQueue_;
-
-    static void taskEntry(void *param);
+    void taskEntry(void *param) override;
     void taskLoop();
 
     void createDmxPacket(ArtNetDmxPacket &packet, uint16_t universe,
