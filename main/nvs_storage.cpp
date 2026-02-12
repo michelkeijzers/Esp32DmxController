@@ -2,45 +2,53 @@
 #include <esp_log.h>
 #include <cstring>
 
-static const char *TAG = "NVSStorage";
+static const char *LOG_TAG = "NVSStorage";
+static const int QUEUE_CAPACITY = 10;
+static const int TASK_PRIORITY = 5;
 
-NVSStorage::NVSStorage(const char *ns) : nvs_handle(0), namespace_name(ns),
-                                         taskHandle_(nullptr), eventQueue_(nullptr)
+NVSStorage::NVSStorage()
+    : RtosTask(),
+      configuration_nvs_handle(0),
+      presets_nvs_handle(0),
+      configuration_namespace_name("configuration"),
+      presets_namespace_name("presets")
 {
-    eventQueue_ = xQueueCreate(4, sizeof(NvsEvent));
-    if (eventQueue_)
-    {
-        xTaskCreate(taskEntry, "NVSStorageTask", 4096, this, 5, &taskHandle_);
-        ESP_LOGI(TAG, "NVSStorage task started");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to create NVSStorage event queue");
-    }
 }
 
 NVSStorage::~NVSStorage()
 {
-    if (taskHandle_)
+    if (configuration_nvs_handle != 0)
     {
-        vTaskDelete(taskHandle_);
+        nvs_close(configuration_nvs_handle);
     }
-    if (eventQueue_)
+
+    if (presets_nvs_handle != 0)
     {
-        vQueueDelete(eventQueue_);
-    }
-    if (nvs_handle != 0)
-    {
-        nvs_close(nvs_handle);
+        nvs_close(presets_nvs_handle);
     }
 }
 
-void NVSStorage::postEvent(const NvsEvent &event)
+esp_err_t NVSStorage::init()
 {
-    if (eventQueue_)
+    if (RtosTask::init("NVSStorageTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event)) != ESP_OK)
     {
-        xQueueSend(eventQueue_, &event, 0);
+        ESP_LOGE(LOG_TAG, "Failed to initialize NVSStorageTask");
+        return ESP_FAIL;
     }
+
+    esp_err_t err = nvs_open(configuration_namespace_name, NVS_READWRITE, &configuration_nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to open configuration NVS namespace: %s", esp_err_to_name(err));
+    }
+
+    err = nvs_open(presets_namespace_name, NVS_READWRITE, &presets_nvs_handle);
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to open presets NVS namespace: %s", esp_err_to_name(err));
+    }
+
+    return err;
 }
 
 void NVSStorage::taskEntry(void *param)
@@ -50,155 +58,146 @@ void NVSStorage::taskEntry(void *param)
 
 void NVSStorage::taskLoop()
 {
-    NvsEvent event;
+    Event event;
     while (true)
     {
         if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
         {
-            // Implement event handling logic here as needed
-            // For now, just log the event type
-            ESP_LOGI(TAG, "NVSStorage event received: %d", event.type);
+            ESP_LOGI(LOG_TAG, "NVSStorage event received: %d", event.type);
+            switch (event.type)
+            {
+            case STORE_CONFIGURATION:
+                storeConfiguration(event.data.configurationData);
+                break;
+
+            case GET_CONFIGURATION:
+                getConfiguration(event.data.configurationData);
+                break;
+
+            case STORE_PRESETS:
+                storePresetsData(event.data.presetsData);
+                break;
+
+            case GET_PRESETS:
+                getPresetsData(event.data.presetsData);
+                break;
+
+            default:
+                ESP_LOGW(LOG_TAG, "Unknown NVSStorage event type: %d", event.type);
+                break;
+            }
         }
     }
 }
 
-esp_err_t NVSStorage::init()
+esp_err_t NVSStorage::storeConfiguration(const ConfigurationEventData &configurationData)
 {
-    esp_err_t err = nvs_open(namespace_name, NVS_READWRITE, &nvs_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to open NVS namespace: %s", esp_err_to_name(err));
-    }
-    return err;
-}
-
-esp_err_t NVSStorage::storeString(const char *key, const char *value)
-{
-    if (!nvs_handle)
+    if (!configuration_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    esp_err_t err = nvs_set_str(nvs_handle, key, value);
-    if (err == ESP_OK)
+    if (nvs_set_u8(configuration_nvs_handle, "SwitchPolarityInv", configurationData.switch_polarity_inverted) != ESP_OK)
     {
-        err = nvs_commit(nvs_handle);
+        ESP_LOGE(LOG_TAG, "Failed to set switch polarity inverted");
+        return ESP_FAIL;
     }
-    return err;
+
+    if (nvs_set_u16(configuration_nvs_handle, "LongPressThreshold", configurationData.long_press_threshold_ms) != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to set long press threshold");
+        return ESP_FAIL;
+    }
+
+    if (nvs_commit(configuration_nvs_handle) != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to commit configuration data");
+        return ESP_FAIL;
+    }
+    return ESP_OK;
 }
 
-esp_err_t NVSStorage::getString(const char *key, char *buffer, size_t buffer_size)
+esp_err_t NVSStorage::getConfiguration(ConfigurationEventData &configurationData)
 {
-    if (!nvs_handle)
+    if (!configuration_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    size_t required_size;
-    esp_err_t err = nvs_get_str(nvs_handle, key, NULL, &required_size);
-    if (err != ESP_OK)
-        return err;
-
-    if (required_size > buffer_size)
+    uint8_t switch_polarity_inverted;
+    if (nvs_get_u8(configuration_nvs_handle, "SwitchPolarityInv", &switch_polarity_inverted) != ESP_OK)
     {
-        return ESP_ERR_INVALID_SIZE;
+        ESP_LOGE(LOG_TAG, "Failed to get switch polarity inverted");
+        return ESP_FAIL;
     }
+    configurationData.switch_polarity_inverted = switch_polarity_inverted;
 
-    return nvs_get_str(nvs_handle, key, buffer, &required_size);
+    uint16_t long_press_threshold_ms;
+    if (nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms) != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to get long press threshold");
+        return ESP_FAIL;
+    }
+    configurationData.long_press_threshold_ms = long_press_threshold_ms;
+
+    return ESP_OK;
 }
 
-esp_err_t NVSStorage::storeInt(const char *key, int32_t value)
+esp_err_t NVSStorage::storePresetsData(const PresetsEventData &presetsData)
 {
-    if (!nvs_handle)
+    if (!presets_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    esp_err_t err = nvs_set_i32(nvs_handle, key, value);
-    if (err == ESP_OK)
+    if (nvs_set_u8(presets_nvs_handle, "NumberOfPresets", presetsData.number_of_presets) != ESP_OK)
     {
-        err = nvs_commit(nvs_handle);
+        ESP_LOGE(LOG_TAG, "Failed to set number of presets");
+        return ESP_FAIL;
     }
-    return err;
-}
 
-esp_err_t NVSStorage::getInt(const char *key, int32_t *value)
-{
-    if (!nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-    return nvs_get_i32(nvs_handle, key, value);
-}
-
-esp_err_t NVSStorage::storeBlob(const char *key, const void *data, size_t length)
-{
-    if (!nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-
-    esp_err_t err = nvs_set_blob(nvs_handle, key, data, length);
-    if (err == ESP_OK)
+    for (uint8_t i = 0; i < presetsData.number_of_presets; ++i)
     {
-        err = nvs_commit(nvs_handle);
+        const PresetEventData &preset = presetsData.presets[i];
+        char key[16];
+        snprintf(key, sizeof(key), "Preset%d", i);
+        if (nvs_set_blob(presets_nvs_handle, key, &preset, sizeof(PresetEventData)) != ESP_OK)
+        {
+            ESP_LOGE(LOG_TAG, "Failed to set preset %d", i);
+            return ESP_FAIL;
+        }
     }
-    return err;
+
+    if (nvs_commit(presets_nvs_handle) != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to commit presets data");
+        return ESP_FAIL;
+    }
+    return ESP_OK;
 }
 
-esp_err_t NVSStorage::getBlob(const char *key, void *buffer, size_t buffer_size, size_t *length)
+esp_err_t NVSStorage::getPresetsData(PresetsEventData &presetsData)
 {
-    if (!nvs_handle)
+    if (!presets_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    esp_err_t err = nvs_get_blob(nvs_handle, key, NULL, length);
-    if (err != ESP_OK)
-        return err;
-
-    if (*length > buffer_size)
+    uint8_t number_of_presets;
+    if (nvs_get_u8(presets_nvs_handle, "NumberOfPresets", &number_of_presets) != ESP_OK)
     {
-        return ESP_ERR_INVALID_SIZE;
+        ESP_LOGE(LOG_TAG, "Failed to get number of presets");
+        return ESP_FAIL;
     }
 
-    return nvs_get_blob(nvs_handle, key, buffer, length);
-}
+    presetsData.number_of_presets = number_of_presets;
 
-esp_err_t NVSStorage::eraseKey(const char *key)
-{
-    if (!nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-
-    esp_err_t err = nvs_erase_key(nvs_handle, key);
-    if (err == ESP_OK)
+    for (uint8_t i = 0; i < number_of_presets; ++i)
     {
-        err = nvs_commit(nvs_handle);
+        char key[16];
+        snprintf(key, sizeof(key), "Preset%d", i);
+        PresetEventData &preset = presetsData.presets[i];
+        size_t length = sizeof(PresetEventData); // Length is not used in this case since we expect a fixed size blob
+        esp_err_t err = nvs_get_blob(presets_nvs_handle, key, &preset, &length);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(LOG_TAG, "Failed to get preset %d", i);
+            return err;
+        }
+        presetsData.presets[i] = preset;
     }
-    return err;
-}
 
-esp_err_t NVSStorage::eraseAll()
-{
-    if (!nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-
-    esp_err_t err = nvs_erase_all(nvs_handle);
-    if (err == ESP_OK)
-    {
-        err = nvs_commit(nvs_handle);
-    }
-    return err;
-}
-
-esp_err_t NVSStorage::keyExists(const char *key, bool *exists)
-{
-    if (!nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-
-    *exists = false;
-    size_t required_size = 0;
-    esp_err_t err = nvs_get_str(nvs_handle, key, NULL, &required_size);
-    if (err == ESP_OK)
-    {
-        *exists = true;
-    }
-    else if (err == ESP_ERR_NVS_NOT_FOUND)
-    {
-        err = ESP_OK; // Key doesn't exist, but that's not an error
-    }
-    return err;
-}
-
-esp_err_t NVSStorage::getStats(nvs_stats_t *stats)
-{
-    return nvs_get_stats(NULL, stats);
+    return ESP_OK;
 }
