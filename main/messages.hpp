@@ -1,8 +1,9 @@
 #pragma once
 
-#include "dmx_presets.hpp"
 class Messages {
   public:
+    static const uint8_t MAX_NR_OF_PRESETS = 20;
+
     enum EventType {
         REQUEST_CONFIGURATION,
         CONFIGURATION_RESPONSE,
@@ -20,6 +21,7 @@ class Messages {
     };
 
     struct PresetEventData {
+        const char *name;
         uint8_t universe_1_data[512];
         uint16_t universe_1_length;
         uint8_t universe_2_data[512];
@@ -27,7 +29,7 @@ class Messages {
     };
     struct PresetsEventData {
         uint8_t number_of_presets;
-        PresetEventData presets[DmxPresets::MAX_NR_OF_PRESETS];
+        PresetEventData presets[MAX_NR_OF_PRESETS];
     };
 
     struct Event {

@@ -12,16 +12,11 @@ extern "C" {
 #include <freertos/task.h>
 }
 #include "dmx_presets.hpp"
+#include "messages.hpp"
 #include "rtos_task.hpp"
 
 class DmxPresetChanger : public RtosTask {
   public:
-    enum EventType { PREVIOUS_PRESET, NEXT_PRESET };
-
-    struct Event {
-        EventType type;
-    };
-
     DmxPresetChanger();
     ~DmxPresetChanger();
 
@@ -32,4 +27,6 @@ class DmxPresetChanger : public RtosTask {
 
     void taskEntry(void *param) override;
     void taskLoop();
+
+    void setPresets(const Messages::PresetsEventData &presetsData);
 };

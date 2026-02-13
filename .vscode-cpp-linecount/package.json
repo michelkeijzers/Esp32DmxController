@@ -1,0 +1,22 @@
+{
+  "name": "cpp-linecount-button",
+  "displayName": "CPP Linecount Button",
+  "description": "Adds a status bar button to count lines in all .cpp/.hpp files in main/ and show the result.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": ">=1.70.0"
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cppLinecount.showLineCounts",
+        "title": "Show CPP/HPP Line Counts"
+      }
+    ]
+  },
+  "categories": ["Other"]
+}

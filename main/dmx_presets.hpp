@@ -9,8 +9,6 @@
 
 class DmxPresets {
   public:
-    static const uint8_t MAX_NR_OF_PRESETS = 20;
-
     // Constructor
     DmxPresets();
 
@@ -19,6 +17,8 @@ class DmxPresets {
 
     // Set number of presets (2-20)
     esp_err_t setNumPresets(uint8_t numPresets);
+    esp_err_t addPreset(const char *name, uint16_t universe_1_length, const uint8_t *universe_1_data,
+        uint16_t universe_2_length, const uint8_t *universe_2_data);
 
     // Get number of presets
     uint8_t getNumPresets() const { return numPresets_; }
@@ -29,12 +29,6 @@ class DmxPresets {
 
     // Set preset data
     esp_err_t setPreset(uint8_t index, const DmxPreset &preset);
-
-    // Save all presets to NVRAM
-    esp_err_t saveToNVRAM();
-
-    // Load all presets from NVRAM
-    esp_err_t loadFromNVRAM();
 
     // Clear all presets
     void clearAll();
@@ -56,7 +50,5 @@ class DmxPresets {
     uint8_t currentPresetIndex_;
     std::vector<DmxPreset> presets_;
 
-    // NVRAM keys
-    static const char *NVS_KEY_NUM_PRESETS;
-    static const char *NVS_KEY_CURRENT_PRESET;
+
 };

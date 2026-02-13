@@ -77,13 +77,13 @@ DmxController -> FootSwitch : init()
 DmxController -> NvsStorage : NvsStorage()
 DmxController -> NvsStorage : init()
 
-DmxController -> NvsStorage : GET_CONFIGURATION message
-NvsStorage -> DmxController : UPDATE_CONFIGURATION message
-DmxController -> FootSwitch : UPDATE_CONFIGURATION message (all foot switch config parameters)
+DmxController -> NvsStorage : REQUEST_CONFIGURATION message
+NvsStorage -> DmxController : CONFIGURATION_RESPONSE
+DmxController -> FootSwitch : SET_CONFIGURATION message
 
-DmxController -> NvsStorage : GET_PRESETS message 
-NvsStorage -> DmxController : UPDATE_PRESETS message
-DmxController -> DmxPresetChanger : UPDATE_PRESETS (all preset data)
+DmxController -> NvsStorage : REQUEST_PRESETS message 
+NvsStorage -> DmxController : PRESETS_RESPONSE
+DmxController -> DmxPresetChanger : SET_PRESETS message
 
 
 
@@ -96,12 +96,12 @@ Main -> DmxController : taskLoop()
 
 title Message Queues Next/Prev Preset
 
-FootSwitch --> DmxController : Next/Previous Preset 
-DmxController --> DmxPresetChanger : Next/Previous Preset
-DmxPresetChanger --> DmxController : Preset to Send <nr, data>
-DmxController --> ArtNetSender : Send DMX Data <nr>
-ArtNetSender --> DmxController : DMX Data Sent <nr>
-DmxController --> SevenSegmentDisplay : Update Display <nr>
+FootSwitch --> DmxController : USER_NEXT_PRESET / USER_PREVIOUS_PRESET
+DmxController --> DmxPresetChanger : SELECT_NEXT_PRESET / SELECT_PREVIOUS_PRESET    
+DmxPresetChanger --> DmxController : USE_PRESET_DATA (preset index + data)
+DmxController --> ArtNetSender : SEND_PRESET_DATA (preset data)
+ArtNetSender --> DmxController : SEND_PRESET_DATA_RESPONSE (ok/nok)
+DmxController --> SevenSegmentDisplay : SHOW_PRESET_INDEX (only index used)
 
 @enduml
 

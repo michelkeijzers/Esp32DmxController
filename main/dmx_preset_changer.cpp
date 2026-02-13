@@ -1,4 +1,5 @@
 #include "dmx_preset_changer.hpp"
+#include "messages.hpp"
 #include <esp_log.h>
 
 static const char *LOG_TAG = "DmxPresetChanger";
@@ -10,7 +11,7 @@ DmxPresetChanger::DmxPresetChanger() : RtosTask() {}
 DmxPresetChanger::~DmxPresetChanger() {}
 
 esp_err_t DmxPresetChanger::init(QueueHandle_t dmxControllerEventQueue) {
-    if (RtosTask::init("DmxPresetChangerTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event),
+    if (RtosTask::init("DmxPresetChangerTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
             dmxControllerEventQueue) != ESP_OK) {
         ESP_LOGE(LOG_TAG, "Failed to initialize DmxPresetChangerTask");
         return ESP_FAIL;
@@ -23,17 +24,28 @@ esp_err_t DmxPresetChanger::init(QueueHandle_t dmxControllerEventQueue) {
 void DmxPresetChanger::taskEntry(void *param) { static_cast<DmxPresetChanger *>(param)->taskLoop(); }
 
 void DmxPresetChanger::taskLoop() {
-    EventType event;
+    Messages::Event event;
     while (true) {
         if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE) {
-            switch (event) {
-            case PREVIOUS_PRESET:
-                // TODO
+            switch (event.type) {
+            case Messages::EventType::SET_PRESETS:
+                setPresets(event.data.presetsData);
                 break;
-            case NEXT_PRESET:
-                // TODO
+
+            default:
+                // Ignore other events
                 break;
             }
         }
     }
+}
+
+void DmxPresetChanger::setPresets(const Messages::PresetsEventData &presetsData) {
+    dmxPresets_.clearAll();
+    for (size_t i = 0; i < presetsData.number_of_presets; ++i) {
+        dmxPresets_.addPreset(presetsData.presets[i].name, presetsData.presets[i].universe_1_length,
+            presetsData.presets[i].universe_1_data, presetsData.presets[i].universe_2_length,
+            presetsData.presets[i].universe_2_data);
+    }
+    ESP_LOGI(LOG_TAG, "Presets updated: number_of_presets=%d", dmxPresets_.getNumPresets());
 }
