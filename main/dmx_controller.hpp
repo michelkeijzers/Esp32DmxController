@@ -18,7 +18,8 @@
 #include <freertos/timers.h>
 #include <stdio.h>
 
-class DmxController : public RtosTask {
+class DmxController : public RtosTask
+{
   public:
     DmxController();
     ~DmxController();
@@ -46,6 +47,7 @@ class DmxController : public RtosTask {
     ArtNetSender *artnetSender = nullptr;
     WebServer *webServer = nullptr;
     NvsStorage *nvsStorage = nullptr;
+
     TickType_t bootTime = 0;
 
     void taskEntry(void *param) override;
