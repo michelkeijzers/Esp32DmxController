@@ -16,18 +16,16 @@
 #include "artnet_sender.hpp"
 #include "web_server.hpp"
 #include "rtos_task.hpp"
+#include "nvs_storage.hpp"
 
-class DmxController : RtosTask
+class DmxController : public RtosTask
 {
 public:
-    struct DmxControllerEvent
-    {
-        // TODO Config, Prev preset, next preset etc
-    };
-
     DmxController();
     ~DmxController();
     esp_err_t init();
+    esp_err_t init_sub_tasks();
+    esp_err_t init_messages();
     void taskLoop();
     esp_err_t performOtaUpdate(const char *url);
     void printFirmwareInfo();
@@ -45,11 +43,11 @@ private:
 
     DmxPresetChanger *presetChanger = nullptr;
     OSCSender *oscSender = nullptr;
-    DmxPresets *dmxPresets = nullptr;
     SevenSegmentDisplay *display = nullptr;
     FootSwitch *footSwitch = nullptr;
     ArtNetSender *artnetSender = nullptr;
     WebServer *webServer = nullptr;
+    NvsStorage *nvsStorage = nullptr;
     TickType_t bootTime = 0;
 
     void taskEntry(void *param) override;

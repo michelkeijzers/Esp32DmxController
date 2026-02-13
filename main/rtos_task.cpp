@@ -1,51 +1,35 @@
 #include "rtos_task.hpp"
 #include "esp_log.h"
 
-RtosTask::RtosTask()
-    : taskHandle_(nullptr),
-      eventQueue_(nullptr),
-      initialized_(false)
-{
-}
+RtosTask::RtosTask() : taskHandle_(nullptr), eventQueue_(nullptr), initialized_(false) {}
 
-RtosTask::~RtosTask()
-{
-    if (taskHandle_)
-    {
+RtosTask::~RtosTask() {
+    if (taskHandle_) {
         vTaskDelete(taskHandle_);
     }
-    if (eventQueue_)
-    {
+    if (eventQueue_) {
         vQueueDelete(eventQueue_);
     }
 }
 
-esp_err_t RtosTask::init(const char *taskName, uint32_t stackSize, UBaseType_t priority, size_t queueCapacity, size_t queueItemSize)
-{
+esp_err_t RtosTask::init(const char *taskName, uint32_t stackSize, UBaseType_t priority, size_t queueCapacity,
+    size_t queueItemSize, QueueHandle_t &dmxControllerEventQueue) {
     taskName_ = taskName;
+    dmxControllerEventQueue_ = dmxControllerEventQueue;
 
     eventQueue_ = xQueueCreate(queueCapacity, queueItemSize);
-    if (!eventQueue_)
-    {
+    if (!eventQueue_) {
         ESP_LOGI(taskName_, "Event queue creation successfully");
-    }
-    else
-    {
+    } else {
         ESP_LOGE(taskName_, "Failed to create event queue");
     }
 
     // Static entry wrapper
-    auto entry = [](void *param)
-    {
-        static_cast<RtosTask *>(param)->taskEntry(param);
-    };
+    auto entry = [](void *param) { static_cast<RtosTask *>(param)->taskEntry(param); };
 
-    if (xTaskCreate(entry, taskName, stackSize, this, priority, &taskHandle_) == pdPASS)
-    {
+    if (xTaskCreate(entry, taskName, stackSize, this, priority, &taskHandle_) == pdPASS) {
         ESP_LOGI(taskName, "Task created successfully");
-    }
-    else
-    {
+    } else {
         ESP_LOGE(taskName, "Failed to create task");
         vQueueDelete(eventQueue_);
         eventQueue_ = nullptr;

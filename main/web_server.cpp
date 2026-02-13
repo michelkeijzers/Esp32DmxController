@@ -211,9 +211,8 @@ class DMXController {
 const app = new DMXController();
 )js";
 
-WebServer::WebServer(DmxPresets *dmxPresets)
-    : server_(nullptr), dmxPresets_(dmxPresets), initialized_(false),
-      taskHandle_(nullptr), eventQueue_(nullptr)
+WebServer::WebServer()
+    : server_(nullptr)
 {
     instance_ = this;
     eventQueue_ = xQueueCreate(4, sizeof(WebServerEvent));
@@ -563,6 +562,7 @@ esp_err_t WebServer::send_error_response(httpd_req_t *req, int status, const cha
 
 std::string WebServer::presets_to_json()
 {
+    DmxPresets *dmxPresets_ = nullptr; // TODO: Set somewhere
     if (!dmxPresets_)
     {
         return "[]";
@@ -617,6 +617,7 @@ std::string WebServer::presets_to_json()
 
 esp_err_t WebServer::json_to_presets(const char *json)
 {
+    DmxPresets *dmxPresets_ = nullptr; // TODO: Set somewhere
     if (!dmxPresets_ || !json)
     {
         return ESP_ERR_INVALID_ARG;

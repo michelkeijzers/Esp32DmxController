@@ -1,41 +1,28 @@
 #pragma once
 
+#include "rtos_task.hpp"
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
-#include "rtos_task.hpp"
 
-enum InterruptEventType
-{
-    PRESS,
-    RELEASE
-};
+enum InterruptEventType { PRESS, RELEASE };
 
-class FootSwitch : RtosTask
-{
-public:
-    struct InterruptEvent
-    {
+class FootSwitch : public RtosTask {
+  public:
+    struct InterruptEvent {
         InterruptEventType type;
     };
 
-    struct Event
-    {
+    struct Event {
         // TODO: configuring long press threshold, polarity etc
     };
 
-    enum class State
-    {
-        BOOT,
-        OTA_CHECK,
-        OTA,
-        NORMAL_OPERATION
-    };
+    enum class State { BOOT, OTA_CHECK, OTA, NORMAL_OPERATION };
 
     FootSwitch();
     ~FootSwitch();
 
-    esp_err_t init(gpio_num_t pinNum);
+    esp_err_t init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pinNum);
 
     uint16_t getLongPressThresholdMs();
     bool getPolarityInverted();
@@ -44,7 +31,7 @@ public:
 
     gpio_num_t getPin() const { return _pin; }
 
-private:
+  private:
     gpio_num_t _pin;
 
     bool lastPinState;

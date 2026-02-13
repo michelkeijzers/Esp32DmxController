@@ -26,20 +26,18 @@ public:
         EventType type;
     };
 
-    WebServer(DmxPresets *dmxPresets = nullptr);
+    WebServer();
     ~WebServer();
 
     esp_err_t init();
     esp_err_t start();
     esp_err_t stop();
-    void setDmxPresets(DmxPresets *dmxPresets) { dmxPresets_ = dmxPresets; }
 
     // Post an event to the web server task
     void postEvent(const WebServerEvent &event);
 
 private:
     httpd_handle_t server_;
-    DmxPresets *dmxPresets_;
     bool initialized_;
 
     TaskHandle_t taskHandle_;

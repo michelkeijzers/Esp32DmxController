@@ -4,20 +4,18 @@
 // Controls a single digit 7-segment display with decimal point
 // 8 segments total: A, B, C, D, E, F, G, DP
 
-#include <stdint.h>
-#include <esp_err.h>
-#include <driver/gpio.h>
 #include "rtos_task.hpp"
+#include <driver/gpio.h>
+#include <esp_err.h>
+#include <stdint.h>
 
 #include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 #include <freertos/queue.h>
+#include <freertos/task.h>
 
-class SevenSegmentDisplay : public RtosTask
-{
-public:
-    struct Event
-    {
+class SevenSegmentDisplay : public RtosTask {
+  public:
+    struct Event {
         char character;
         bool dot;
     };
@@ -25,20 +23,10 @@ public:
     SevenSegmentDisplay();
     ~SevenSegmentDisplay();
 
-    esp_err_t init(const gpio_num_t pins[8]);
+    esp_err_t init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8]);
 
-private:
-    enum Segment
-    {
-        SEG_A = 0,
-        SEG_B,
-        SEG_C,
-        SEG_D,
-        SEG_E,
-        SEG_F,
-        SEG_G,
-        SEG_DP
-    };
+  private:
+    enum Segment { SEG_A = 0, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G, SEG_DP };
     gpio_num_t segmentPins_[8];
     uint8_t currentPattern_;
     bool decimalPointOn_;

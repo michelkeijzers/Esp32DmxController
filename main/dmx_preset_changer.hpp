@@ -1,40 +1,33 @@
 #pragma once
 
-#include <stdio.h>
-#include "osc_sender.hpp"
-#include "dmx_presets.hpp"
-#include "seven_segment_display.hpp"
 #include "artnet_sender.hpp"
-
-extern "C"
-{
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <freertos/queue.h>
-}
-#include "rtos_task.hpp"
 #include "dmx_presets.hpp"
+#include "osc_sender.hpp"
+#include "seven_segment_display.hpp"
+#include <stdio.h>
 
-class DmxPresetChanger : RtosTask
-{
-public:
-    enum EventType
-    {
-        PREVIOUS_PRESET,
-        NEXT_PRESET
-    };
+extern "C" {
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
+#include <freertos/task.h>
+}
+#include "dmx_presets.hpp"
+#include "rtos_task.hpp"
 
-    struct Event
-    {
+class DmxPresetChanger : public RtosTask {
+  public:
+    enum EventType { PREVIOUS_PRESET, NEXT_PRESET };
+
+    struct Event {
         EventType type;
     };
 
     DmxPresetChanger();
     ~DmxPresetChanger();
 
-    esp_err_t init();
+    esp_err_t init(QueueHandle_t dmxControllerEventQueue);
 
-private:
+  private:
     DmxPresets dmxPresets_;
 
     void taskEntry(void *param) override;

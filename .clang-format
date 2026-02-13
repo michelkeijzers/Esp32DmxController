@@ -1,0 +1,8 @@
+AlignAfterOPenBracket: false
+
+IndentWidth: 4
+BasedOnStyle: LLVM
+ContinuationIndentWidth: 4
+AlignAfterOpenBracket: false
+"C_Cpp.clang_format_style": "file"
+ColumnLimit: 120
