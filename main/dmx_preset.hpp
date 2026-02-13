@@ -1,16 +1,14 @@
 #pragma once
 
+#include "dmx_preset.hpp"
+#include <cstring>
 #include <stdint.h>
 #include <string>
-#include <cstring>
-
 // DMX Universe size
 const uint16_t DMX_UNIVERSE_SIZE = 512;
-const uint8_t MAX_NR_OF_PRESETS = 20;
 
-class DmxPreset
-{
-public:
+class DmxPreset {
+  public:
     // Constructor
     DmxPreset();
 
@@ -32,7 +30,7 @@ public:
     // Copy from another preset
     void copyFrom(const DmxPreset &other);
 
-private:
+  private:
     char name_[32];                        // Preset name (max 31 chars + null)
     uint8_t universe1_[DMX_UNIVERSE_SIZE]; // Universe 1 data (512 channels)
     uint8_t universe2_[DMX_UNIVERSE_SIZE]; // Universe 2 data (512 channels)

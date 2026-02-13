@@ -1,4 +1,5 @@
 #include "foot_switch.hpp"
+#include "messages.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -26,15 +27,15 @@ static const int QUEUE_CAPACITY = 10;
 static const int TASK_PRIORITY = 5;
 
 FootSwitch::FootSwitch()
-    : RtosTask(), _pin(GPIO_NUM_NC), lastPinState(false), pressStartTime(0),
-      longPressTimeMs(1000), // Default long press time
-      polarityInverted(false), longPressThresholdMs(1000), state_(State::BOOT) {}
+    : RtosTask(), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
+      longPressTimeMs_(1000), // Default long press time
+      polarityInverted_(false), longPressThresholdMs_(1000), state_(State::BOOT) {}
 
 FootSwitch::~FootSwitch() {}
 
 esp_err_t FootSwitch::init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pinNum) {
-    if (RtosTask::init("FootSwitchTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event), dmxControllerEventQueue) !=
-        ESP_OK) {
+    if (RtosTask::init("FootSwitchTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
+            dmxControllerEventQueue) != ESP_OK) {
         ESP_LOGE(LOG_TAG, "Failed to initialize FootSwitchTask");
         return ESP_FAIL;
     }
@@ -51,10 +52,10 @@ esp_err_t FootSwitch::init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pin
     }
     // Read initial state of the pin and set lastPinState accordingly
     int initialLevel = gpio_get_level(pinNum);
-    lastPinState = (initialLevel == 0);
-    state_ = lastPinState ? State::OTA_CHECK : State::NORMAL_OPERATION;
+    lastPinState_ = (initialLevel == 0);
+    state_ = lastPinState_ ? State::OTA_CHECK : State::NORMAL_OPERATION;
 
-    _pin = pinNum;
+    pin_ = pinNum;
     interrupt_event_queue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
     if (interrupt_event_queue == nullptr) {
         ESP_LOGE(LOG_TAG, "Failed to create foot switch interrupt event queue");
@@ -66,7 +67,7 @@ esp_err_t FootSwitch::init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pin
         return ESP_FAIL;
     }
 
-    if (gpio_isr_handler_add(_pin, isr_handler, this) != ESP_OK) {
+    if (gpio_isr_handler_add(pin_, isr_handler, this) != ESP_OK) {
         ESP_LOGE(LOG_TAG, "Failed to add GPIO ISR handler");
         return ESP_FAIL;
     }
@@ -96,12 +97,12 @@ void FootSwitch::taskLoop() {
                     lastStableState = currentState;
                     if (debouncedState) {
                         // Debouncing finished: switch pressed
-                        pressStartTime = xTaskGetTickCount();
+                        pressStartTime_ = xTaskGetTickCount();
                     } else {
                         // Debouncing finished: switch released
                         TickType_t now = xTaskGetTickCount();
-                        TickType_t elapsedMs = (now - pressStartTime) * portTICK_PERIOD_MS;
-                        if (elapsedMs >= longPressThresholdMs) {
+                        TickType_t elapsedMs = (now - pressStartTime_) * portTICK_PERIOD_MS;
+                        if (elapsedMs >= longPressThresholdMs_) {
                             ESP_LOGI(LOG_TAG, "Long press detected: %lu ms", elapsedMs);
                             bool legal = HandleLongPress();
                             if (!legal) {
@@ -114,6 +115,18 @@ void FootSwitch::taskLoop() {
                         }
                     }
                 }
+            }
+        }
+
+        Messages::Event event;
+        if (xQueueReceive(getEventQueue(), &event, 0) == pdTRUE) {
+            if (event.type == Messages::EventType::SET_CONFIGURATION) {
+                polarityInverted_ = event.data.configurationData.switch_polarity_inverted;
+                longPressThresholdMs_ = event.data.configurationData.long_press_threshold_ms;
+                ESP_LOGI(LOG_TAG, "Configuration updated: polarityInverted=%d, longPressThresholdMs=%d",
+                    polarityInverted_, longPressThresholdMs_);
+            } else {
+                ESP_LOGW(LOG_TAG, "Unknown event type received in FootSwitch: %d", event.type);
             }
         }
         vTaskDelay(pdMS_TO_TICKS(10));

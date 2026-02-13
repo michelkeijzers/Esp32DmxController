@@ -1,10 +1,9 @@
 #pragma once
 
-class Messages
-{
-public:
-    enum EventType
-    {
+#include "dmx_presets.hpp"
+class Messages {
+  public:
+    enum EventType {
         REQUEST_CONFIGURATION,
         CONFIGURATION_RESPONSE,
         SET_CONFIGURATION,
@@ -15,30 +14,25 @@ public:
         SET_PRESETS_RESPONSE
     };
 
-    struct ConfigurationEventData
-    {
+    struct ConfigurationEventData {
         bool switch_polarity_inverted;
         uint16_t long_press_threshold_ms;
     };
 
-    struct PresetEventData
-    {
+    struct PresetEventData {
         uint8_t universe_1_data[512];
         uint16_t universe_1_length;
         uint8_t universe_2_data[512];
         uint16_t universe_2_length;
     };
-    struct PresetsEventData
-    {
+    struct PresetsEventData {
         uint8_t number_of_presets;
-        PresetEventData presets[MAX_NR_OF_PRESETS];
+        PresetEventData presets[DmxPresets::MAX_NR_OF_PRESETS];
     };
 
-    struct Event
-    {
+    struct Event {
         EventType type;
-        union
-        {
+        union {
             ConfigurationEventData configurationData;
             PresetsEventData presetsData;
         } data;

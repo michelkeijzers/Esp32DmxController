@@ -125,17 +125,52 @@ esp_err_t DmxController::init_messages() {
     Messages::Event event = Messages::Event();
     event.type = Messages::REQUEST_CONFIGURATION;
     if (xQueueSend(nvsStorage->getEventQueue(), &event, 0) != pdPASS) {
-        ESP_LOGE(LOG_TAG, "Failed to send config request to NvsStorage");
+        ESP_LOGE(LOG_TAG, "Failed to send configuration request to NvsStorage");
         return ESP_FAIL;
     }
 
     // Receive config response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE) {
-        ESP_LOGE(LOG_TAG, "Failed to receive config response from NvsStorage");
+        ESP_LOGE(LOG_TAG, "Failed to receive configuration response from NvsStorage");
         return ESP_FAIL;
     }
     if (event.type != Messages::EventType::CONFIGURATION_RESPONSE) {
+        ESP_LOGE(LOG_TAG, "Received unexpected configuration event type from NvsStorage: %d", event.type);
+        return ESP_FAIL;
+    }
+
+    // Send config response to FootSwitch (no response needed)
+    Messages::Event footSwitchEvent = Messages::Event();
+    footSwitchEvent.type = Messages::SET_CONFIGURATION;
+    footSwitchEvent.data.configurationData = event.data.configurationData;
+    if (xQueueSend(footSwitch->getEventQueue(), &footSwitchEvent, 0) != pdPASS) {
+        ESP_LOGE(LOG_TAG, "Failed to send configuration to FootSwitch");
+        return ESP_FAIL;
+    }
+
+    // Send a message to NvsStorage to request presets
+    event.type = Messages::REQUEST_PRESETS;
+    if (xQueueSend(nvsStorage->getEventQueue(), &event, 0) != pdPASS) {
+        ESP_LOGE(LOG_TAG, "Failed to send presets request to NvsStorage");
+        return ESP_FAIL;
+    }
+
+    // Receive presets response (blocking)
+    if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE) {
+        ESP_LOGE(LOG_TAG, "Failed to receive presets response from NvsStorage");
+        return ESP_FAIL;
+    }
+    if (event.type != Messages::EventType::PRESETS_RESPONSE) {
         ESP_LOGE(LOG_TAG, "Received unexpected event type from NvsStorage: %d", event.type);
+        return ESP_FAIL;
+    }
+
+    // Send presets to DmxPresetChanger (no response needed)
+    Messages::Event presetChangerEvent = Messages::Event();
+    presetChangerEvent.type = Messages::SET_PRESETS;
+    presetChangerEvent.data.presetsData = event.data.presetsData;
+    if (xQueueSend(presetChanger->getEventQueue(), &presetChangerEvent, 0) != pdPASS) {
+        ESP_LOGE(LOG_TAG, "Failed to send presets to DmxPresetChanger");
         return ESP_FAIL;
     }
 

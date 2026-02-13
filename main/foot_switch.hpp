@@ -13,10 +13,6 @@ class FootSwitch : public RtosTask {
         InterruptEventType type;
     };
 
-    struct Event {
-        // TODO: configuring long press threshold, polarity etc
-    };
-
     enum class State { BOOT, OTA_CHECK, OTA, NORMAL_OPERATION };
 
     FootSwitch();
@@ -29,16 +25,17 @@ class FootSwitch : public RtosTask {
 
     void taskEntry(void *param) override;
 
-    gpio_num_t getPin() const { return _pin; }
+    gpio_num_t getPin() const { return pin_; }
 
   private:
-    gpio_num_t _pin;
+    gpio_num_t pin_;
 
-    bool lastPinState;
-    TickType_t pressStartTime;
-    uint32_t longPressTimeMs;
-    bool polarityInverted;         // Configuration
-    uint16_t longPressThresholdMs; // Configuration
+    bool lastPinState_;
+    TickType_t pressStartTime_;
+    uint32_t longPressTimeMs_;
+
+    bool polarityInverted_;
+    uint16_t longPressThresholdMs_;
 
     State state_;
 

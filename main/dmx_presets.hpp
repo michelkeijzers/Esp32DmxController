@@ -1,15 +1,16 @@
 #pragma once
 
 #include "dmx_preset.hpp"
-#include <vector>
 #include <esp_err.h>
+#include <vector>
 // Maximum number of presets
 #define MAX_PRESETS 20
 #define MIN_PRESETS 2
 
-class DmxPresets
-{
-public:
+class DmxPresets {
+  public:
+    static const uint8_t MAX_NR_OF_PRESETS = 20;
+
     // Constructor
     DmxPresets();
 
@@ -50,7 +51,7 @@ public:
     // Move to previous preset (with wraparound)
     uint8_t previousPreset();
 
-private:
+  private:
     uint8_t numPresets_;
     uint8_t currentPresetIndex_;
     std::vector<DmxPreset> presets_;
