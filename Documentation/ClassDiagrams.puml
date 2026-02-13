@@ -107,14 +107,16 @@ DmxController --> SevenSegmentDisplay : SHOW_PRESET_INDEX (only index used)
 
 @startuml
 
-title Message Queues Update Presets and Config
+title Webserver Update Config/Presets
 
-WebServer --> DmxController : Update (config, presets)
-DmxController --> NVRAM : Save (config, presets)
-DmxController --> DmxPresetChanger : UpdatePresets (presets)
-DmxController --> FootSwitch : Update Config (config)
-NVRAM --> DmxController : Save Result (ok/nok)
-DmxController --> SevenSegmentDisplay : Show Save Result (ok/nok)
+WebServer --> DmxController : STORE_CONFIG
+DmxController --> NvsStorage : STORE_CONFIG
+NvsStorage --> DmxController : STORE_CONFIG_RESPONSE
+DmxController --> FootSwitch : SET_CONFIGURATION (as Init)
+DmxController --> NvsStorage : STORE_PRESETS
+NvsStorage --> DmxController : STORE_PRESETS_RESPONSE
+DmxController --> DmxController : Continue as in: USE_PRESET_DATA (preset index + data) 
+
 
 @enduml
 
@@ -122,10 +124,12 @@ DmxController --> SevenSegmentDisplay : Show Save Result (ok/nok)
 
 @startuml 
 title OTA Update
-FootSwitch --> DmxController : OTA Request
-DmxController --> OTA : Start OTA Update
-OTA --> DmxController : OTA Update Result (ok/nok)
-DmxController --> SevenSegmentDisplay : Show OTA Result (ok/nok)
+FootSwitch --> DmxController : REQUEST_OTA
+DmxController --> OTA : START_OTA 
+OTA --> DmxController : OTA_FINISHED (ok/nok)
+DmxController --> SevenSegmentDisplay : SHOW_OTA_RESULT
+SevenSegmentDisplay --> DmxController : SHOW_OTA_RESULT_RESPONSE (ok) 
+DmxController --> RTOS: Reset
 
 @enduml 
 

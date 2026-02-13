@@ -3,10 +3,7 @@
 
 static const char *TAG = "DmxPreset";
 
-DmxPreset::DmxPreset()
-{
-    clear();
-}
+DmxPreset::DmxPreset() { clear(); }
 
 void DmxPreset::setName(const char *name)
 {
@@ -21,10 +18,7 @@ void DmxPreset::setName(const char *name)
     }
 }
 
-const char *DmxPreset::getName() const
-{
-    return name_;
-}
+const char *DmxPreset::getName() const { return name_; }
 
 void DmxPreset::setUniverseValue(uint8_t universe, uint16_t channel, uint8_t value)
 {
@@ -58,10 +52,20 @@ uint8_t DmxPreset::getUniverseValue(uint8_t universe, uint16_t channel) const
 
     if (universe == 0)
     {
+        if (channel >= universe1Length_)
+        {
+            ESP_LOGE(TAG, "Channel %d exceeds universe 1 length %d", channel, universe1Length_);
+            return 0;
+        }
         return universe1_[channel];
     }
     else if (universe == 1)
     {
+        if (channel >= universe2Length_)
+        {
+            ESP_LOGE(TAG, "Channel %d exceeds universe 2 length %d", channel, universe2Length_);
+            return 0;
+        }
         return universe2_[channel];
     }
     else
@@ -88,6 +92,7 @@ void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t le
         {
             memset(universe1_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
         }
+        universe1Length_ = length;
     }
     else if (universe == 1)
     {
@@ -96,6 +101,7 @@ void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t le
         {
             memset(universe2_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
         }
+        universe2Length_ = length;
     }
     else
     {
@@ -120,16 +126,38 @@ const uint8_t *DmxPreset::getUniverseData(uint8_t universe) const
     }
 }
 
+uint16_t DmxPreset::getUniverseLength(uint8_t universe) const
+{
+    if (universe == 0)
+    {
+        return universe1Length_;
+    }
+    else if (universe == 1)
+    {
+        return universe2Length_;
+    }
+    else
+    {
+        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
+        return 0;
+    }
+}
+
 void DmxPreset::clear()
 {
     memset(name_, 0, sizeof(name_));
     memset(universe1_, 0, sizeof(universe1_));
+    universe1Length_ = 0;
     memset(universe2_, 0, sizeof(universe2_));
+    universe2Length_ = 0;
 }
 
 void DmxPreset::copyFrom(const DmxPreset &other)
 {
-    strcpy(name_, other.name_);
+    index_ = other.getIndex();
+    memcpy(name_, other.getName(), sizeof(name_));
     memcpy(universe1_, other.universe1_, sizeof(universe1_));
+    universe1Length_ = other.universe1Length_;
     memcpy(universe2_, other.universe2_, sizeof(universe2_));
+    universe2Length_ = other.universe2Length_;
 }

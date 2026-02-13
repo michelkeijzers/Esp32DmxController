@@ -1,11 +1,11 @@
 #include "web_server.hpp"
 #include <esp_log.h>
 
+#include "foot_switch.hpp"
 #include <cJSON.h>
 #include <cstring>
-#include <vector>
 #include <esp_spiffs.h>
-#include "foot_switch.hpp"
+#include <vector>
 
 static const char *TAG = "WebServer";
 
@@ -211,8 +211,7 @@ class DMXController {
 const app = new DMXController();
 )js";
 
-WebServer::WebServer()
-    : server_(nullptr)
+WebServer::WebServer() : server_(nullptr)
 {
     instance_ = this;
     eventQueue_ = xQueueCreate(4, sizeof(WebServerEvent));
@@ -247,10 +246,7 @@ void WebServer::postEvent(const WebServerEvent &event)
     }
 }
 
-void WebServer::taskEntry(void *param)
-{
-    static_cast<WebServer *>(param)->taskLoop();
-}
+void WebServer::taskEntry(void *param) { static_cast<WebServer *>(param)->taskLoop(); }
 
 void WebServer::taskLoop()
 {
@@ -279,10 +275,7 @@ void WebServer::taskLoop()
 void WebServer::init_spiffs()
 {
     esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 8,
-        .format_if_mount_failed = true};
+        .base_path = "/spiffs", .partition_label = NULL, .max_files = 8, .format_if_mount_failed = true};
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
     if (ret != ESP_OK)
     {
@@ -316,46 +309,27 @@ esp_err_t WebServer::init()
     }
 
     // Register URI handlers
-    httpd_uri_t root_uri = {
-        .uri = "/",
-        .method = HTTP_GET,
-        .handler = root_handler,
-        .user_ctx = nullptr};
+    httpd_uri_t root_uri = {.uri = "/", .method = HTTP_GET, .handler = root_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &root_uri);
 
     httpd_uri_t api_presets_uri = {
-        .uri = "/api/presets",
-        .method = HTTP_GET,
-        .handler = api_presets_handler,
-        .user_ctx = nullptr};
+        .uri = "/api/presets", .method = HTTP_GET, .handler = api_presets_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &api_presets_uri);
 
     httpd_uri_t api_presets_post_uri = {
-        .uri = "/api/presets",
-        .method = HTTP_POST,
-        .handler = api_presets_handler,
-        .user_ctx = nullptr};
+        .uri = "/api/presets", .method = HTTP_POST, .handler = api_presets_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &api_presets_post_uri);
 
     httpd_uri_t api_config_uri = {
-        .uri = "/api/config",
-        .method = HTTP_GET,
-        .handler = api_config_handler,
-        .user_ctx = nullptr};
+        .uri = "/api/config", .method = HTTP_GET, .handler = api_config_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &api_config_uri);
 
     httpd_uri_t api_config_post_uri = {
-        .uri = "/api/config",
-        .method = HTTP_POST,
-        .handler = api_config_handler,
-        .user_ctx = nullptr};
+        .uri = "/api/config", .method = HTTP_POST, .handler = api_config_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &api_config_post_uri);
 
     httpd_uri_t static_file_uri = {
-        .uri = "/*",
-        .method = HTTP_GET,
-        .handler = static_file_handler,
-        .user_ctx = nullptr};
+        .uri = "/*", .method = HTTP_GET, .handler = static_file_handler, .user_ctx = nullptr};
     httpd_register_uri_handler(server_, &static_file_uri);
 
     initialized_ = true;
@@ -576,19 +550,18 @@ std::string WebServer::presets_to_json()
 
     for (uint8_t i = 0; i < dmxPresets_->getNumPresets(); i++)
     {
-        const DmxPreset *preset = dmxPresets_->getPreset(i);
-        if (!preset)
-            continue;
+        const DmxPreset &preset = dmxPresets_->getPreset(i);
 
         cJSON *preset_obj = cJSON_CreateObject();
         if (!preset_obj)
             continue;
 
-        cJSON_AddStringToObject(preset_obj, "name", preset->getName());
+        cJSON_AddNumberToObject(preset_obj, "index", preset.getIndex());
+        cJSON_AddStringToObject(preset_obj, "name", preset.getName());
 
         // Universe 1
         cJSON *universe1 = cJSON_CreateArray();
-        const uint8_t *u1_data = preset->getUniverseData(0);
+        const uint8_t *u1_data = preset.getUniverseData(0);
         for (int j = 0; j < DMX_UNIVERSE_SIZE; j++)
         {
             cJSON_AddItemToArray(universe1, cJSON_CreateNumber(u1_data[j]));
@@ -597,7 +570,7 @@ std::string WebServer::presets_to_json()
 
         // Universe 2
         cJSON *universe2 = cJSON_CreateArray();
-        const uint8_t *u2_data = preset->getUniverseData(1);
+        const uint8_t *u2_data = preset.getUniverseData(1);
         for (int j = 0; j < DMX_UNIVERSE_SIZE; j++)
         {
             cJSON_AddItemToArray(universe2, cJSON_CreateNumber(u2_data[j]));
@@ -660,6 +633,12 @@ esp_err_t WebServer::json_to_presets(const char *json)
 
         DmxPreset preset;
 
+        // Index
+        cJSON *index = cJSON_GetObjectItem(preset_obj, "index");
+        if (index && cJSON_IsNumber(index))
+        {
+            preset.setIndex((uint8_t)index->valuedouble);
+        }
         // Name
         cJSON *name = cJSON_GetObjectItem(preset_obj, "name");
         if (name && cJSON_IsString(name))
@@ -725,7 +704,8 @@ std::string WebServer::config_to_json()
         return "{}";
     }
 
-    // TODO const char *polarity_str = (footSwitch->getFootSwitchPolarity() == FootSwitch::NORMAL) ? "NORMAL" : "INVERSE";
+    // TODO const char *polarity_str = (footSwitch->getFootSwitchPolarity() == FootSwitch::NORMAL) ? "NORMAL" :
+    // "INVERSE";
     // TODO cJSON_AddStringToObject(root, "footSwitchPolarity", polarity_str);
     // TODO cJSON_AddNumberToObject(root, "footSwitchLongPressTime", configurator_->getLongPressTimeMs());
 

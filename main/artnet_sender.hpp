@@ -10,42 +10,32 @@
 #define ARTNET_PORT 6454
 #define ARTNET_MAX_UNIVERSES 2
 
-extern "C" {
+extern "C"
+{
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
 }
 #include "rtos_task.hpp"
 
-class ArtNetSender : RtosTask {
+class ArtNetSender : public RtosTask
+{
   public:
-    struct ArtNetHeader {
+    struct ArtNetHeader
+    {
         char id[8];
         uint16_t opcode;
         uint16_t version;
     };
 
-    struct ArtNetDmxPacket {
+    struct ArtNetDmxPacket
+    {
         ArtNetHeader header;
         uint8_t sequence;
         uint8_t physical;
         uint16_t universe;
         uint16_t length;
         uint8_t data[512];
-    };
-
-    enum EventType { SEND_UNIVERSES };
-
-    struct SendEvent {
-        EventType type;
-        union {
-            struct {
-                const uint8_t *universe_1_data;
-                uint16_t len_1;
-                const uint8_t *universe_2_data;
-                uint16_t len_2;
-            } multi;
-        } payload;
     };
 
     ArtNetSender();
