@@ -1,20 +1,20 @@
 #pragma once
-#include <esp_http_server.h>
-#include <esp_err.h>
 #include "dmx_presets.hpp"
-#include <string>
 #include "foot_switch.hpp"
+#include <esp_err.h>
+#include <esp_http_server.h>
+#include <string>
 
 extern "C"
 {
 #include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
 #include <freertos/queue.h>
+#include <freertos/task.h>
 }
 
 class WebServer
 {
-public:
+  public:
     enum EventType
     {
         START_SERVER,
@@ -29,14 +29,14 @@ public:
     WebServer();
     ~WebServer();
 
-    esp_err_t init();
+    virtual esp_err_t init();
     esp_err_t start();
     esp_err_t stop();
 
     // Post an event to the web server task
     void postEvent(const WebServerEvent &event);
 
-private:
+  private:
     httpd_handle_t server_;
     bool initialized_;
 

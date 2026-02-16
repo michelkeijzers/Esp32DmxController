@@ -1,17 +1,17 @@
 #pragma once
 
+#include <esp_err.h>
+#include <lwip/sockets.h>
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <esp_err.h>
-#include <lwip/sockets.h>
 
 // OSC (Open Sound Control) message implementation for ESP32
 // Sends OSC messages over UDP
 
 class OSCSender
 {
-private:
+  private:
     int sockfd;
     struct sockaddr_in dest_addr;
     bool initialized;
@@ -22,12 +22,12 @@ private:
     void writeString(std::vector<uint8_t> &buffer, const char *str);
     void padTo4Bytes(std::vector<uint8_t> &buffer);
 
-public:
+  public:
     OSCSender();
     ~OSCSender();
 
     // Initialize OSC sender with destination IP and port
-    esp_err_t init(const char *dest_ip, uint16_t dest_port);
+    virtual esp_err_t init(const char *dest_ip, uint16_t dest_port);
 
     // Send OSC message with address and single integer value
     esp_err_t sendMessage(const char *address, int32_t value);

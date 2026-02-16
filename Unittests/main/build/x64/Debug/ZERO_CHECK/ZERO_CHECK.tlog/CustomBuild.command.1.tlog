@@ -1,0 +1,10 @@
+^C:\USERS\I4STUDIO\ESP32TEST\UNITTESTS\MAIN\BUILD\CMAKEFILES\888EBED02B428C174DAFF3BF8C3A573D\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Unittests/main -BC:/Users/i4studio/Esp32Test/Unittests/main/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/i4studio/Esp32Test/Unittests/main/build/UnitTests.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

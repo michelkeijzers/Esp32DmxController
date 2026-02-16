@@ -1,3 +1,8 @@
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
 #include "web_server.hpp"
 #include <esp_log.h>
 
@@ -274,8 +279,11 @@ void WebServer::taskLoop()
 
 void WebServer::init_spiffs()
 {
-    esp_vfs_spiffs_conf_t conf = {
-        .base_path = "/spiffs", .partition_label = NULL, .max_files = 8, .format_if_mount_failed = true};
+    esp_vfs_spiffs_conf_t conf;
+    conf.base_path = "/spiffs";
+    conf.partition_label = NULL;
+    conf.max_files = 8;
+    conf.format_if_mount_failed = true;
     esp_err_t ret = esp_vfs_spiffs_register(&conf);
     if (ret != ESP_OK)
     {
@@ -309,27 +317,46 @@ esp_err_t WebServer::init()
     }
 
     // Register URI handlers
-    httpd_uri_t root_uri = {.uri = "/", .method = HTTP_GET, .handler = root_handler, .user_ctx = nullptr};
+    httpd_uri_t root_uri;
+    root_uri.uri = "/";
+    root_uri.method = HTTP_GET;
+    root_uri.handler = root_handler;
+    root_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &root_uri);
 
-    httpd_uri_t api_presets_uri = {
-        .uri = "/api/presets", .method = HTTP_GET, .handler = api_presets_handler, .user_ctx = nullptr};
+    httpd_uri_t api_presets_uri;
+    api_presets_uri.uri = "/api/presets";
+    api_presets_uri.method = HTTP_GET;
+    api_presets_uri.handler = api_presets_handler;
+    api_presets_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_presets_uri);
 
-    httpd_uri_t api_presets_post_uri = {
-        .uri = "/api/presets", .method = HTTP_POST, .handler = api_presets_handler, .user_ctx = nullptr};
+    httpd_uri_t api_presets_post_uri;
+    api_presets_post_uri.uri = "/api/presets";
+    api_presets_post_uri.method = HTTP_POST;
+    api_presets_post_uri.handler = api_presets_handler;
+    api_presets_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_presets_post_uri);
 
-    httpd_uri_t api_config_uri = {
-        .uri = "/api/config", .method = HTTP_GET, .handler = api_config_handler, .user_ctx = nullptr};
+    httpd_uri_t api_config_uri;
+    api_config_uri.uri = "/api/config";
+    api_config_uri.method = HTTP_GET;
+    api_config_uri.handler = api_config_handler;
+    api_config_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_config_uri);
 
-    httpd_uri_t api_config_post_uri = {
-        .uri = "/api/config", .method = HTTP_POST, .handler = api_config_handler, .user_ctx = nullptr};
+    httpd_uri_t api_config_post_uri;
+    api_config_post_uri.uri = "/api/config";
+    api_config_post_uri.method = HTTP_POST;
+    api_config_post_uri.handler = api_config_handler;
+    api_config_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_config_post_uri);
 
-    httpd_uri_t static_file_uri = {
-        .uri = "/*", .method = HTTP_GET, .handler = static_file_handler, .user_ctx = nullptr};
+    httpd_uri_t static_file_uri;
+    static_file_uri.uri = "/*";
+    static_file_uri.method = HTTP_GET;
+    static_file_uri.handler = static_file_handler;
+    static_file_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &static_file_uri);
 
     initialized_ = true;

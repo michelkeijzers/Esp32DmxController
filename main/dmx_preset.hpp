@@ -14,7 +14,7 @@ class DmxPreset
     DmxPreset();
 
     // Set preset name
-    void setIndex(uint16_t index) { index_ = index; }
+    void setIndex(uint16_t index) { index_ = static_cast<uint8_t>(index); }
     uint16_t getIndex() const { return index_; }
 
     void setName(const char *name);

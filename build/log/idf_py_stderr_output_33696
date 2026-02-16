@@ -1,0 +1,5 @@
+Command: cmake -G Ninja -DPYTHON_DEPS_CHECKED=1 -DPYTHON=C:\Espressif\tools\python\v5.5.2\venv\Scripts\python.exe -DESP_PLATFORM=1 -DCCACHE_ENABLE=0 C:\Users\i4studio\Esp32Test
+fatal: bad config line 2 in file C:/esp/v5.5.2/esp-idf/.git/modules/components/bootloader/subproject/components/micro-ecc/micro-ecc/config
+info: Trying to set symbol ESP_SYSTEM_NO_BACKTRACE to n, but it is currently selected by choice ESP_BACKTRACING_METHOD. For setting it to n, set another choice symbol to y instead.
+warning: user value 68 on the int symbol LWIP_DHCP_OPTIONS_LEN (defined at C:/esp/v5.5.2/esp-idf/components/lwip/Kconfig:364) ignored due to being outside the active range ([69, 255]) -- falling back on defaults
+fatal: bad config line 2 in file C:/esp/v5.5.2/esp-idf/.git/modules/components/openthread/openthread/config

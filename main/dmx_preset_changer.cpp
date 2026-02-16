@@ -44,7 +44,7 @@ void DmxPresetChanger::taskLoop()
                 Messages::Event dmxControllerEvent = Messages::Event();
                 dmxControllerEvent.type = Messages::EventType::USE_PRESET_DATA;
                 DmxPreset &currentPreset = dmxPresets_.getCurrentPreset();
-                dmxControllerEvent.data.presetData.presetNumber = currentPreset.getIndex();
+                dmxControllerEvent.data.presetData.presetNumber = static_cast<uint8_t>(currentPreset.getIndex());
                 dmxControllerEvent.data.presetData.name = currentPreset.getName();
                 dmxControllerEvent.data.presetData.universe1Length = currentPreset.getUniverseLength(0);
                 memcpy(dmxControllerEvent.data.presetData.universe1Data, currentPreset.getUniverseData(0),
@@ -67,7 +67,7 @@ void DmxPresetChanger::taskLoop()
                 Messages::Event dmxControllerEvent = Messages::Event();
                 dmxControllerEvent.type = Messages::EventType::USE_PRESET_DATA;
                 DmxPreset &currentPreset = dmxPresets_.getCurrentPreset();
-                dmxControllerEvent.data.presetData.presetNumber = currentPreset.getIndex();
+                dmxControllerEvent.data.presetData.presetNumber = static_cast<uint8_t>(currentPreset.getIndex());
                 dmxControllerEvent.data.presetData.name = currentPreset.getName();
                 dmxControllerEvent.data.presetData.universe1Length = currentPreset.getUniverseLength(0);
                 memcpy(dmxControllerEvent.data.presetData.universe1Data, currentPreset.getUniverseData(0),
@@ -95,11 +95,11 @@ void DmxPresetChanger::taskLoop()
 void DmxPresetChanger::setPresets(const Messages::PresetsEventData &presetsData)
 {
     dmxPresets_.clearAll();
-    for (size_t i = 0; i < presetsData.numberOfPresets; ++i)
+    for (uint8_t i = 0; i < static_cast<uint8_t>(presetsData.numberOfPresets); ++i)
     {
-        dmxPresets_.addPreset(presetsData.presets[i].presetNumber, presetsData.presets[i].name,
-            presetsData.presets[i].universe1Length, presetsData.presets[i].universe1Data,
-            presetsData.presets[i].universe2Length, presetsData.presets[i].universe2Data);
+        dmxPresets_.addPreset(static_cast<uint8_t>(presetsData.presets[i].presetNumber), presetsData.presets[i].name,
+            static_cast<uint16_t>(presetsData.presets[i].universe1Length), presetsData.presets[i].universe1Data,
+            static_cast<uint16_t>(presetsData.presets[i].universe2Length), presetsData.presets[i].universe2Data);
     }
     ESP_LOGI(LOG_TAG, "Presets updated: number of presets=%d", dmxPresets_.getNumPresets());
 }

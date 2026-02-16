@@ -6,7 +6,8 @@
 #include "seven_segment_display.hpp"
 #include <stdio.h>
 
-extern "C" {
+extern "C"
+{
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -15,12 +16,13 @@ extern "C" {
 #include "messages.hpp"
 #include "rtos_task.hpp"
 
-class DmxPresetChanger : public RtosTask {
+class DmxPresetChanger : public RtosTask
+{
   public:
     DmxPresetChanger();
     ~DmxPresetChanger();
 
-    esp_err_t init(QueueHandle_t dmxControllerEventQueue);
+    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue);
 
   private:
     DmxPresets dmxPresets_;

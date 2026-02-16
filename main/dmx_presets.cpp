@@ -38,7 +38,7 @@ esp_err_t DmxPresets::setNumPresets(uint8_t numPresets)
 esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, uint16_t universe11Length,
     const uint8_t *universe1Data, uint16_t universe2Length, const uint8_t *universe2Data)
 {
-    uint8_t index = presets_.size();
+    uint8_t index = static_cast<uint8_t>(presets_.size());
     if (index >= numPresets_)
     {
         ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numPresets_ - 1);

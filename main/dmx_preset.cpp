@@ -9,7 +9,7 @@ void DmxPreset::setName(const char *name)
 {
     if (name)
     {
-        strncpy(name_, name, sizeof(name_) - 1);
+        strncpy_s(name_, sizeof(name_), name, sizeof(name_) - 1);
         name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
     }
     else
@@ -83,7 +83,7 @@ void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t le
         return;
     }
 
-    size_t copyLength = (length > DMX_UNIVERSE_SIZE) ? DMX_UNIVERSE_SIZE : length;
+    uint16_t copyLength = static_cast<uint16_t>((length > DMX_UNIVERSE_SIZE) ? DMX_UNIVERSE_SIZE : length);
 
     if (universe == 0)
     {
@@ -92,7 +92,7 @@ void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t le
         {
             memset(universe1_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
         }
-        universe1Length_ = length;
+        universe1Length_ = static_cast<uint16_t>(length);
     }
     else if (universe == 1)
     {
@@ -101,7 +101,7 @@ void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t le
         {
             memset(universe2_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
         }
-        universe2Length_ = length;
+        universe2Length_ = static_cast<uint16_t>(length);
     }
     else
     {

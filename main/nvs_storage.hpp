@@ -6,7 +6,8 @@
 #include <string>
 #include <vector>
 
-extern "C" {
+extern "C"
+{
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
@@ -15,12 +16,13 @@ extern "C" {
 #include "messages.hpp"
 #include "rtos_task.hpp"
 
-class NvsStorage : public RtosTask {
+class NvsStorage : public RtosTask
+{
   public:
     NvsStorage();
     ~NvsStorage();
 
-    esp_err_t init(QueueHandle_t dmxControllerEventQueue);
+    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue);
 
     // Synchronous wrappers (for compatibility)
     esp_err_t setConfiguration(const Messages::ConfigurationEventData &config);

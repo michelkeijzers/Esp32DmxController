@@ -1,4 +1,5 @@
 #include "seven_segment_display.hpp"
+#include "driver/gpio.h"
 #include <esp_check.h>
 #include <esp_log.h>
 #include <freertos/FreeRTOS.h>
@@ -57,14 +58,17 @@ SevenSegmentDisplay::SevenSegmentDisplay() : RtosTask(), currentPattern_(0), dec
 
 SevenSegmentDisplay::~SevenSegmentDisplay() {}
 
-esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8]) {
+esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8])
+{
     if (RtosTask::init("SevenSegmentDisplayTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event),
-            dmxControllerEventQueue) != ESP_OK) {
+            dmxControllerEventQueue) != ESP_OK)
+    {
         ESP_LOGE(LOG_TAG, "Failed to initialize SevenSegmentDisplayTask");
         return ESP_FAIL;
     }
 
-    if (!pins) {
+    if (!pins)
+    {
         ESP_LOGE(LOG_TAG, "Invalid pins array");
         return ESP_ERR_INVALID_ARG;
     }
@@ -73,16 +77,19 @@ esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const
     decimalPointOn_ = false;
 
     // Configure GPIO pins
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++)
+    {
         segmentPins_[i] = pins[i];
 
-        gpio_config_t io_conf = {.pin_bit_mask = (1ULL << pins[i]),
-            .mode = GPIO_MODE_OUTPUT,
-            .pull_up_en = GPIO_PULLUP_DISABLE,
-            .pull_down_en = GPIO_PULLDOWN_DISABLE,
-            .intr_type = GPIO_INTR_DISABLE};
+        gpio_config_t io_conf = {};
+        io_conf.pin_bit_mask = (1ULL << pins[i]);
+        io_conf.mode = GPIO_MODE_OUTPUT;
+        io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+        io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+        io_conf.intr_type = GPIO_INTR_DISABLE;
 
-        if (gpio_config(&io_conf) != ESP_OK) {
+        if (gpio_config(&io_conf) != ESP_OK)
+        {
             ESP_LOGE(LOG_TAG, "Failed to configure GPIO pin %d", pins[i]);
             return ESP_FAIL;
         }
@@ -95,56 +102,81 @@ esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const
 
 void SevenSegmentDisplay::taskEntry(void *param) { static_cast<SevenSegmentDisplay *>(param)->taskLoop(); }
 
-void SevenSegmentDisplay::taskLoop() {
+void SevenSegmentDisplay::taskLoop()
+{
     Event event;
-    while (true) {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE) {
+    while (true)
+    {
+        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        {
             displayDigit(event.character, event.dot);
         }
     }
 }
 
-esp_err_t SevenSegmentDisplay::displayDigit(char character, bool dot) {
+esp_err_t SevenSegmentDisplay::displayDigit(char character, bool dot)
+{
     esp_err_t ret = ESP_OK;
     uint8_t pattern = 0;
     decimalPointOn_ = dot;
 
     // Map character to pattern
-    if (character >= '0' && character <= '9') {
+    if (character >= '0' && character <= '9')
+    {
         pattern = digitPatterns_[character - '0'];
-    } else if (character >= 'A' && character <= 'F') {
+    }
+    else if (character >= 'A' && character <= 'F')
+    {
         pattern = digitPatterns_[10 + (character - 'A')];
-    } else if (character >= 'a' && character <= 'f') {
+    }
+    else if (character >= 'a' && character <= 'f')
+    {
         pattern = digitPatterns_[10 + (character - 'a')];
-    } else if (character == '-') {
+    }
+    else if (character == '-')
+    {
         pattern = digitPatterns_[32];
-    } else if (character == '_') {
+    }
+    else if (character == '_')
+    {
         pattern = digitPatterns_[33];
-    } else if (character == '=') {
+    }
+    else if (character == '=')
+    {
         pattern = digitPatterns_[34];
-    } else if (character == '.') {
+    }
+    else if (character == '.')
+    {
         pattern = digitPatterns_[35];
-    } else if (character == ' ') {
+    }
+    else if (character == ' ')
+    {
         pattern = digitPatterns_[36];
-    } else {
+    }
+    else
+    {
         pattern = digitPatterns_[37]; // All segments on for unknown
         ret = ESP_ERR_INVALID_ARG;
     }
 
-    if (ret == ESP_OK) {
+    if (ret == ESP_OK)
+    {
         currentPattern_ = pattern;
         ret = updateDisplay();
     }
     return ret;
 }
 
-esp_err_t SevenSegmentDisplay::updateDisplay() {
-    if (!initialized_) {
+esp_err_t SevenSegmentDisplay::updateDisplay()
+{
+    if (!initialized_)
+    {
         return ESP_ERR_INVALID_STATE;
     }
 
     // Set each segment based on the current pattern and display type
-    for (int i = 0; i < 7; i++) { // Segments A-G
+    for (int i = 0; i < 7; i++)
+    { // Segments A-G
         bool segmentOn = (currentPattern_ & (1 << i)) != 0;
         bool gpioLevel;
 

@@ -1,10 +1,12 @@
 #pragma once
+#include <cstdint>
 #include <esp_err.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
 
-class RtosTask {
+class RtosTask
+{
   protected:
     TaskHandle_t taskHandle_;
     QueueHandle_t eventQueue_;
@@ -20,7 +22,7 @@ class RtosTask {
         size_t queueItemSize, QueueHandle_t &dmxControllerQueue);
     virtual void taskEntry(void *param) = 0;
     TaskHandle_t getTaskHandle() const { return taskHandle_; }
-    QueueHandle_t getEventQueue() const { return eventQueue_; }
+    virtual QueueHandle_t getEventQueue() const { return eventQueue_; }
     QueueHandle_t getDmxControllerEventQueue() const { return dmxControllerEventQueue_; }
     const char *getTaskName() const { return taskName_; }
     bool isInitialized() const { return initialized_; }

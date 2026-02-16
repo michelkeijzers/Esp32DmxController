@@ -1,4 +1,10 @@
+#ifdef _MSC_VER
+#ifndef portYIELD_FROM_ISR
+#define portYIELD_FROM_ISR() ((void)0)
+#endif
+#endif
 #include "foot_switch.hpp"
+#include "esp_attr.h"
 #include "messages.hpp"
 #include <driver/gpio.h>
 #include <esp_log.h>
@@ -46,11 +52,13 @@ esp_err_t FootSwitch::init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pin
         return ESP_FAIL;
     }
 
-    gpio_config_t io_conf = {.pin_bit_mask = (1ULL << pinNum),
-        .mode = GPIO_MODE_INPUT,
-        .pull_up_en = GPIO_PULLUP_ENABLE,
-        .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_ANYEDGE}; // Enable interrupt on both edges
+    // Classic C++ initialization for unit test build
+    gpio_config_t io_conf = {};
+    io_conf.pin_bit_mask = (1ULL << pinNum);
+    io_conf.mode = GPIO_MODE_INPUT;
+    io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
+    io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+    io_conf.intr_type = GPIO_INTR_ANYEDGE; // Enable interrupt on both edges
 
     if (gpio_config(&io_conf) != ESP_OK)
     {

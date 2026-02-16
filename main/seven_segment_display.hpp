@@ -13,9 +13,11 @@
 #include <freertos/queue.h>
 #include <freertos/task.h>
 
-class SevenSegmentDisplay : public RtosTask {
+class SevenSegmentDisplay : public RtosTask
+{
   public:
-    struct Event {
+    struct Event
+    {
         char character;
         bool dot;
     };
@@ -23,10 +25,20 @@ class SevenSegmentDisplay : public RtosTask {
     SevenSegmentDisplay();
     ~SevenSegmentDisplay();
 
-    esp_err_t init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8]);
+    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8]);
 
   private:
-    enum Segment { SEG_A = 0, SEG_B, SEG_C, SEG_D, SEG_E, SEG_F, SEG_G, SEG_DP };
+    enum Segment
+    {
+        SEG_A = 0,
+        SEG_B,
+        SEG_C,
+        SEG_D,
+        SEG_E,
+        SEG_F,
+        SEG_G,
+        SEG_DP
+    };
     gpio_num_t segmentPins_[8];
     uint8_t currentPattern_;
     bool decimalPointOn_;

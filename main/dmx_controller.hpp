@@ -21,7 +21,9 @@
 class DmxController : public RtosTask
 {
   public:
-    DmxController();
+    DmxController(DmxPresetChanger *presetChanger = nullptr, OSCSender *oscSender = nullptr,
+        SevenSegmentDisplay *display = nullptr, FootSwitch *footSwitch = nullptr, ArtNetSender *artnetSender = nullptr,
+        WebServer *webServer = nullptr, NvsStorage *nvsStorage = nullptr);
     ~DmxController();
     esp_err_t init();
     esp_err_t init_sub_tasks();
@@ -30,7 +32,7 @@ class DmxController : public RtosTask
     esp_err_t performOtaUpdate(const char *url);
     void printFirmwareInfo();
 
-  private:
+  protected:
     static constexpr gpio_num_t FOOT_SWITCH_PIN = GPIO_NUM_4;
     static constexpr gpio_num_t DISPLAY_PINS[8] = {
         GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7, GPIO_NUM_8, GPIO_NUM_9};
@@ -40,13 +42,13 @@ class DmxController : public RtosTask
     static constexpr int OSC_DEST_PORT = 8000;
     static constexpr const char *ARTNET_DEST_IP = "192.168.1.100";
 
-    DmxPresetChanger *presetChanger = nullptr;
-    OSCSender *oscSender = nullptr;
-    SevenSegmentDisplay *display = nullptr;
-    FootSwitch *footSwitch = nullptr;
-    ArtNetSender *artnetSender = nullptr;
-    WebServer *webServer = nullptr;
-    NvsStorage *nvsStorage = nullptr;
+    DmxPresetChanger *presetChanger_ = nullptr;
+    OSCSender *oscSender_ = nullptr;
+    SevenSegmentDisplay *display_ = nullptr;
+    FootSwitch *footSwitch_ = nullptr;
+    ArtNetSender *artnetSender_ = nullptr;
+    WebServer *webServer_ = nullptr;
+    NvsStorage *nvsStorage_ = nullptr;
 
     TickType_t bootTime = 0;
 

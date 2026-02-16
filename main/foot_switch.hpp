@@ -5,20 +5,32 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
 
-enum InterruptEventType { PRESS, RELEASE };
+enum InterruptEventType
+{
+    PRESS,
+    RELEASE
+};
 
-class FootSwitch : public RtosTask {
+class FootSwitch : public RtosTask
+{
   public:
-    struct InterruptEvent {
+    struct InterruptEvent
+    {
         InterruptEventType type;
     };
 
-    enum class State { BOOT, OTA_CHECK, OTA, NORMAL_OPERATION };
+    enum class State
+    {
+        BOOT,
+        OTA_CHECK,
+        OTA,
+        NORMAL_OPERATION
+    };
 
     FootSwitch();
     ~FootSwitch();
 
-    esp_err_t init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pinNum);
+    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pinNum);
 
     uint16_t getLongPressThresholdMs();
     bool getPolarityInverted();

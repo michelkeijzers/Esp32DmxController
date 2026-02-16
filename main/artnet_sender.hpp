@@ -41,7 +41,8 @@ class ArtNetSender : public RtosTask
     ArtNetSender();
     ~ArtNetSender();
 
-    esp_err_t init(QueueHandle_t dmxControllerEventQueue, const char *dest_ip, uint16_t dest_port = ARTNET_PORT);
+    virtual esp_err_t init(
+        QueueHandle_t dmxControllerEventQueue, const char *dest_ip, uint16_t dest_port = ARTNET_PORT);
 
     void close();
 
