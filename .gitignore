@@ -1,0 +1,13 @@
+# Ignore build directories
+build/
+**/build/
+CMakeFiles/
+CMakeCache.txt
+*.obj
+*.exe
+*.log
+*.user
+*.suo
+*.VC.db
+*.VC.opendb
+*.vscode/
