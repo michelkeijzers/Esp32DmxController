@@ -1,3 +1,0 @@
-C:/Users/i4studio/Esp32Test/Unittests/main/build/CMakeFiles/run_tests.dir
-C:/Users/i4studio/Esp32Test/Unittests/main/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/i4studio/Esp32Test/Unittests/main/build/CMakeFiles/ZERO_CHECK.dir
