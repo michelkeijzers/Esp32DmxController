@@ -31,29 +31,21 @@ DmxController::~DmxController()
 void DmxController::printFirmwareInfo()
 {
     const esp_app_desc_t *app_desc = esp_app_get_description();
-    ESP_LOGW(LOG_TAG, "Current firmware version: %s\n", app_desc->version);
-    ESP_LOGW(LOG_TAG, "Project name: %s\n", app_desc->project_name);
-    ESP_LOGW(LOG_TAG, "Compile time: %s %s\n", app_desc->date, app_desc->time);
+    ESP_LOGW(LOG_TAG, "Current firmware version: %s", app_desc->version);
+    ESP_LOGW(LOG_TAG, "Project name: %s", app_desc->project_name);
+    ESP_LOGW(LOG_TAG, "Compile time: %s %s", app_desc->date, app_desc->time);
 }
 
 esp_err_t DmxController::performOtaUpdate(const char *url)
 {
     printf("Starting OTA update from: %s\n", url);
-    // Classic C++ initialization for unit test build
-    esp_http_client_config_t config = {};
-    // If needed, set fields manually here for test build
-    // config.url = url; // Not available in stub, so skip or add to stub if needed
-    // config.cert_pem = OTA_CERT_PEM;
-    // config.timeout_ms = 30000;
-    // config.skip_cert_common_name_check = false;
-
     esp_https_ota_config_t ota_config = {};
-    // ota_config.http_config = &config;
+    // ota_config.http_config = NULL;
     // ota_config.http_client_init_cb = NULL;
     esp_err_t ret = esp_https_ota(&ota_config);
     if (ret == ESP_OK)
     {
-        ESP_LOGW(LOG_TAG, "OTA update successful, restarting...\n");
+        ESP_LOGW(LOG_TAG, "OTA update successful, restarting...");
         esp_restart();
     }
     else
@@ -85,14 +77,12 @@ esp_err_t DmxController::init()
     printf("Initializing sub-tasks...\n");
     if (init_sub_tasks() != ESP_OK)
     {
-        printf("Failed to initialize sub-tasks\n");
         ESP_LOGE(LOG_TAG, "Failed to initialize sub-tasks");
         return ESP_FAIL;
     }
 
     if (init_messages() != ESP_OK)
     {
-        printf("Failed to initialize message handling\n");
         ESP_LOGE(LOG_TAG, "Failed to initialize message handling");
         return ESP_FAIL;
     }
@@ -103,7 +93,10 @@ esp_err_t DmxController::init()
 esp_err_t DmxController::init_sub_tasks()
 {
     if (!presetChanger_)
-        presetChanger_ = new DmxPresetChanger();
+    {
+        ESP_LOGE(LOG_TAG, "presetChanger_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (presetChanger_->init(getEventQueue()) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize DmxPresetChanger");
@@ -111,7 +104,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!oscSender_)
-        oscSender_ = new OSCSender();
+    {
+        ESP_LOGE(LOG_TAG, "oscSender_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (oscSender_->init(OSC_DEST_IP, OSC_DEST_PORT) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize OSCSender");
@@ -119,7 +115,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!display_)
-        display_ = new SevenSegmentDisplay();
+    {
+        ESP_LOGE(LOG_TAG, "display_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (display_->init(getEventQueue(), DISPLAY_PINS) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize SevenSegmentDisplay");
@@ -127,7 +126,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!footSwitch_)
-        footSwitch_ = new FootSwitch();
+    {
+        ESP_LOGE(LOG_TAG, "footSwitch_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (footSwitch_->init(getEventQueue(), FOOT_SWITCH_PIN) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize FootSwitch");
@@ -135,7 +137,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!artnetSender_)
-        artnetSender_ = new ArtNetSender();
+    {
+        ESP_LOGE(LOG_TAG, "artnetSender_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (artnetSender_->init(getEventQueue(), ARTNET_DEST_IP, 6454) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize ArtNetSender");
@@ -143,7 +148,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!webServer_)
-        webServer_ = new WebServer();
+    {
+        ESP_LOGE(LOG_TAG, "webServer_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (webServer_->init() != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize WebServer");
@@ -151,7 +159,10 @@ esp_err_t DmxController::init_sub_tasks()
     }
 
     if (!nvsStorage_)
-        nvsStorage_ = new NvsStorage();
+    {
+        ESP_LOGE(LOG_TAG, "nvsStorage_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
     if (nvsStorage_->init(getEventQueue()) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize NvsStorage");

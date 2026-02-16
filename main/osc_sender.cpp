@@ -1,20 +1,15 @@
 #include "osc_sender.hpp"
-#include <lwip/sockets.h>
-#include <lwip/netdb.h>
-#include <esp_log.h>
-#include <cstring>
 #include <algorithm>
+#include <cstring>
+#include <esp_log.h>
+#include <lwip/netdb.h>
+#include <lwip/sockets.h>
 
 static const char *TAG = "OSC";
 
-OSCSender::OSCSender() : sockfd(-1), initialized(false)
-{
-}
+OSCSender::OSCSender() : sockfd(-1), initialized(false) {}
 
-OSCSender::~OSCSender()
-{
-    close();
-}
+OSCSender::~OSCSender() { close(); }
 
 esp_err_t OSCSender::init(const char *dest_ip, uint16_t dest_port)
 {
@@ -64,9 +59,7 @@ void OSCSender::writeFloat(std::vector<uint8_t> &buffer, float value)
     memcpy(&int_value, &value, sizeof(float));
 
     // Swap to big-endian
-    int_value = ((int_value >> 24) & 0xFF) |
-                ((int_value >> 8) & 0xFF00) |
-                ((int_value << 8) & 0xFF0000) |
+    int_value = ((int_value >> 24) & 0xFF) | ((int_value >> 8) & 0xFF00) | ((int_value << 8) & 0xFF0000) |
                 ((int_value << 24) & 0xFF000000);
 
     buffer.push_back((int_value >> 24) & 0xFF);
@@ -110,8 +103,8 @@ esp_err_t OSCSender::sendMessage(const char *address, int32_t value)
     writeInt32(buffer, value);
 
     // Send the packet
-    ssize_t sent = sendto(sockfd, buffer.data(), buffer.size(), 0,
-                          (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    ssize_t sent = sendto(
+        sockfd, buffer.data(), static_cast<int>(buffer.size()), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sent < 0)
     {
@@ -143,8 +136,8 @@ esp_err_t OSCSender::sendMessage(const char *address, float value)
     writeFloat(buffer, value);
 
     // Send the packet
-    ssize_t sent = sendto(sockfd, buffer.data(), buffer.size(), 0,
-                          (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    ssize_t sent = sendto(
+        sockfd, buffer.data(), static_cast<int>(buffer.size()), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sent < 0)
     {
@@ -176,8 +169,8 @@ esp_err_t OSCSender::sendMessage(const char *address, const char *value)
     writeString(buffer, value);
 
     // Send the packet
-    ssize_t sent = sendto(sockfd, buffer.data(), buffer.size(), 0,
-                          (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    ssize_t sent = sendto(
+        sockfd, buffer.data(), static_cast<int>(buffer.size()), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sent < 0)
     {
@@ -217,8 +210,8 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<int32_t>
     }
 
     // Send the packet
-    ssize_t sent = sendto(sockfd, buffer.data(), buffer.size(), 0,
-                          (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    ssize_t sent = sendto(
+        sockfd, buffer.data(), static_cast<int>(buffer.size()), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sent < 0)
     {
@@ -226,7 +219,7 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<int32_t>
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s with %d integers", address, values.size());
+    ESP_LOGD(TAG, "Sent OSC message: %s with %d integers", address, static_cast<int>(values.size()));
     return ESP_OK;
 }
 
@@ -258,8 +251,8 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<float> &
     }
 
     // Send the packet
-    ssize_t sent = sendto(sockfd, buffer.data(), buffer.size(), 0,
-                          (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    ssize_t sent = sendto(
+        sockfd, buffer.data(), static_cast<int>(buffer.size()), 0, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
 
     if (sent < 0)
     {
@@ -267,7 +260,7 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<float> &
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s with %d floats", address, values.size());
+    ESP_LOGD(TAG, "Sent OSC message: %s with %d floats", address, static_cast<int>(values.size()));
     return ESP_OK;
 }
 

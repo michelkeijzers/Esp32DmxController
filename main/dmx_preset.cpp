@@ -1,3 +1,8 @@
+#ifdef _MSC_VER
+#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+#endif
 #include "dmx_preset.hpp"
 #include <esp_log.h>
 
@@ -9,7 +14,8 @@ void DmxPreset::setName(const char *name)
 {
     if (name)
     {
-        strncpy_s(name_, sizeof(name_), name, sizeof(name_) - 1);
+        strncpy(name_, name, sizeof(name_) - 1);
+        name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
         name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
     }
     else
@@ -34,7 +40,7 @@ void DmxPreset::setUniverseValue(uint8_t universe, uint16_t channel, uint8_t val
     }
     else if (universe == 1)
     {
-        universe2_[channel] = value;
+        universe2_[static_cast<uint8_t>(channel)] = value;
     }
     else
     {

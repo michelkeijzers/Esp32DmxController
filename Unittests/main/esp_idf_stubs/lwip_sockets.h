@@ -31,7 +31,7 @@ extern "C"
     static inline int setsockopt(int, int, int, const void *, int) { return 0; }
     static inline int sendto(int, const void *, int, int, const struct sockaddr *, int) { return 0; }
     static inline int closesocket(int) { return 0; }
-    static inline int close(int) { return 0; }
+    /* Remove stub for close(int) to avoid MSVC CRT linkage conflict */
     static inline int inet_pton(int, const char *, void *) { return 1; }
     static inline unsigned short htons(unsigned short x) { return x; }
 

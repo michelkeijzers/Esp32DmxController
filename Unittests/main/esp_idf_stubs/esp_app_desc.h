@@ -7,7 +7,10 @@ extern "C"
 
     typedef struct esp_app_desc
     {
-        int dummy;
+        char version[32];
+        char project_name[32];
+        char date[16];
+        char time[16];
     } esp_app_desc_t;
 
     static inline const esp_app_desc_t *esp_app_get_description(void)

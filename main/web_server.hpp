@@ -27,7 +27,7 @@ class WebServer
     };
 
     WebServer();
-    ~WebServer();
+    virtual ~WebServer();
 
     virtual esp_err_t init();
     esp_err_t start();

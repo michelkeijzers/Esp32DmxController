@@ -24,7 +24,7 @@ class OSCSender
 
   public:
     OSCSender();
-    ~OSCSender();
+    virtual ~OSCSender();
 
     // Initialize OSC sender with destination IP and port
     virtual esp_err_t init(const char *dest_ip, uint16_t dest_port);

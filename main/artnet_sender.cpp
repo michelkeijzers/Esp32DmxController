@@ -2,6 +2,9 @@
 #include <cstring>
 #include <esp_log.h>
 #include <lwip/inet.h>
+#ifdef _MSC_VER
+#include <io.h>
+#endif
 #include <messages.hpp>
 
 static const char *LOG_TAG = "ArtNetSender";

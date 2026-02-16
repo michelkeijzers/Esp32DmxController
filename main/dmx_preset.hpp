@@ -36,7 +36,7 @@ class DmxPreset
     void copyFrom(const DmxPreset &other);
 
   private:
-    uint8_t index_;
+    uint16_t index_;
     char name_[32];                        // Preset name (max 31 chars + null)
     uint8_t universe1_[DMX_UNIVERSE_SIZE]; // Universe 1 data (512 channels)
     uint16_t universe1Length_;

@@ -26,9 +26,11 @@ class DmxController : public RtosTask
         WebServer *webServer = nullptr, NvsStorage *nvsStorage = nullptr);
     ~DmxController();
     esp_err_t init();
+    void taskLoop();
+
+  private:
     esp_err_t init_sub_tasks();
     esp_err_t init_messages();
-    void taskLoop();
     esp_err_t performOtaUpdate(const char *url);
     void printFirmwareInfo();
 

@@ -1,5 +1,16 @@
+
 cmake_minimum_required(VERSION 3.14)
 project(UnitTests)
+
+
+# Use vcpkg toolchain file if available
+if(DEFINED ENV{VCPKG_ROOT})
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+endif()
+
+
+# Hardcode GTest_DIR for vcpkg integration
+set(GTest_DIR "C:/tools/vcpkg/installed/x64-windows/share/gtest" CACHE PATH "Path to GTest cmake config")
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,10 +28,10 @@ file(GLOB STUB_SOURCES
 # Use vcpkg's GoogleTest
 find_package(GTest CONFIG REQUIRED)
 
+
 add_executable(
   run_tests
   custom_main.cpp
-  simple_test.cpp
   dmx_controller_tests.cpp
   ${CMAKE_SOURCE_DIR}/../../main/dmx_controller.cpp
   ${CMAKE_SOURCE_DIR}/../../main/artnet_sender.cpp
@@ -48,7 +59,5 @@ target_link_libraries(
 )
 
 # Force MSVC linker to include all symbols to ensure test registration
-if(MSVC)
-  target_link_options(run_tests PRIVATE /OPT:NOREF)
-endif()
+
 

@@ -26,7 +26,6 @@ extern "C"
 
     typedef int esp_err_t;
     static inline int esp_vfs_spiffs_register(const esp_vfs_spiffs_conf_t *) { return 0; }
-    static inline const char *esp_err_to_name(int err) { return "ESP_OK"; }
 
 #ifdef __cplusplus
 }

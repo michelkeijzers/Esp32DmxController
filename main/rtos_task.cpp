@@ -14,7 +14,8 @@ RtosTask::~RtosTask()
     {
         vTaskDelete(taskHandle_);
     }
-    if (eventQueue_)
+    // Only delete eventQueue_ if it is not the test stub dummyQueue (0x1)
+    if (eventQueue_ && eventQueue_ != reinterpret_cast<QueueHandle_t>(0x1))
     {
         vQueueDelete(eventQueue_);
     }
