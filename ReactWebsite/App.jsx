@@ -5,6 +5,8 @@ import PresetList from './components/PresetList'
 import PresetEdit from './components/PresetEdit'
 import ValueEdit from './components/ValueEdit'
 import Configuration from './components/Configuration'
+import ManualButton from './components/ManualButton'
+import ManualPage from './components/ManualPage'
 
 // Helper function to generate values between 0 and 255
 const generateValues = (count) => {
@@ -24,12 +26,11 @@ const generatePresets = (count) => {
 import { useNavigate } from 'react-router-dom'
 
 function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController, LoadFromDmxController }) {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const isEditPage = location.pathname.startsWith('/preset/') || location.pathname === '/config'
-  
-  if (isEditPage) return null
-  
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isEditPage = location.pathname.startsWith('/preset/') || location.pathname === '/config';
+  const isManualPage = location.pathname === '/manual';
+  if (isEditPage || isManualPage) return null;
   return (
     <>
       <div className="esp32-config">
@@ -47,19 +48,18 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
           </span>
         )}
       </div>
-      
-      <div className="config-button-container">
+      <div className="config-button-container" style={{ display: 'flex', gap: '8px' }}>
         <button className="config-button" onClick={() => navigate('/config')}>
           Configuration
         </button>
+        <ManualButton />
       </div>
-      
       <div className="preset-selector">
         <label htmlFor="preset-count">Number of Presets:</label>
         <span className="preset-count-display">{presetCount}</span>
       </div>
     </>
-  )
+  );
 }
 
 function App() {
@@ -362,6 +362,10 @@ function App() {
                   onConfigChange={handleConfigChange}
                 />
               } 
+            />
+            <Route 
+              path="/manual" 
+              element={<ManualPage />} 
             />
           </Routes>
         </main>

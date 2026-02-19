@@ -55,7 +55,7 @@ function ValueEdit({ presets, onUpdateValue }) {
       <div className="value-edit-header">
         <h1>{preset.name}</h1>
         <p className="value-edit-info">
-          {section === 'values1' ? 'Universe 1' : 'Universe 2'} - DMX Address {index}
+          Universe 1 - DMX Address {index}
         </p>
       </div>
 
@@ -98,7 +98,7 @@ function ValueEdit({ presets, onUpdateValue }) {
           onClick={handleSave}
           disabled={!isValid}
         >
-          Save
+          Enter
         </button>
       </div>
     </div>

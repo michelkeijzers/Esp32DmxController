@@ -10,7 +10,7 @@ function PresetEdit({ presets, onUpdateName }) {
     return (
       <div className="preset-edit-error">
         <h2>Preset not found</h2>
-        <button onClick={() => navigate('/')}>Back to List</button>
+        <button className="manual-button" onClick={() => navigate('/')}>Home</button>
       </div>
     )
   }
@@ -34,9 +34,7 @@ function PresetEdit({ presets, onUpdateName }) {
   return (
     <div className="preset-edit">
       <div className="preset-edit-header">
-        <button className="back-button" onClick={() => navigate('/')}>
-          ← Back to List
-        </button>
+        <button className="manual-button" onClick={() => navigate('/')}>Home</button>
         <div className="preset-title-container">
           <span className="preset-number">Preset {preset.id - 1}</span>
           <input
@@ -85,22 +83,7 @@ function PresetEdit({ presets, onUpdateName }) {
           </div>
         </div>
 
-        <div className="preset-section">
-          <h3>Universe 2</h3>
-          <div className="values-grid-full">
-            {preset.values2.map((value, index) => (
-              <span 
-                key={index} 
-                className="value-small"
-                onClick={() => navigate(`/preset/${preset.id}/values2/${index}`)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span className="index">[{index}]</span>
-                <span className="value-display-inline">{value}</span>
-              </span>
-            ))}
-          </div>
-        </div>
+        {/* Universe 2 removed */}
       </div>
     </div>
   )

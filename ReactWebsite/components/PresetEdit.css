@@ -38,7 +38,7 @@
 .preset-name-edit-input {
   width: 100%;
   max-width: 400px;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border: 1px solid #555;
   border-radius: 6px;
   color: #646cff;
@@ -234,12 +234,14 @@
 }
 
 .full-data summary:hover {
-  background: #3a3a3a;
+  background: #1a1a1a;
   color: #747bff;
 }
 
 .values-grid-full {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.15rem;
   flex-direction: column;
   gap: 0.3rem;
   margin-top: 0.5rem;
@@ -255,7 +257,7 @@
   align-items: center;
   gap: 0.5rem;
   justify-content: flex-start;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border-radius: 4px;
   transition: background 0.2s;
 }
@@ -275,7 +277,7 @@
 
 .value-input-small {
   width: 45px;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border: 1px solid #555;
   border-radius: 3px;
   color: #fff;

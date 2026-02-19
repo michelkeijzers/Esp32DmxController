@@ -1,3 +1,42 @@
+/* User manual markdown table styling */
+.user-manual table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1.5rem 0;
+}
+.user-manual th, .user-manual td {
+  border: 1px solid #888;
+  padding: 0.5rem 1rem;
+  text-align: left;
+  background: #222;
+  color: #fff;
+}
+.user-manual th {
+  background: #646cff;
+  color: #fff;
+}
+.user-manual tr:nth-child(even) td {
+  background: #292a3a;
+}
+.manual-button {
+  background: #646cff;
+  color: white;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.manual-button:hover {
+  background: #747bff;
+}
+
+.manual-button:active {
+  background: #535ac5;
+}
 #root {
   max-width: 1400px;
   margin: 0 auto;
@@ -35,7 +74,7 @@ main {
   gap: 1rem;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border-radius: 8px;
   max-width: 700px;
   margin-left: auto;
@@ -47,7 +86,7 @@ main {
   justify-content: center;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border-radius: 8px;
   max-width: 700px;
   margin-left: auto;
@@ -120,7 +159,7 @@ main {
   gap: 1rem;
   margin-top: 0.5rem;
   padding: 0.5rem;
-  background: #3a3a3a;
+  background: #1a1a1a;
   border-radius: 8px;
   max-width: 700px;
   margin-left: auto;
