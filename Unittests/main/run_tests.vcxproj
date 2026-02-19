@@ -442,6 +442,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\rtos_task.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_presets.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_preset.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\max3485_sender.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queue.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\task.cpp" />

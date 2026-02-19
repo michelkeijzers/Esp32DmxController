@@ -1,20 +1,28 @@
 #include "dmx_controller.hpp"
 #include "artnet_sender.hpp"
+#include "dmx_preset_changer.hpp"
 #include "esp_app_desc.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
 #include "esp_netif.h"
 #include "esp_system.h"
+#include "foot_switch.hpp"
+#include "max3485_sender.hpp"
 #include "messages.hpp"
+#include "nvs_storage.hpp"
+#include "osc_sender.hpp"
+#include "seven_segment_display.hpp"
+#include "web_server.hpp"
 
 static const char *LOG_TAG = "DmxController";
 static const int QUEUE_CAPACITY = 10;
 static const int TASK_PRIORITY = 5;
 
 DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
-    FootSwitch *footSwitch, ArtNetSender *artnetSender, WebServer *webServer, NvsStorage *nvsStorage)
+    FootSwitch *footSwitch, Max3485Sender *max3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
+    NvsStorage *nvsStorage)
     : RtosTask(), presetChanger_(presetChanger), oscSender_(oscSender), display_(display), footSwitch_(footSwitch),
-      artnetSender_(artnetSender), webServer_(webServer), nvsStorage_(nvsStorage)
+      max3485Sender_(max3485Sender), artnetSender_(artnetSender), webServer_(webServer), nvsStorage_(nvsStorage)
 {
 }
 
@@ -24,6 +32,7 @@ DmxController::~DmxController()
     delete oscSender_;
     delete display_;
     delete footSwitch_;
+    delete max3485Sender_;
     delete artnetSender_;
     delete webServer_;
 }
@@ -133,6 +142,17 @@ esp_err_t DmxController::init_sub_tasks()
     if (footSwitch_->init(getEventQueue(), FOOT_SWITCH_PIN) != ESP_OK)
     {
         ESP_LOGE(LOG_TAG, "Failed to initialize FootSwitch");
+        return ESP_FAIL;
+    }
+
+    if (!max3485Sender_)
+    {
+        ESP_LOGE(LOG_TAG, "max3485Sender_ is nullptr");
+        return ESP_ERR_INVALID_ARG;
+    }
+    if (max3485Sender_->init(getEventQueue()) != ESP_OK)
+    {
+        ESP_LOGE(LOG_TAG, "Failed to initialize Max3485Sender");
         return ESP_FAIL;
     }
 

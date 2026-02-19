@@ -44,6 +44,7 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/../../main/rtos_task.cpp
   ${CMAKE_SOURCE_DIR}/../../main/dmx_presets.cpp
   ${CMAKE_SOURCE_DIR}/../../main/dmx_preset.cpp
+  ${CMAKE_SOURCE_DIR}/../../main/max3485_sender.cpp
   ${STUB_SOURCES}
 )
 

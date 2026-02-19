@@ -4,26 +4,29 @@
 #include "dmx_presets.hpp"
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
+#include "max3485_sender.hpp"
 #include "nvs_storage.hpp"
 #include "osc_sender.hpp"
 #include "rtos_task.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
+#include <esp_err.h>
 #include <esp_https_ota.h>
 #include <esp_log.h>
 #include <esp_ota_ops.h>
 #include <esp_wifi.h>
-#include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <freertos/timers.h>
+#include <stdint.h>
 #include <stdio.h>
 
 class DmxController : public RtosTask
 {
   public:
     DmxController(DmxPresetChanger *presetChanger = nullptr, OSCSender *oscSender = nullptr,
-        SevenSegmentDisplay *display = nullptr, FootSwitch *footSwitch = nullptr, ArtNetSender *artnetSender = nullptr,
-        WebServer *webServer = nullptr, NvsStorage *nvsStorage = nullptr);
+        SevenSegmentDisplay *display = nullptr, FootSwitch *footSwitch = nullptr,
+        Max3485Sender *dmx3485Sender = nullptr, ArtNetSender *artnetSender = nullptr, WebServer *webServer = nullptr,
+        NvsStorage *nvsStorage = nullptr);
     ~DmxController();
     esp_err_t init();
     void taskLoop();
@@ -48,6 +51,7 @@ class DmxController : public RtosTask
     OSCSender *oscSender_ = nullptr;
     SevenSegmentDisplay *display_ = nullptr;
     FootSwitch *footSwitch_ = nullptr;
+    Max3485Sender *max3485Sender_ = nullptr;
     ArtNetSender *artnetSender_ = nullptr;
     WebServer *webServer_ = nullptr;
     NvsStorage *nvsStorage_ = nullptr;

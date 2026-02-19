@@ -96,7 +96,7 @@ The 4-digit 7-segment display provides feedback and status. Below is a table of 
 | Function / Status        |      Displayed Text      |
 | ------------------------ | :----------------------: |
 | Preset number (e.g. 15)  |         `P  15`          |
-| Blackout preset          |     'P0-1' or `P---`     |
+| Blackout preset          |     `P0-1` or `P---`     |
 | Booting                  |          `boot`          |
 | Boot ready               |          `rEAd`          |
 | OTA update in progress   |          `otAb`          |
@@ -116,7 +116,3 @@ The 4-digit 7-segment display provides feedback and status. Below is a table of 
 | Config changed           |          `CnFG`          |
 
 > Note: Some messages are abbreviated to fit the 4-digit display. Characters are shown as they would appear on a 7-segment display.
-
----
-
-For further assistance, refer to the website's help section or contact support.

@@ -40,6 +40,9 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_preset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\max3485_sender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

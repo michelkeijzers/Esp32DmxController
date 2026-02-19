@@ -37,6 +37,10 @@ DmxPresetChanger --|> RtosTask
 class OscHandler #Grey {}
 DmxController *-- OscHandler : Task
 
+class Max3485Sender { }
+DmxController *-- Max3485Sender : Task
+Max3485Sender --> DmxPreset : Access
+
 class ArtNetSender { }
 DmxController *-- ArtNetSender : Task
 ArtNetSender --> DmxPreset : Access   
