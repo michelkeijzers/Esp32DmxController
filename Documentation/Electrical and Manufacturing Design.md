@@ -59,27 +59,25 @@ To fit the perf board in the enclosure, the 4 courners need to be cut.
 
 ### ESP32 Pin Mapping Table
 
+In case a DevKit is used, the following table outlines the pin connections:
+
 | ESP32 Pin | Connected Device/Function | Target Pin/Connector | Notes                          |
 | --------- | ------------------------- | -------------------- | ------------------------------ |
 | GPIO16    | MAX3485 Sender            | DI                   | UART2 TX (unused but reserved) |
-| GPIO18    | MAX3485 Sender            | DE/RE                | Direction control              |
 | GPIO21    | Seven Segment Display     | CLK                  | TM1637 CLK                     |
 | GPIO22    | Seven Segment Display     | DIO                  | TM1637 DIO                     |
 | GPIO25    | Foot Switch               | Switch Input         | Digital Input                  |
 | 5V        | Power Supply              | Barrel Jack 5V       | Main power input               |
 | GND       | Power Supply              | Barrel Jack GND      | Ground reference               |
 
-In case to use a ESP32 C3 Dev board, the pin mapping would be as follows:
+A C3 Dev board only can be used when a TM1637 is used for the seven segments display.
 
-| ESP32 C3 Pin | Connected Device/Function | Target Pin/Connector | Notes             |
-| ------------ | ------------------------- | -------------------- | ----------------- |
-| GPIO4        | MAX3485 Sender            | DI                   | UART1 TX for DMX  |
-| GPIO5        | MAX3485 Sender            | DE/RE                | Direction control |
-| GPIO6        | Seven Segment Display     | CLK                  | TM1637 CLK        |
-| GPIO7        | Seven Segment Display     | DIO                  | TM1637 DIO        |
-| GPIO10       | Foot Switch               | Switch Input         | Digital Input     |
-| 5V           | Power Supply              | Barrel Jack 5V       | Main power input  |
-| GND          | Power Supply              | Barrel Jack GND      | Ground reference  |
+| ESP32 C3 Pin | Connected Device/Function | Target Pin/Connector | Notes         |
+| ------------ | ------------------------- | -------------------- | ------------- | --- |
+| GPIO9        | Seven Segment Display     | Clock Line           | TM1637 CLK    |
+| GPIO8        | Seven Segment Display     | Data Line            | TM1637 DIO    |
+| GPIO21       | MAX3485 Dev Board         | MAX3485 DI (TX)      | UART TX       |     |
+| GPIO         | Foot Switch               | GPIO                 | Interrupt Pin |
 
 ## Perf Board Layout
 

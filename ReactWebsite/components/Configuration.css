@@ -47,7 +47,7 @@
 }
 
 .config-item label {
-  color: #990
+  color: #990;
   font-weight: 500;
   font-size: 1rem;
 }
@@ -65,7 +65,7 @@
   padding: 0.5rem 1rem;
   background: transparent;
   border-radius: 6px;
-  transition: background 0.2s;
+  transition: background-color 0.2s;
 }
 
 .radio-option:hover {
