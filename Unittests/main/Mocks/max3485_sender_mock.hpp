@@ -1,5 +1,5 @@
 #pragma once
-#include "max3485_sender.hpp"
+#include "../../main/Tasks/max3485_sender.hpp"
 #include <gmock/gmock.h>
 
 class MockMax3485Sender : public Max3485Sender

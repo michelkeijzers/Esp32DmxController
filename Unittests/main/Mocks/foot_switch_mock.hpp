@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/foot_switch.hpp"
+#include "../../main/Tasks/foot_switch.hpp"
 #include <gmock/gmock.h>
 class MockFootSwitch : public FootSwitch
 {

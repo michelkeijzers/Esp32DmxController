@@ -1195,8 +1195,8 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/i4studio/Esp32Test/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/i4studio/Esp32Test/main/max3485_sender.cpp", "C:/Users/i4studio/Esp32Test/main/dmx_controller.cpp", "C:/Users/i4studio/Esp32Test/main/rtos_task.cpp", "C:/Users/i4studio/Esp32Test/main/main.cpp", "C:/Users/i4studio/Esp32Test/main/foot_switch.cpp", "C:/Users/i4studio/Esp32Test/main/dmx_preset_changer.cpp", "C:/Users/i4studio/Esp32Test/main/nvs_storage.cpp", "C:/Users/i4studio/Esp32Test/main/osc_sender.cpp", "C:/Users/i4studio/Esp32Test/main/seven_segment_display.cpp", "C:/Users/i4studio/Esp32Test/main/dmx_preset.cpp", "C:/Users/i4studio/Esp32Test/main/dmx_presets.cpp", "C:/Users/i4studio/Esp32Test/main/artnet_sender.cpp", "C:/Users/i4studio/Esp32Test/main/web_server.cpp" ],
-            "include_dirs": [ "." ]
+            "sources": [ "C:/Users/i4studio/Esp32Test/main/Tasks/max3485_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/foot_switch.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_preset_changer.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/nvs_storage.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/osc_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/seven_segment_display.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/artnet_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/web_server.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_controller.cpp", "C:/Users/i4studio/Esp32Test/main/Base/rtos_task.cpp", "C:/Users/i4studio/Esp32Test/main/main.cpp", "C:/Users/i4studio/Esp32Test/main/Data/dmx_presets.cpp" ],
+            "include_dirs": [ ".", "Tasks" ]
         },
         "mbedtls": {
             "alias": "idf::mbedtls",
@@ -2830,7 +2830,7 @@
             "priv_reqs": [],
             "managed_reqs": [],
             "managed_priv_reqs": [],
-            "include_dirs": [ "." ]
+            "include_dirs": [ ".", "Tasks" ]
         }
     },
     "debug_prefix_map_gdbinit": "",

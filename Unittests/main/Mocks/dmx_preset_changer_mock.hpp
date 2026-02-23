@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/dmx_preset_changer.hpp"
+#include "../../main/Tasks/dmx_preset_changer.hpp"
 #include <gmock/gmock.h>
 class MockPresetChanger : public DmxPresetChanger
 {

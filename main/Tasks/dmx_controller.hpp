@@ -1,13 +1,13 @@
 #pragma once
+#include "Base/rtos_task.hpp"
+#include "Data/dmx_presets.hpp"
 #include "artnet_sender.hpp"
 #include "dmx_preset_changer.hpp"
-#include "dmx_presets.hpp"
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
 #include "nvs_storage.hpp"
 #include "osc_sender.hpp"
-#include "rtos_task.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 #include <esp_err.h>

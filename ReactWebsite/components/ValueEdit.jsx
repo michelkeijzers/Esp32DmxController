@@ -55,7 +55,7 @@ function ValueEdit({ presets, onUpdateValue }) {
       <div className="value-edit-header">
         <h1>{preset.name}</h1>
         <p className="value-edit-info">
-          Universe 1 - DMX Address {index}
+          DMX Address {index}
         </p>
       </div>
 

@@ -16,7 +16,7 @@ extern "C"
 #include <freertos/queue.h>
 #include <freertos/task.h>
 }
-#include "rtos_task.hpp"
+#include "Base/rtos_task.hpp"
 
 class ArtNetSender : public RtosTask
 {

@@ -8,7 +8,7 @@ extern "C"
 #include <freertos/queue.h>
 #include <freertos/task.h>
 }
-#include "rtos_task.hpp"
+#include "Base/rtos_task.hpp"
 
 // Class to send DMX data to MAX3485 board
 class Max3485Sender : public RtosTask

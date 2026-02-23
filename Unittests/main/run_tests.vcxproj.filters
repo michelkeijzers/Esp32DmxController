@@ -7,40 +7,40 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\dmx_controller_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_controller.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\artnet_sender.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\artnet_sender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\osc_sender.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\osc_sender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\seven_segment_display.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_preset_changer.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_preset_changer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\foot_switch.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\nvs_storage.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\nvs_storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\web_server.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\web_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\rtos_task.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\max3485_sender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_presets.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Base\rtos_task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\dmx_preset.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_presets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\max3485_sender.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_preset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queue.cpp">

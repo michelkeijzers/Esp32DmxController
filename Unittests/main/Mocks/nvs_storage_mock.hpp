@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/nvs_storage.hpp"
+#include "../../main/Tasks/nvs_storage.hpp"
 #include <gmock/gmock.h>
 class MockNvsStorage : public NvsStorage
 {

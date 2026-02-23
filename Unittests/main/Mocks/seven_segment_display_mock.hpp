@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/seven_segment_display.hpp"
+#include "../../main/Tasks/seven_segment_display.hpp"
 #include <gmock/gmock.h>
 class MockSevenSegmentDisplay : public SevenSegmentDisplay
 {

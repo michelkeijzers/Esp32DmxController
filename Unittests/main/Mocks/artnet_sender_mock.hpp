@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/artnet_sender.hpp"
+#include "../../main/Tasks/artnet_sender.hpp"
 #include <gmock/gmock.h>
 class MockArtNetSender : public ArtNetSender
 {

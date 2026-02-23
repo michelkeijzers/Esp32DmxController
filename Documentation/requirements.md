@@ -199,7 +199,7 @@
 
 ### REQ.PRE.400 – DMX Universe Allocation
 
-**Description:** Each preset shall contain two DMX universes, each with 512 values.  
+**Description:** Each preset shall contain one DMX universe, each with 512 values.  
 **Rationale:** This ensures compatibility with DMX lighting systems and provides sufficient control granularity.
 
 ### REQ.PRE.410 – Preset Data Storage
@@ -215,19 +215,19 @@ Preset data shall be stored persistently in NVRAM to retain values across system
 
 # Art-Net Requirements
 
+## REQ.NAX.1xx – Max3485 DMX Transmission
+
+### REQ.MAX.100 – Preset Max3485 DMX Data Transmission
+
+**Description:** Preset DMX data shall be transmitted via the Max3485 Dev board.
+**Rationale:** The Max3485 Dev board provides reliable DMX data transmission, ensuring compatibility with lighting control systems.
+
 ## REQ.ART.1xx – Art-Net Transmission
 
 ### REQ.ART.100 – Preset DMX Data Transmission
 
 **Description:** Preset DMX data shall be transmitted via the Art-Net protocol.  
 **Rationale:** Art-Net is a widely adopted standard for DMX data distribution over IP networks, ensuring compatibility with lighting control systems.
-
-### REQ.ART.110 – Universe Selection
-
-**Description:** If the second DMX universe is disabled in configuration, only the first universe shall be transmitted.  
-**Rationale:** This provides flexibility in system configuration and avoids unnecessary network traffic.
-
----
 
 ## REQ.ART.2xx – Channel Configuration
 
@@ -252,7 +252,7 @@ Preset data shall be stored persistently in NVRAM to retain values across system
 
 ### REQ.ART.310 – Configuration-Driven Behavior
 
-**Description:** Art-Net transmission behavior (universe enable/disable, channel limits) shall be controlled via configuration items.  
+**Description:** Art-Net transmission behavior (channel limits) shall be controlled via configuration items.  
 **Rationale:** Configuration-driven design allows flexible deployment without code modifications.
 
 # React Website Requirements
@@ -299,7 +299,7 @@ Preset data shall be stored persistently in NVRAM to retain values across system
 
 ### REQ.REA.310 – Preset DMX Data Display
 
-**Description:** For each preset, the React webpage shall display the DMX channels of the two universes.  
+**Description:** For each preset, the React webpage shall display the DMX channels.  
 **Rationale:** Provides visibility and control over preset data for users.
 
 ### REQ.REA.320 – Preset Data Upload to NVRAM

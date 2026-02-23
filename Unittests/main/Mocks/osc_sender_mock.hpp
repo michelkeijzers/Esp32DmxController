@@ -1,5 +1,5 @@
 #pragma once
-#include "../../main/osc_sender.hpp"
+#include "../../main/Tasks/osc_sender.hpp"
 #include <gmock/gmock.h>
 class MockOSCSender : public OSCSender
 {

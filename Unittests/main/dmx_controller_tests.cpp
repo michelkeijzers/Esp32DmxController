@@ -5,15 +5,15 @@ extern "C" void __force_link_DmxControllerQueueFailTest() {}
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../main/artnet_sender.hpp"
-#include "../../main/dmx_controller.hpp"
-#include "../../main/dmx_preset_changer.hpp"
-#include "../../main/foot_switch.hpp"
-#include "../../main/max3485_sender.hpp"
-#include "../../main/nvs_storage.hpp"
-#include "../../main/osc_sender.hpp"
-#include "../../main/seven_segment_display.hpp"
-#include "../../main/web_server.hpp"
+#include "../../main/Tasks/artnet_sender.hpp"
+#include "../../main/Tasks/dmx_controller.hpp"
+#include "../../main/Tasks/dmx_preset_changer.hpp"
+#include "../../main/Tasks/foot_switch.hpp"
+#include "../../main/Tasks/max3485_sender.hpp"
+#include "../../main/Tasks/nvs_storage.hpp"
+#include "../../main/Tasks/osc_sender.hpp"
+#include "../../main/Tasks/seven_segment_display.hpp"
+#include "../../main/Tasks/web_server.hpp"
 
 #include "driver/gpio.h"
 #include "esp_err.h"

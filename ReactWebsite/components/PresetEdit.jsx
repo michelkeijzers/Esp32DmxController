@@ -67,7 +67,7 @@ function PresetEdit({ presets, onUpdateName }) {
 
       <div className="preset-sections">
         <div className="preset-section">
-          <h3>Universe 1</h3>
+          {/* <h3>Universe 1</h3> */}
           <div className="values-grid-full">
             {preset.values1.map((value, index) => (
               <span 

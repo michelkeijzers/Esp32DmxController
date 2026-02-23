@@ -18,25 +18,76 @@ This device is a DMX controller that allows you to manage up to 20 presets, each
 
 The device hosts a website for configuration and control. Access the website by connecting to the device's network and entering its IP address in your browser.
 
-### Preset Configuration
+![Description of screenshot](Images/webserver.png)
 
-- Configure all 512 channels for each preset.
-- Save, edit, and organize presets easily.
+### Main Navigation Buttons
+
+At the top of the web interface, you will find several important buttons:
+
+- **Load**: Loads the current configuration and presets from the device. Use this to refresh the interface with the latest data stored on the controller.
+- **Save**: Saves any changes you have made to presets or configuration back to the device. Always click Save after making adjustments to ensure your changes are stored.
+- **Configuration**: Opens the configuration page, where you can adjust system settings such as DMX transmission, foot switch behavior, OSC, and more.
+- **Manual**: Opens this user manual directly in the web interface for quick reference and help.
+
+### Managing Presets
+
+The preset management area allows you to organize and edit your DMX presets directly from the web interface. Here are the main controls:
+
+- **Index**: The number shown at the start of each preset row. This is the preset's position/order in the list.
+- **Name**: Pressing on the name the navigation moves to a new screen to edit the preset's name and DMX channel values.
+- **Arrow Down (↓)**: Moves the preset one position lower in the list, swapping with the preset below.
+- **Arrow Up (↑)**: Moves the preset one position higher in the list, swapping with the preset above.
+- **Plus (+) Button**: Adds a new preset to the list. The new preset will appear at the end or in the next available slot.
+- **X Button**: Deletes the corresponding preset from the list. Use with caution—this action cannot be undone.
+
+These controls make it easy to reorder, rename, add, or remove presets as needed for your show or installation.
+
+### Editing a Preset
+
+Clicking the Name of the preset shows the edit screen:
+
+![Description of screenshot](Images/edit_preset.png)
+
+Below the edit preset image, you will find the following controls and fields:
+
+- **Preset Number**: Clearly displayed at the top or in the header, indicating which preset you are currently editing.
+- **Preset Name**: An editable field where you can assign or change the name of the current preset for easy identification.
+- **DMX Values (1–512)**: A grid where you can set the value (0–255) for each of the 512 DMX channels in the preset. Adjust these values to define the lighting or device behavior for this preset.
+- **Left Arrow (←)**: Navigate to the previous preset in the list. This allows you to quickly switch and edit other presets without returning to the main list.
+- **Right Arrow (→)**: Navigate to the next preset in the list.
+
+These controls make it easy to view, edit, and navigate between all your DMX presets directly from the web interface.
+
+When selecting a value of one of the 512 DMX channels, you get to the a screen to edit the DMX value for that channel:
+
+![alt text](Images/edit_dmx_value.png)
 
 ### Configuration Section
 
-The website provides additional configuration options:
+The website provides the following configuration options:
+
+#### Presets
+
+- **Maximum Number of Presets**: Set the maximum number of presets (20–50).
+- **Blackout Preset Long Press Time**: Set the time (2000–5000 ms) required to activate the blackout preset with a long press while on preset 1.
+
+#### Foot Switch
+
+- **Polarity**: Choose between Standard and Inverted polarity for the foot switch input.
+- **Long Press Time**: Set the duration (in milliseconds) required for a long press action on the foot switch (range: 500–2000 ms).
+- **Send Foot Switch State Changes through OSC**: Enable to send foot switch state changes as OSC messages.
+
+#### OSC (Open Sound Control)
+
+- **OSC Address (IP)**: Set the destination IP address for OSC messages.
+- **OSC Receive Port**: Set the port to receive OSC messages (1–65535).
+- **OSC Send Port**: Set the port to send OSC messages (1–65535).
 
 #### DMX Transmission
 
 - **Send via ArtNET**: Enable or disable DMX transmission over ArtNET protocol.
 - **Send to DMX connector**: Enable or disable DMX output via the physical DMX connector.
 - At least one option must be enabled for DMX transmission. If both are disabled, a warning is shown: _"DMX will not be transmitted"_.
-
-#### Foot Switch
-
-- **Polarity**: Choose between Standard and Inverted polarity for the foot switch input.
-- **Long Press Time**: Set the duration (in milliseconds) required for a long press action on the foot switch (range: 500–2000 ms).
 
 ---
 
