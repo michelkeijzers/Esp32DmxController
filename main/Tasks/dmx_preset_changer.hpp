@@ -22,7 +22,7 @@ class DmxPresetChanger : public RtosTask
     DmxPresetChanger();
     ~DmxPresetChanger();
 
-    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
 
   private:
     DmxPresets dmxPresets_;

@@ -7,23 +7,35 @@
 
 class RtosTask
 {
+  public:
+    struct TaskProperties
+    {
+        const char *taskName_;
+        const char *logTag;
+        UBaseType_t taskPriority;
+        size_t stackSize;
+        size_t queueCapacity;
+        size_t queueItemSize;
+        QueueHandle_t mainEventQueue;
+    };
+
   protected:
-    TaskHandle_t taskHandle_;
-    QueueHandle_t eventQueue_;
-    QueueHandle_t dmxControllerEventQueue_;
+    const char *task_name;
+    const char *log_tag_;
+    TaskHandle_t task_handle_;
+    QueueHandle_t event_queue_;
     bool initialized_;
-    const char *taskName_;
+    QueueHandle_t main_event_queue_;
 
   public:
     RtosTask();
     virtual ~RtosTask();
 
-    esp_err_t init(const char *taskName, uint32_t stackSize, UBaseType_t priority, size_t queueCapacity,
-        size_t queueItemSize, QueueHandle_t &dmxControllerQueue);
+    esp_err_t init(TaskProperties taskProperties);
     virtual void taskEntry(void *param) = 0;
-    TaskHandle_t getTaskHandle() const { return taskHandle_; }
-    virtual QueueHandle_t getEventQueue() const { return eventQueue_; }
-    QueueHandle_t getDmxControllerEventQueue() const { return dmxControllerEventQueue_; }
-    const char *getTaskName() const { return taskName_; }
+    TaskHandle_t getTaskHandle() const { return task_handle_; }
+    virtual QueueHandle_t getEventQueue() const { return event_queue_; }
+    QueueHandle_t getDmxControllerEventQueue() const { return main_event_queue_; }
+    const char *getTaskName() const { return task_name; }
     bool isInitialized() const { return initialized_; }
 };

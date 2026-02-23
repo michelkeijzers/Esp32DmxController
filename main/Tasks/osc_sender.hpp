@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Base/rtos_task.hpp"
 #include <esp_err.h>
+#include <esp_log.h>
 #include <lwip/sockets.h>
 #include <stdint.h>
 #include <string>
@@ -9,10 +11,9 @@
 // OSC (Open Sound Control) message implementation for ESP32
 // Sends OSC messages over UDP
 
-class OSCSender
+class OSCSender : public RtosTask
 {
   private:
-    int sockfd;
     struct sockaddr_in dest_addr;
     bool initialized;
 
@@ -27,7 +28,10 @@ class OSCSender
     virtual ~OSCSender();
 
     // Initialize OSC sender with destination IP and port
-    virtual esp_err_t init(const char *dest_ip, uint16_t dest_port);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port);
+
+  private:
+    int sockfd;
 
     // Send OSC message with address and single integer value
     esp_err_t sendMessage(const char *address, int32_t value);
@@ -46,4 +50,7 @@ class OSCSender
 
     // Close the OSC sender
     void close();
+
+    void taskEntry(void *param) override;
+    void taskLoop();
 };

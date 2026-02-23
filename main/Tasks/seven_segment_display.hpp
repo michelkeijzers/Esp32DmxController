@@ -25,7 +25,12 @@ class SevenSegmentDisplay : public RtosTask
     SevenSegmentDisplay();
     ~SevenSegmentDisplay();
 
-    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8]);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8]);
+
+  private:
+    const char *logTag_;
+    int taskPriority_;
+    int queueCapacity_;
 
   private:
     enum Segment

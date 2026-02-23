@@ -7,10 +7,6 @@
 #endif
 #include <messages.hpp>
 
-static const char *LOG_TAG = "ArtNetSender";
-static const int QUEUE_CAPACITY = 20;
-static const int TASK_PRIORITY = 5;
-
 ArtNetSender::ArtNetSender() : RtosTask(), sockfd_(-1), sequence_counter_(0)
 {
     memset(&dest_addr_, 0, sizeof(dest_addr_));
@@ -20,48 +16,50 @@ ArtNetSender::~ArtNetSender() {}
 
 void ArtNetSender::taskEntry(void *param) { static_cast<ArtNetSender *>(param)->taskLoop(); }
 
-esp_err_t ArtNetSender::init(QueueHandle_t dmxControllerEventQueue, const char *dest_ip, uint16_t dest_port)
+esp_err_t ArtNetSender::init(TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port)
 {
-    if (RtosTask::init("ArtNetSenderTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
-            dmxControllerEventQueue) != ESP_OK)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize ArtNetSenderTask");
+        ESP_LOGE(log_tag_, "Failed to initialize ArtNetSenderTask");
         return ESP_FAIL;
     }
 
     if (!dest_ip)
     {
-        ESP_LOGE(LOG_TAG, "Invalid destination IP");
+        ESP_LOGE(log_tag_, "Invalid destination IP");
         return ESP_ERR_INVALID_ARG;
     }
 
     // Create UDP socket
+
     sockfd_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd_ < 0)
     {
-        ESP_LOGE(LOG_TAG, "Failed to create socket");
+        ESP_LOGE(log_tag_, "Failed to create socket");
         return ESP_FAIL;
     }
 
     // Set up destination address
     dest_addr_.sin_family = AF_INET;
     dest_addr_.sin_port = htons(dest_port);
+
     if (inet_pton(AF_INET, dest_ip, &dest_addr_.sin_addr) != 1)
     {
-        ESP_LOGE(LOG_TAG, "Invalid destination IP address: %s", dest_ip);
+        ESP_LOGE(log_tag_, "Invalid destination IP address: %s", dest_ip);
         close();
         return ESP_ERR_INVALID_ARG;
     }
 
     // Set socket options for broadcast if needed
     int broadcast = 1;
+
     if (setsockopt(sockfd_, SOL_SOCKET, SO_BROADCAST, &broadcast, sizeof(broadcast)) < 0)
     {
-        ESP_LOGW(LOG_TAG, "Failed to set broadcast option");
+        ESP_LOGW(log_tag_, "Failed to set broadcast option");
     }
 
     initialized_ = true;
-    ESP_LOGI(LOG_TAG, "Art-Net sender initialized, destination: %s:%d", dest_ip, dest_port);
+    ESP_LOGI(log_tag_, "Art-Net sender initialized, destination: %s:%d", dest_ip, dest_port);
     return ESP_OK;
 }
 
@@ -70,7 +68,7 @@ void ArtNetSender::taskLoop()
     Messages::Event event;
     while (true)
     {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
             switch (event.type)
             {
@@ -84,7 +82,7 @@ void ArtNetSender::taskLoop()
                 // TODO: Fill ack/nack
                 if (xQueueSend(getDmxControllerEventQueue(), &responseEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to send preset data sent response to DmxController");
+                    ESP_LOGE(log_tag_, "Failed to send preset data sent response to DmxController");
                 }
                 break;
 
@@ -100,13 +98,13 @@ esp_err_t ArtNetSender::sendUniverse(uint16_t universe, const uint8_t *data, uin
 {
     if (!initialized_)
     {
-        ESP_LOGE(LOG_TAG, "Art-Net sender not initialized");
+        ESP_LOGE(log_tag_, "Art-Net sender not initialized");
         return ESP_ERR_INVALID_STATE;
     }
 
     if (!data || length == 0 || length > 512)
     {
-        ESP_LOGE(LOG_TAG, "Invalid data or length");
+        ESP_LOGE(log_tag_, "Invalid data or length");
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -125,11 +123,11 @@ esp_err_t ArtNetSender::sendUniverse(uint16_t universe, const uint8_t *data, uin
 
     if (sent < 0)
     {
-        ESP_LOGE(LOG_TAG, "Failed to send Art-Net packet");
+        ESP_LOGE(log_tag_, "Failed to send Art-Net packet");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(LOG_TAG, "Sent Art-Net universe %d (%d bytes)", universe, length);
+    ESP_LOGD(log_tag_, "Sent Art-Net universe %d (%d bytes)", universe, length);
     return ESP_OK;
 }
 
@@ -165,7 +163,11 @@ void ArtNetSender::close()
 {
     if (sockfd_ >= 0)
     {
+#ifdef _MSC_VER
+        ::_close(sockfd_);
+#else
         ::close(sockfd_);
+#endif
         sockfd_ = -1;
     }
     initialized_ = false;

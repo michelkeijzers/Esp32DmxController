@@ -30,7 +30,12 @@ class FootSwitch : public RtosTask
     FootSwitch();
     ~FootSwitch();
 
-    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue, gpio_num_t pinNum);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum);
+
+  private:
+    const char *logTag_;
+    int taskPriority_;
+    int queueCapacity_;
 
     uint16_t getLongPressThresholdMs();
     bool getPolarityInverted();

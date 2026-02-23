@@ -5,10 +5,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-static const char *LOG_TAG = "SevenSegmentDisplay";
-static const int QUEUE_CAPACITY = 10;
-static const int TASK_PRIORITY = 5;
-
 // Digit patterns for common cathode 7-segment display
 // Each bit represents a segment: bit 0 = A, 1 = B, 2 = C, 3 = D, 4 = E, 5 = F, 6 = G
 // DP is handled separately
@@ -58,18 +54,17 @@ SevenSegmentDisplay::SevenSegmentDisplay() : RtosTask(), currentPattern_(0), dec
 
 SevenSegmentDisplay::~SevenSegmentDisplay() {}
 
-esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const gpio_num_t pins[8])
+esp_err_t SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8])
 {
-    if (RtosTask::init("SevenSegmentDisplayTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Event),
-            dmxControllerEventQueue) != ESP_OK)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize SevenSegmentDisplayTask");
+        ESP_LOGE(log_tag_, "Failed to initialize SevenSegmentDisplayTask");
         return ESP_FAIL;
     }
 
     if (!pins)
     {
-        ESP_LOGE(LOG_TAG, "Invalid pins array");
+        ESP_LOGE(log_tag_, "Invalid pins array");
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -90,13 +85,13 @@ esp_err_t SevenSegmentDisplay::init(QueueHandle_t dmxControllerEventQueue, const
 
         if (gpio_config(&io_conf) != ESP_OK)
         {
-            ESP_LOGE(LOG_TAG, "Failed to configure GPIO pin %d", pins[i]);
+            ESP_LOGE(log_tag_, "Failed to configure GPIO pin %d", pins[i]);
             return ESP_FAIL;
         }
         segmentPins_[i] = pins[i];
     }
 
-    ESP_LOGI(LOG_TAG, "SevenSegmentDisplay task started");
+    ESP_LOGI(log_tag_, "SevenSegmentDisplay task started");
     return ESP_OK;
 }
 
@@ -107,7 +102,7 @@ void SevenSegmentDisplay::taskLoop()
     Event event;
     while (true)
     {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
             displayDigit(event.character, event.dot);
         }

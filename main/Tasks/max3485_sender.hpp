@@ -17,7 +17,12 @@ class Max3485Sender : public RtosTask
     Max3485Sender();
     ~Max3485Sender();
 
-    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
+
+  private:
+    const char *logTag_;
+    int taskPriority_;
+    int queueCapacity_;
     void close();
 
     esp_err_t sendDmx(const uint8_t *data, uint16_t length);

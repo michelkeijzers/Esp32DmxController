@@ -1,28 +1,28 @@
 #include "osc_sender.hpp"
+#include "Messages.hpp"
 #include <algorithm>
 #include <cstring>
 #include <esp_log.h>
 #include <lwip/netdb.h>
 #include <lwip/sockets.h>
 
-static const char *TAG = "OSC";
-
-OSCSender::OSCSender() : sockfd(-1), initialized(false) {}
+OSCSender::OSCSender() : RtosTask(), sockfd(-1) {}
 
 OSCSender::~OSCSender() { close(); }
 
-esp_err_t OSCSender::init(const char *dest_ip, uint16_t dest_port)
+esp_err_t OSCSender::init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port)
 {
-    if (initialized)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        close();
+        ESP_LOGE(log_tag_, "Failed to initialize OSCSender task");
+        return ESP_FAIL;
     }
 
     // Create UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
     if (sockfd < 0)
     {
-        ESP_LOGE(TAG, "Failed to create socket");
+        ESP_LOGE(log_tag_, "Failed to create socket");
         return ESP_FAIL;
     }
 
@@ -33,13 +33,13 @@ esp_err_t OSCSender::init(const char *dest_ip, uint16_t dest_port)
 
     if (inet_pton(AF_INET, dest_ip, &dest_addr.sin_addr) != 1)
     {
-        ESP_LOGE(TAG, "Invalid destination IP address");
+        ESP_LOGE(log_tag_, "Invalid destination IP address");
         close();
         return ESP_FAIL;
     }
 
     initialized = true;
-    ESP_LOGI(TAG, "OSC sender initialized to %s:%d", dest_ip, dest_port);
+    ESP_LOGI(log_tag_, "OSC sender initialized to %s:%d", dest_ip, dest_port);
     return ESP_OK;
 }
 
@@ -87,7 +87,7 @@ esp_err_t OSCSender::sendMessage(const char *address, int32_t value)
 {
     if (!initialized)
     {
-        ESP_LOGE(TAG, "OSC sender not initialized");
+        ESP_LOGE(log_tag_, "OSC sender not initialized");
         return ESP_FAIL;
     }
 
@@ -108,11 +108,11 @@ esp_err_t OSCSender::sendMessage(const char *address, int32_t value)
 
     if (sent < 0)
     {
-        ESP_LOGE(TAG, "Failed to send OSC message");
+        ESP_LOGE(log_tag_, "Failed to send OSC message");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s %ld", address, (long)value);
+    ESP_LOGD(log_tag_, "Sent OSC message: %s %ld", address, (long)value);
     return ESP_OK;
 }
 
@@ -120,7 +120,7 @@ esp_err_t OSCSender::sendMessage(const char *address, float value)
 {
     if (!initialized)
     {
-        ESP_LOGE(TAG, "OSC sender not initialized");
+        ESP_LOGE(log_tag_, "OSC sender not initialized");
         return ESP_FAIL;
     }
 
@@ -141,11 +141,11 @@ esp_err_t OSCSender::sendMessage(const char *address, float value)
 
     if (sent < 0)
     {
-        ESP_LOGE(TAG, "Failed to send OSC message");
+        ESP_LOGE(log_tag_, "Failed to send OSC message");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s %f", address, value);
+    ESP_LOGD(log_tag_, "Sent OSC message: %s %f", address, value);
     return ESP_OK;
 }
 
@@ -153,7 +153,7 @@ esp_err_t OSCSender::sendMessage(const char *address, const char *value)
 {
     if (!initialized)
     {
-        ESP_LOGE(TAG, "OSC sender not initialized");
+        ESP_LOGE(log_tag_, "OSC sender not initialized");
         return ESP_FAIL;
     }
 
@@ -174,11 +174,11 @@ esp_err_t OSCSender::sendMessage(const char *address, const char *value)
 
     if (sent < 0)
     {
-        ESP_LOGE(TAG, "Failed to send OSC message");
+        ESP_LOGE(log_tag_, "Failed to send OSC message");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s %s", address, value);
+    ESP_LOGD(log_tag_, "Sent OSC message: %s %s", address, value);
     return ESP_OK;
 }
 
@@ -186,7 +186,7 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<int32_t>
 {
     if (!initialized)
     {
-        ESP_LOGE(TAG, "OSC sender not initialized");
+        ESP_LOGE(log_tag_, "OSC sender not initialized");
         return ESP_FAIL;
     }
 
@@ -215,11 +215,11 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<int32_t>
 
     if (sent < 0)
     {
-        ESP_LOGE(TAG, "Failed to send OSC message");
+        ESP_LOGE(log_tag_, "Failed to send OSC message");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s with %d integers", address, static_cast<int>(values.size()));
+    ESP_LOGD(log_tag_, "Sent OSC message: %s with %d integers", address, static_cast<int>(values.size()));
     return ESP_OK;
 }
 
@@ -227,7 +227,7 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<float> &
 {
     if (!initialized)
     {
-        ESP_LOGE(TAG, "OSC sender not initialized");
+        ESP_LOGE(log_tag_, "OSC sender not initialized");
         return ESP_FAIL;
     }
 
@@ -256,11 +256,11 @@ esp_err_t OSCSender::sendMessage(const char *address, const std::vector<float> &
 
     if (sent < 0)
     {
-        ESP_LOGE(TAG, "Failed to send OSC message");
+        ESP_LOGE(log_tag_, "Failed to send OSC message");
         return ESP_FAIL;
     }
 
-    ESP_LOGD(TAG, "Sent OSC message: %s with %d floats", address, static_cast<int>(values.size()));
+    ESP_LOGD(log_tag_, "Sent OSC message: %s with %d floats", address, static_cast<int>(values.size()));
     return ESP_OK;
 }
 
@@ -272,4 +272,27 @@ void OSCSender::close()
         sockfd = -1;
     }
     initialized = false;
+}
+
+void OSCSender::taskEntry(void *param) { static_cast<OSCSender *>(param)->taskLoop(); }
+
+void OSCSender::taskLoop()
+{
+    Messages::Event event;
+    while (true)
+    {
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
+        {
+            ESP_LOGI(log_tag_, "OSC event received: %d", event.type);
+            switch (event.type)
+            {
+            case 0:
+                // No-op or dummy case to suppress warning
+                break;
+            default:
+                ESP_LOGW(log_tag_, "Unknown OSC event type: %d", event.type);
+                break;
+            }
+        }
+    }
 }

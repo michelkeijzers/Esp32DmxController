@@ -14,10 +14,6 @@
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
-static const char *LOG_TAG = "DmxController";
-static const int QUEUE_CAPACITY = 10;
-static const int TASK_PRIORITY = 5;
-
 DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
     FootSwitch *footSwitch, Max3485Sender *max3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
     NvsStorage *nvsStorage)
@@ -26,23 +22,14 @@ DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSend
 {
 }
 
-DmxController::~DmxController()
-{
-    delete presetChanger_;
-    delete oscSender_;
-    delete display_;
-    delete footSwitch_;
-    delete max3485Sender_;
-    delete artnetSender_;
-    delete webServer_;
-}
+DmxController::~DmxController() {}
 
 void DmxController::printFirmwareInfo()
 {
     const esp_app_desc_t *app_desc = esp_app_get_description();
-    ESP_LOGW(LOG_TAG, "Current firmware version: %s", app_desc->version);
-    ESP_LOGW(LOG_TAG, "Project name: %s", app_desc->project_name);
-    ESP_LOGW(LOG_TAG, "Compile time: %s %s", app_desc->date, app_desc->time);
+    ESP_LOGW(log_tag_, "Current firmware version: %s", app_desc->version);
+    ESP_LOGW(log_tag_, "Project name: %s", app_desc->project_name);
+    ESP_LOGW(log_tag_, "Compile time: %s %s", app_desc->date, app_desc->time);
 }
 
 esp_err_t DmxController::performOtaUpdate(const char *url)
@@ -54,12 +41,12 @@ esp_err_t DmxController::performOtaUpdate(const char *url)
     esp_err_t ret = esp_https_ota(&ota_config);
     if (ret == ESP_OK)
     {
-        ESP_LOGW(LOG_TAG, "OTA update successful, restarting...");
+        ESP_LOGW(log_tag_, "OTA update successful, restarting...");
         esp_restart();
     }
     else
     {
-        ESP_LOGE(LOG_TAG, "OTA update failed: %s\n", esp_err_to_name(ret));
+        ESP_LOGE(log_tag_, "OTA update failed: %s\n", esp_err_to_name(ret));
     }
     return ret;
 }
@@ -69,10 +56,17 @@ esp_err_t DmxController::init()
     printf("Initializing DmxController...\n");
     QueueHandle_t queue = getEventQueue(); // Unused
     printf("DmxController init: queue handle = %p\n", (void *)queue);
-    if (RtosTask::init("DmxControllerTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event), queue) !=
-        ESP_OK)
+    TaskProperties dmxControllerTaskProperties = {.taskName_ = "DmxControllerTask",
+        .logTag = "DmxController",
+        .taskPriority = 4,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = queue};
+
+    if (RtosTask::init(dmxControllerTaskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize DmxControllerTask");
+        ESP_LOGE(log_tag_, "Failed to initialize DmxControllerTask");
         return ESP_FAIL;
     }
 
@@ -86,13 +80,13 @@ esp_err_t DmxController::init()
     printf("Initializing sub-tasks...\n");
     if (init_sub_tasks() != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize sub-tasks");
+        ESP_LOGE(log_tag_, "Failed to initialize sub-tasks");
         return ESP_FAIL;
     }
 
     if (init_messages() != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize message handling");
+        ESP_LOGE(log_tag_, "Failed to initialize message handling");
         return ESP_FAIL;
     }
 
@@ -103,89 +97,138 @@ esp_err_t DmxController::init_sub_tasks()
 {
     if (!presetChanger_)
     {
-        ESP_LOGE(LOG_TAG, "presetChanger_ is nullptr");
+        ESP_LOGE(log_tag_, "presetChanger_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (presetChanger_->init(getEventQueue()) != ESP_OK)
+    TaskProperties presetChangerTaskProperties = {.taskName_ = "DmxPresetChangerTask",
+        .logTag = "DmxPresetChanger",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (presetChanger_->init(presetChangerTaskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize DmxPresetChanger");
+        ESP_LOGE(log_tag_, "Failed to initialize DmxPresetChanger");
         return ESP_FAIL;
     }
 
     if (!oscSender_)
     {
-        ESP_LOGE(LOG_TAG, "oscSender_ is nullptr");
+        ESP_LOGE(log_tag_, "oscSender_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (oscSender_->init(OSC_DEST_IP, OSC_DEST_PORT) != ESP_OK)
+    TaskProperties oscSenderTaskProperties = {.taskName_ = "OSCSenderTask",
+        .logTag = "OSCSender",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (oscSender_->init(oscSenderTaskProperties, OSC_DEST_IP, OSC_DEST_PORT) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize OSCSender");
+        ESP_LOGE(log_tag_, "Failed to initialize OSCSender");
         return ESP_FAIL;
     }
 
     if (!display_)
     {
-        ESP_LOGE(LOG_TAG, "display_ is nullptr");
+        ESP_LOGE(log_tag_, "display_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (display_->init(getEventQueue(), DISPLAY_PINS) != ESP_OK)
+    TaskProperties taskProperties = {.taskName_ = "SevenSegmentDisplayTask",
+        .logTag = "SevenSegmentDisplay",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (display_->init(taskProperties, DISPLAY_PINS) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize SevenSegmentDisplay");
+        ESP_LOGE(log_tag_, "Failed to initialize SevenSegmentDisplay");
         return ESP_FAIL;
     }
 
     if (!footSwitch_)
     {
-        ESP_LOGE(LOG_TAG, "footSwitch_ is nullptr");
+        ESP_LOGE(log_tag_, "footSwitch_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (footSwitch_->init(getEventQueue(), FOOT_SWITCH_PIN) != ESP_OK)
+    TaskProperties footSwitchTaskProperties = {.taskName_ = "FootSwitchTask",
+        .logTag = "FootSwitch",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (footSwitch_->init(footSwitchTaskProperties, FOOT_SWITCH_PIN) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize FootSwitch");
+        ESP_LOGE(log_tag_, "Failed to initialize FootSwitch");
         return ESP_FAIL;
     }
 
     if (!max3485Sender_)
     {
-        ESP_LOGE(LOG_TAG, "max3485Sender_ is nullptr");
+        ESP_LOGE(log_tag_, "max3485Sender_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (max3485Sender_->init(getEventQueue()) != ESP_OK)
+    TaskProperties max3485SenderTaskProperties = {.taskName_ = "Max3485SenderTask",
+        .logTag = "Max3485Sender",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (max3485Sender_->init(max3485SenderTaskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize Max3485Sender");
+        ESP_LOGE(log_tag_, "Failed to initialize Max3485Sender");
         return ESP_FAIL;
     }
 
     if (!artnetSender_)
     {
-        ESP_LOGE(LOG_TAG, "artnetSender_ is nullptr");
+        ESP_LOGE(log_tag_, "artnetSender_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (artnetSender_->init(getEventQueue(), ARTNET_DEST_IP, 6454) != ESP_OK)
+    TaskProperties artnetSenderTaskProperties = {.taskName_ = "ArtNetSenderTask",
+        .logTag = "ArtNetSender",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (artnetSender_->init(artnetSenderTaskProperties, ARTNET_DEST_IP, 6454) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize ArtNetSender");
+        ESP_LOGE(log_tag_, "Failed to initialize ArtNetSender");
         return ESP_FAIL;
     }
 
     if (!webServer_)
     {
-        ESP_LOGE(LOG_TAG, "webServer_ is nullptr");
+        ESP_LOGE(log_tag_, "webServer_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
     if (webServer_->init() != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize WebServer");
+        ESP_LOGE(log_tag_, "Failed to initialize WebServer");
         return ESP_FAIL;
     }
 
+    TaskProperties nvsStorageTaskProperties = {.taskName_ = "NvsStorageTask",
+        .logTag = "NvsStorage",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
     if (!nvsStorage_)
     {
-        ESP_LOGE(LOG_TAG, "nvsStorage_ is nullptr");
+        ESP_LOGE(log_tag_, "nvsStorage_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (nvsStorage_->init(getEventQueue()) != ESP_OK)
+    if (nvsStorage_->init(nvsStorageTaskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to initialize NvsStorage");
         return ESP_FAIL;
     }
 
@@ -199,19 +242,19 @@ esp_err_t DmxController::init_messages()
     event.type = Messages::REQUEST_CONFIGURATION;
     if (xQueueSend(nvsStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
-        ESP_LOGE(LOG_TAG, "Failed to send configuration request to NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to send configuration request to NvsStorage");
         return ESP_FAIL;
     }
 
     // Receive config response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
-        ESP_LOGE(LOG_TAG, "Failed to receive configuration response from NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to receive configuration response from NvsStorage");
         return ESP_FAIL;
     }
     if (event.type != Messages::EventType::CONFIGURATION_RESPONSE)
     {
-        ESP_LOGE(LOG_TAG, "Received unexpected configuration event type from NvsStorage: %d", event.type);
+        ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvsStorage: %d", event.type);
         return ESP_FAIL;
     }
 
@@ -221,7 +264,7 @@ esp_err_t DmxController::init_messages()
     footSwitchEvent.data.configurationData = event.data.configurationData;
     if (xQueueSend(footSwitch_->getEventQueue(), &footSwitchEvent, 0) != pdPASS)
     {
-        ESP_LOGE(LOG_TAG, "Failed to send configuration to FootSwitch");
+        ESP_LOGE(log_tag_, "Failed to send configuration to FootSwitch");
         return ESP_FAIL;
     }
 
@@ -229,19 +272,19 @@ esp_err_t DmxController::init_messages()
     event.type = Messages::REQUEST_PRESETS;
     if (xQueueSend(nvsStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
-        ESP_LOGE(LOG_TAG, "Failed to send presets request to NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to send presets request to NvsStorage");
         return ESP_FAIL;
     }
 
     // Receive presets response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
-        ESP_LOGE(LOG_TAG, "Failed to receive presets response from NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to receive presets response from NvsStorage");
         return ESP_FAIL;
     }
     if (event.type != Messages::EventType::PRESETS_RESPONSE)
     {
-        ESP_LOGE(LOG_TAG, "Received unexpected event type from NvsStorage: %d", event.type);
+        ESP_LOGE(log_tag_, "Received unexpected event type from NvsStorage: %d", event.type);
         return ESP_FAIL;
     }
 
@@ -251,7 +294,7 @@ esp_err_t DmxController::init_messages()
     presetChangerEvent.data.presetsData = event.data.presetsData;
     if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
     {
-        ESP_LOGE(LOG_TAG, "Failed to send presets to DmxPresetChanger");
+        ESP_LOGE(log_tag_, "Failed to send presets to DmxPresetChanger");
         return ESP_FAIL;
     }
 
@@ -277,7 +320,7 @@ void DmxController::taskLoop()
                 presetChangerEvent.type = Messages::EventType::SELECT_NEXT_PRESET;
                 if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward next preset change event to DmxPresetChanger");
+                    ESP_LOGE(log_tag_, "Failed to forward next preset change event to DmxPresetChanger");
                 }
             }
             break;
@@ -289,7 +332,7 @@ void DmxController::taskLoop()
                 presetChangerEvent.type = Messages::EventType::SELECT_PREVIOUS_PRESET;
                 if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward previous preset change event to DmxPresetChanger");
+                    ESP_LOGE(log_tag_, "Failed to forward previous preset change event to DmxPresetChanger");
                 }
             }
             break;
@@ -302,7 +345,7 @@ void DmxController::taskLoop()
                 artNetEvent.data.presetData = event.data.presetData;
                 if (xQueueSend(artnetSender_->getEventQueue(), &artNetEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward preset data to ArtNetSender");
+                    ESP_LOGE(log_tag_, "Failed to forward preset data to ArtNetSender");
                 }
             }
             break;
@@ -315,7 +358,7 @@ void DmxController::taskLoop()
                 displayEvent.data.presetData.presetNumber = event.data.presetData.presetNumber;
                 if (xQueueSend(display_->getEventQueue(), &displayEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward preset index to SevenSegmentDisplay");
+                    ESP_LOGE(log_tag_, "Failed to forward preset index to SevenSegmentDisplay");
                 }
             }
             break;

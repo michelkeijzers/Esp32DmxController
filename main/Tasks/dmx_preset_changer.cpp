@@ -2,24 +2,19 @@
 #include "messages.hpp"
 #include <esp_log.h>
 
-static const char *LOG_TAG = "DmxPresetChanger";
-static const int QUEUE_CAPACITY = 10;
-static const int TASK_PRIORITY = 5;
-
-DmxPresetChanger::DmxPresetChanger() : RtosTask() {}
+DmxPresetChanger::DmxPresetChanger() {}
 
 DmxPresetChanger::~DmxPresetChanger() {}
 
-esp_err_t DmxPresetChanger::init(QueueHandle_t dmxControllerEventQueue)
+esp_err_t DmxPresetChanger::init(TaskProperties taskProperties)
 {
-    if (RtosTask::init("DmxPresetChangerTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
-            dmxControllerEventQueue) != ESP_OK)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize DmxPresetChangerTask");
+        ESP_LOGE(log_tag_, "Failed to initialize DmxPresetChangerTask");
         return ESP_FAIL;
     }
 
-    ESP_LOGI(LOG_TAG, "DmxPresetChanger task started");
+    ESP_LOGI(log_tag_, "DmxPresetChanger task started");
     return ESP_OK;
 }
 
@@ -30,7 +25,7 @@ void DmxPresetChanger::taskLoop()
     Messages::Event event;
     while (true)
     {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
             switch (event.type)
             {
@@ -55,9 +50,9 @@ void DmxPresetChanger::taskLoop()
 
                 if (xQueueSend(getDmxControllerEventQueue(), &dmxControllerEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward current preset data to DmxController");
+                    ESP_LOGE(log_tag_, "Failed to forward current preset data to DmxController");
                 }
-                ESP_LOGI(LOG_TAG, "Selected next preset: index=%d", dmxPresets_.getCurrentPresetIndex());
+                ESP_LOGI(log_tag_, "Selected next preset: index=%d", dmxPresets_.getCurrentPresetIndex());
             }
             break;
 
@@ -78,9 +73,9 @@ void DmxPresetChanger::taskLoop()
 
                 if (xQueueSend(getDmxControllerEventQueue(), &dmxControllerEvent, 0) != pdPASS)
                 {
-                    ESP_LOGE(LOG_TAG, "Failed to forward current preset data to DmxController");
+                    ESP_LOGE(log_tag_, "Failed to forward current preset data to DmxController");
                 }
-                ESP_LOGI(LOG_TAG, "Selected previous preset: index=%d", dmxPresets_.getCurrentPresetIndex());
+                ESP_LOGI(log_tag_, "Selected previous preset: index=%d", dmxPresets_.getCurrentPresetIndex());
             }
             break;
 
@@ -101,5 +96,5 @@ void DmxPresetChanger::setPresets(const Messages::PresetsEventData &presetsData)
             static_cast<uint16_t>(presetsData.presets[i].universe1Length), presetsData.presets[i].universe1Data,
             static_cast<uint16_t>(presetsData.presets[i].universe2Length), presetsData.presets[i].universe2Data);
     }
-    ESP_LOGI(LOG_TAG, "Presets updated: number of presets=%d", dmxPresets_.getNumPresets());
+    ESP_LOGI(log_tag_, "Presets updated: number of presets=%d", dmxPresets_.getNumPresets());
 }

@@ -12,7 +12,8 @@ endif()
 # Hardcode GTest_DIR for vcpkg integration
 set(GTest_DIR "C:/tools/vcpkg/installed/x64-windows/share/gtest" CACHE PATH "Path to GTest cmake config")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/esp_idf_stubs)
 include_directories(${CMAKE_SOURCE_DIR}/../../main)

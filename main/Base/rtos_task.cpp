@@ -6,49 +6,51 @@
 #include "freertos/task.h"
 #include <stdio.h>
 
-RtosTask::RtosTask() : taskHandle_(nullptr), eventQueue_(nullptr), initialized_(false) {}
+RtosTask::RtosTask() : task_handle_(nullptr), event_queue_(nullptr), initialized_(false) {}
 
 RtosTask::~RtosTask()
 {
-    if (taskHandle_)
+    if (task_handle_)
     {
-        vTaskDelete(taskHandle_);
+        vTaskDelete(task_handle_);
     }
     // Only delete eventQueue_ if it is not the test stub dummyQueue (0x1)
-    if (eventQueue_ && eventQueue_ != reinterpret_cast<QueueHandle_t>(0x1))
+    if (event_queue_ && event_queue_ != reinterpret_cast<QueueHandle_t>(0x1))
     {
-        vQueueDelete(eventQueue_);
+        vQueueDelete(event_queue_);
     }
 }
 
-esp_err_t RtosTask::init(const char *taskName, uint32_t stackSize, UBaseType_t priority, size_t queueCapacity,
-    size_t queueItemSize, QueueHandle_t &dmxControllerEventQueue)
+esp_err_t RtosTask::init(TaskProperties taskProperties)
 {
-    taskName_ = taskName;
-    dmxControllerEventQueue_ = dmxControllerEventQueue;
+    task_name = taskProperties.taskName_;
+    log_tag_ = taskProperties.logTag;
+    main_event_queue_ = taskProperties.mainEventQueue;
 
-    eventQueue_ = xQueueCreate(static_cast<unsigned int>(queueCapacity), static_cast<unsigned int>(queueItemSize));
-    if (!eventQueue_)
+    event_queue_ = xQueueCreate(
+        static_cast<uint32_t>(taskProperties.queueCapacity), static_cast<uint32_t>(taskProperties.queueItemSize));
+    if (!event_queue_)
     {
-        ESP_LOGI(taskName_, "Event queue creation successfully");
+        ESP_LOGI(log_tag_, "Event queue creation successfully");
     }
     else
     {
-        ESP_LOGE(taskName_, "Failed to create event queue");
+        ESP_LOGE(log_tag_, "Failed to create event queue");
     }
 
     // Static entry wrapper
     auto entry = [](void *param) { static_cast<RtosTask *>(param)->taskEntry(param); };
 
-    if (xTaskCreate(entry, taskName, stackSize, this, priority, &taskHandle_) == pdPASS)
+    if (xTaskCreate(entry, taskProperties.taskName_, static_cast<uint32_t>(taskProperties.stackSize), this,
+            taskProperties.taskPriority, &task_handle_) == pdPASS)
     {
-        ESP_LOGI(taskName, "Task created successfully");
+        ESP_LOGI(log_tag_, "Task created successfully");
     }
     else
     {
-        ESP_LOGE(taskName, "Failed to create task");
-        vQueueDelete(eventQueue_);
-        eventQueue_ = nullptr;
+        ESP_LOGE(log_tag_, "Failed to create task");
+        vQueueDelete(event_queue_);
+        event_queue_ = nullptr;
         return ESP_FAIL;
     }
     initialized_ = true;

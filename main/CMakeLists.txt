@@ -1,5 +1,7 @@
 # Treat all warnings as errors for C++
- idf_component_register(
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+idf_component_register(
     SRCS 
         "Tasks/max3485_sender.cpp"
         "Tasks/foot_switch.cpp"
@@ -13,6 +15,7 @@
         "Base/rtos_task.cpp"
         "main.cpp"
         "Data/dmx_presets.cpp"
+        "Data/dmx_preset.cpp"
     INCLUDE_DIRS "." "Tasks"
     REQUIRES esp_https_ota app_update nvs_flash esp_wifi esp_event driver json esp_http_server spiffs
 )

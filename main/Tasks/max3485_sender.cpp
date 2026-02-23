@@ -10,24 +10,22 @@
 #include "esp_rom_sys.h"
 #endif
 #include <messages.hpp>
-static const char *LOG_TAG = "Max3485Sender";
-static const int QUEUE_CAPACITY = 20;
-static const int TASK_PRIORITY = 5;
+
 static const uart_port_t DMX_UART_PORT = UART_NUM_1;
 static const int DMX_TX_PIN = 17; // Set to your TX pin
 static const int DMX_BAUD_RATE = 250000;
 static const int DMX_BREAK_US = 100;
 static const int DMX_MAB_US = 12;
 
-Max3485Sender::Max3485Sender() : RtosTask(), initialized_(false) {}
+Max3485Sender::Max3485Sender() : RtosTask() {}
+
 Max3485Sender::~Max3485Sender() { close(); }
 
-esp_err_t Max3485Sender::init(QueueHandle_t dmxControllerEventQueue)
+esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
 {
-    if (RtosTask::init("Max3485SenderTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
-            dmxControllerEventQueue) != ESP_OK)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize Max3485SenderTask");
+        ESP_LOGE(log_tag_, "Failed to initialize Max3485SenderTask");
         return ESP_FAIL;
     }
     uart_config_t uart_config;
@@ -41,7 +39,7 @@ esp_err_t Max3485Sender::init(QueueHandle_t dmxControllerEventQueue)
         uart_set_pin(DMX_UART_PORT, DMX_TX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
     ESP_ERROR_CHECK(uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0));
     initialized_ = true;
-    ESP_LOGI(LOG_TAG, "MAX3485 sender initialized");
+    ESP_LOGI(log_tag_, "MAX3485 sender initialized");
     return ESP_OK;
 }
 
@@ -58,12 +56,12 @@ esp_err_t Max3485Sender::sendDmx(const uint8_t *data, uint16_t length)
 {
     if (!initialized_)
     {
-        ESP_LOGE(LOG_TAG, "MAX3485 sender not initialized");
+        ESP_LOGE(log_tag_, "MAX3485 sender not initialized");
         return ESP_ERR_INVALID_STATE;
     }
     if (!data || length == 0 || length > 512)
     {
-        ESP_LOGE(LOG_TAG, "Invalid DMX data or length");
+        ESP_LOGE(log_tag_, "Invalid DMX data or length");
         return ESP_ERR_INVALID_ARG;
     }
     // DMX break
@@ -75,10 +73,10 @@ esp_err_t Max3485Sender::sendDmx(const uint8_t *data, uint16_t length)
     int written = uart_write_bytes(DMX_UART_PORT, (const char *)data, length);
     if (written != length)
     {
-        ESP_LOGE(LOG_TAG, "Failed to write all DMX bytes");
+        ESP_LOGE(log_tag_, "Failed to write all DMX bytes");
         return ESP_FAIL;
     }
-    ESP_LOGD(LOG_TAG, "Sent DMX frame (%d bytes)", length);
+    ESP_LOGD(log_tag_, "Sent DMX frame (%d bytes)", length);
     return ESP_OK;
 }
 
@@ -89,7 +87,7 @@ void Max3485Sender::taskLoop()
     Messages::Event event;
     while (true)
     {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
             switch (event.type)
             {

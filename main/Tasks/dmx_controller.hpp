@@ -23,10 +23,9 @@
 class DmxController : public RtosTask
 {
   public:
-    DmxController(DmxPresetChanger *presetChanger = nullptr, OSCSender *oscSender = nullptr,
-        SevenSegmentDisplay *display = nullptr, FootSwitch *footSwitch = nullptr,
-        Max3485Sender *dmx3485Sender = nullptr, ArtNetSender *artnetSender = nullptr, WebServer *webServer = nullptr,
-        NvsStorage *nvsStorage = nullptr);
+    DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
+        FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
+        NvsStorage *nvsStorage);
     ~DmxController();
     esp_err_t init();
     void taskLoop();
@@ -47,14 +46,14 @@ class DmxController : public RtosTask
     static constexpr int OSC_DEST_PORT = 8000;
     static constexpr const char *ARTNET_DEST_IP = "192.168.1.100";
 
-    DmxPresetChanger *presetChanger_ = nullptr;
-    OSCSender *oscSender_ = nullptr;
-    SevenSegmentDisplay *display_ = nullptr;
-    FootSwitch *footSwitch_ = nullptr;
-    Max3485Sender *max3485Sender_ = nullptr;
-    ArtNetSender *artnetSender_ = nullptr;
-    WebServer *webServer_ = nullptr;
-    NvsStorage *nvsStorage_ = nullptr;
+    DmxPresetChanger *presetChanger_;
+    OSCSender *oscSender_;
+    SevenSegmentDisplay *display_;
+    FootSwitch *footSwitch_;
+    Max3485Sender *max3485Sender_;
+    ArtNetSender *artnetSender_;
+    WebServer *webServer_;
+    NvsStorage *nvsStorage_;
 
     TickType_t bootTime = 0;
 

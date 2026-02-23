@@ -22,7 +22,12 @@ class NvsStorage : public RtosTask
     NvsStorage();
     ~NvsStorage();
 
-    virtual esp_err_t init(QueueHandle_t dmxControllerEventQueue);
+    virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
+
+  private:
+    const char *log_tag_;
+    int task_priority_;
+    int queue_capacity_;
 
     // Synchronous wrappers (for compatibility)
     esp_err_t setConfiguration(const Messages::ConfigurationEventData &config);

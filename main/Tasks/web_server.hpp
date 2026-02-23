@@ -30,6 +30,11 @@ class WebServer
     virtual ~WebServer();
 
     virtual esp_err_t init();
+
+  private:
+    const char *logTag_;
+    int taskPriority_;
+    int queueCapacity_;
     esp_err_t start();
     esp_err_t stop();
 

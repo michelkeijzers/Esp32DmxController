@@ -2,10 +2,6 @@
 #include <cstring>
 #include <esp_log.h>
 
-static const char *LOG_TAG = "NvsStorage";
-static const int QUEUE_CAPACITY = 10;
-static const int TASK_PRIORITY = 5;
-
 NvsStorage::NvsStorage()
     : RtosTask(), configuration_nvs_handle(0), presets_nvs_handle(0), configuration_namespace_name("configuration"),
       presets_namespace_name("presets")
@@ -25,25 +21,24 @@ NvsStorage::~NvsStorage()
     }
 }
 
-esp_err_t NvsStorage::init(QueueHandle_t dmxControllerEventQueue)
+esp_err_t NvsStorage::init(RtosTask::TaskProperties taskProperties)
 {
-    if (RtosTask::init("NVSStorageTask", 2048, TASK_PRIORITY, QUEUE_CAPACITY, sizeof(Messages::Event),
-            dmxControllerEventQueue) != ESP_OK)
+    if (RtosTask::init(taskProperties) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to initialize NVSStorageTask");
+        ESP_LOGE(log_tag_, "Failed to initialize NVSStorageTask");
         return ESP_FAIL;
     }
 
     esp_err_t err = nvs_open(configuration_namespace_name, NVS_READWRITE, &configuration_nvs_handle);
     if (err != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to open configuration NVS namespace: %s", esp_err_to_name(err));
+        ESP_LOGE(log_tag_, "Failed to open configuration NVS namespace: %s", esp_err_to_name(err));
     }
 
     err = nvs_open(presets_namespace_name, NVS_READWRITE, &presets_nvs_handle);
     if (err != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to open presets NVS namespace: %s", esp_err_to_name(err));
+        ESP_LOGE(log_tag_, "Failed to open presets NVS namespace: %s", esp_err_to_name(err));
     }
 
     return err;
@@ -56,9 +51,9 @@ void NvsStorage::taskLoop()
     Messages::Event event;
     while (true)
     {
-        if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(LOG_TAG, "NVSStorage event received: %d", event.type);
+            ESP_LOGI(log_tag_, "NVSStorage event received: %d", event.type);
             switch (event.type)
             {
             case Messages::SET_CONFIGURATION:
@@ -78,7 +73,7 @@ void NvsStorage::taskLoop()
                 break;
 
             default:
-                ESP_LOGW(LOG_TAG, "Unknown NVSStorage event type: %d", event.type);
+                ESP_LOGW(log_tag_, "Unknown NVSStorage event type: %d", event.type);
                 break;
             }
         }
@@ -92,19 +87,19 @@ esp_err_t NvsStorage::setConfiguration(const Messages::ConfigurationEventData &c
 
     if (nvs_set_u8(configuration_nvs_handle, "SwitchPolarityInv", configurationData.switchPolarityInverted) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to set switch polarity inverted");
+        ESP_LOGE(log_tag_, "Failed to set switch polarity inverted");
         return ESP_FAIL;
     }
 
     if (nvs_set_u16(configuration_nvs_handle, "LongPressThreshold", configurationData.longPressThresholdMs) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to set long press threshold");
+        ESP_LOGE(log_tag_, "Failed to set long press threshold");
         return ESP_FAIL;
     }
 
     if (nvs_commit(configuration_nvs_handle) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to commit configuration data");
+        ESP_LOGE(log_tag_, "Failed to commit configuration data");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -118,7 +113,7 @@ esp_err_t NvsStorage::requestConfiguration(Messages::ConfigurationEventData &con
     uint8_t switch_polarity_inverted;
     if (nvs_get_u8(configuration_nvs_handle, "SwitchPolarityInv", &switch_polarity_inverted) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to get switch polarity inverted");
+        ESP_LOGE(log_tag_, "Failed to get switch polarity inverted");
         return ESP_FAIL;
     }
     configurationData.switchPolarityInverted = switch_polarity_inverted;
@@ -126,7 +121,7 @@ esp_err_t NvsStorage::requestConfiguration(Messages::ConfigurationEventData &con
     uint16_t long_press_threshold_ms;
     if (nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to get long press threshold");
+        ESP_LOGE(log_tag_, "Failed to get long press threshold");
         return ESP_FAIL;
     }
     configurationData.longPressThresholdMs = long_press_threshold_ms;
@@ -147,7 +142,7 @@ esp_err_t NvsStorage::setPresets(const Messages::PresetsEventData &presetsData)
 
     if (nvs_set_u8(presets_nvs_handle, "NumberOfPresets", presetsData.numberOfPresets) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to set number of presets");
+        ESP_LOGE(log_tag_, "Failed to set number of presets");
         return ESP_FAIL;
     }
 
@@ -158,14 +153,14 @@ esp_err_t NvsStorage::setPresets(const Messages::PresetsEventData &presetsData)
         snprintf(key, sizeof(key), "Preset%d", i);
         if (nvs_set_blob(presets_nvs_handle, key, &preset, sizeof(Messages::PresetEventData)) != ESP_OK)
         {
-            ESP_LOGE(LOG_TAG, "Failed to set preset %d", i);
+            ESP_LOGE(log_tag_, "Failed to set preset %d", i);
             return ESP_FAIL;
         }
     }
 
     if (nvs_commit(presets_nvs_handle) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to commit presets data");
+        ESP_LOGE(log_tag_, "Failed to commit presets data");
         return ESP_FAIL;
     }
     return ESP_OK;
@@ -179,7 +174,7 @@ esp_err_t NvsStorage::requestPresets(Messages::PresetsEventData &presetsData)
     uint8_t number_of_presets;
     if (nvs_get_u8(presets_nvs_handle, "NumberOfPresets", &number_of_presets) != ESP_OK)
     {
-        ESP_LOGE(LOG_TAG, "Failed to get number of presets");
+        ESP_LOGE(log_tag_, "Failed to get number of presets");
         return ESP_FAIL;
     }
 
@@ -195,7 +190,7 @@ esp_err_t NvsStorage::requestPresets(Messages::PresetsEventData &presetsData)
         esp_err_t err = nvs_get_blob(presets_nvs_handle, key, &preset, &length);
         if (err != ESP_OK)
         {
-            ESP_LOGE(LOG_TAG, "Failed to get preset %d", i);
+            ESP_LOGE(log_tag_, "Failed to get preset %d", i);
             return err;
         }
         presetsData.presets[i] = preset;
