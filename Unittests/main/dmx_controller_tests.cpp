@@ -10,7 +10,7 @@ extern "C" void __force_link_DmxControllerQueueFailTest() {}
 #include "../../main/Tasks/dmx_preset_changer.hpp"
 #include "../../main/Tasks/foot_switch.hpp"
 #include "../../main/Tasks/max3485_sender.hpp"
-#include "../../main/Tasks/nvs_storage.hpp"
+#include "../../main/Tasks/nv_storage.hpp"
 #include "../../main/Tasks/osc_sender.hpp"
 #include "../../main/Tasks/seven_segment_display.hpp"
 #include "../../main/Tasks/web_server.hpp"
@@ -34,7 +34,7 @@ extern "C"
 #include "Mocks/dmx_preset_changer_mock.hpp"
 #include "Mocks/foot_switch_mock.hpp"
 #include "Mocks/max3485_sender_mock.hpp"
-#include "Mocks/nvs_storage_mock.hpp"
+#include "Mocks/nv_storage_mock.hpp"
 #include "Mocks/osc_sender_mock.hpp"
 #include "Mocks/seven_segment_display_mock.hpp"
 #include "Mocks/web_server_mock.hpp"
@@ -66,13 +66,13 @@ class DmxControllerTest : public ::testing::Test
     MockMax3485Sender *mockMax3485Sender;
     MockArtNetSender *mockArtNetSender;
     MockWebServer *mockWebServer;
-    MockNvsStorage *mockNvsStorage;
+    MockNvStorage *mockNvStorage;
 
     DmxControllerTest()
         : mockPresetChanger(new MockPresetChanger()), mockOscSender(new MockOSCSender()),
           mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
           mockMax3485Sender(new MockMax3485Sender()), mockArtNetSender(new MockArtNetSender()),
-          mockWebServer(new MockWebServer()), mockNvsStorage(new MockNvsStorage())
+          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage())
     {
         testing::Mock::AllowLeak(mockPresetChanger);
         testing::Mock::AllowLeak(mockOscSender);
@@ -81,7 +81,7 @@ class DmxControllerTest : public ::testing::Test
         testing::Mock::AllowLeak(mockMax3485Sender);
         testing::Mock::AllowLeak(mockArtNetSender);
         testing::Mock::AllowLeak(mockWebServer);
-        testing::Mock::AllowLeak(mockNvsStorage);
+        testing::Mock::AllowLeak(mockNvStorage);
     }
 
     void SetUp() override { std::cout << "TEST_F SetUp()\n"; }
@@ -101,7 +101,7 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     {
         QueueHandle_t testQueue;
         ControllerTestDouble(DmxPresetChanger *pc, OSCSender *os, SevenSegmentDisplay *sd, FootSwitch *fs,
-            Max3485Sender *ms, ArtNetSender *an, WebServer *ws, NvsStorage *ns, QueueHandle_t q)
+            Max3485Sender *ms, ArtNetSender *an, WebServer *ws, NvStorage *ns, QueueHandle_t q)
             : DmxController(pc, os, sd, fs, ms, an, ws, ns), testQueue(q)
         {
         }
@@ -116,17 +116,17 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     ASSERT_NE(mockMax3485Sender, nullptr);
     ASSERT_NE(mockArtNetSender, nullptr);
     ASSERT_NE(mockWebServer, nullptr);
-    ASSERT_NE(mockNvsStorage, nullptr);
+    ASSERT_NE(mockNvStorage, nullptr);
 
     ControllerTestDouble controllerWithQueue(mockPresetChanger, mockOscSender, mockDisplay, mockFootSwitch,
-        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvsStorage, dummyQueue);
+        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvStorage, dummyQueue);
 
     EXPECT_CALL(*mockPresetChanger, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockDisplay, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockArtNetSender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockNvsStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
 
     EXPECT_CALL(*mockPresetChanger, init(_)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockOscSender, init(_, _)).WillRepeatedly(Return(ESP_OK));
@@ -135,7 +135,7 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockArtNetSender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockNvsStorage, init(_)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
 
     controllerWithQueue.init(); // TODO: Check return value (messaging)
 
@@ -215,13 +215,13 @@ class DmxControllerQueueFailTest : public ::testing::Test
     MockMax3485Sender *mockMax3485Sender;
     MockArtNetSender *mockArtNetSender;
     MockWebServer *mockWebServer;
-    MockNvsStorage *mockNvsStorage;
+    MockNvStorage *mockNvStorage;
 
     DmxControllerQueueFailTest()
         : mockPresetChanger(new MockPresetChanger()), mockOscSender(new MockOSCSender()),
           mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
           mockMax3485Sender(new MockMax3485Sender()), mockArtNetSender(new MockArtNetSender()),
-          mockWebServer(new MockWebServer()), mockNvsStorage(new MockNvsStorage())
+          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage())
     {
         testing::Mock::AllowLeak(mockPresetChanger);
         testing::Mock::AllowLeak(mockOscSender);
@@ -230,7 +230,7 @@ class DmxControllerQueueFailTest : public ::testing::Test
         testing::Mock::AllowLeak(mockMax3485Sender);
         testing::Mock::AllowLeak(mockArtNetSender);
         testing::Mock::AllowLeak(mockWebServer);
-        testing::Mock::AllowLeak(mockNvsStorage);
+        testing::Mock::AllowLeak(mockNvStorage);
     }
     void SetUp() override {}
     void TearDown() override {}
@@ -249,7 +249,7 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     {
         QueueHandle_t testQueue;
         ControllerTestDouble(DmxPresetChanger *pc, OSCSender *os, SevenSegmentDisplay *sd, FootSwitch *fs,
-            MockMax3485Sender *ms, ArtNetSender *an, WebServer *ws, NvsStorage *ns, QueueHandle_t q)
+            MockMax3485Sender *ms, ArtNetSender *an, WebServer *ws, NvStorage *ns, QueueHandle_t q)
             : DmxController(pc, os, sd, fs, ms, an, ws, ns), testQueue(q)
         {
         }
@@ -263,13 +263,13 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
             max3485Sender_ = nullptr;
             artnetSender_ = nullptr;
             webServer_ = nullptr;
-            nvsStorage_ = nullptr;
+            nvStorage_ = nullptr;
         }
     };
 
     QueueHandle_t dummyQueue = reinterpret_cast<QueueHandle_t>(0x1);
     ControllerTestDouble controllerWithQueue(mockPresetChanger, mockOscSender, mockDisplay, mockFootSwitch,
-        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvsStorage, dummyQueue);
+        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvStorage, dummyQueue);
 
     // Null checks before dereferencing mocks
     ASSERT_NE(mockPresetChanger, nullptr);
@@ -279,14 +279,14 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     ASSERT_NE(mockMax3485Sender, nullptr);
     ASSERT_NE(mockArtNetSender, nullptr);
     ASSERT_NE(mockWebServer, nullptr);
-    ASSERT_NE(mockNvsStorage, nullptr);
+    ASSERT_NE(mockNvStorage, nullptr);
 
     EXPECT_CALL(*mockPresetChanger, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockDisplay, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockArtNetSender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockNvsStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
 
     EXPECT_CALL(*mockPresetChanger, init(_)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockOscSender, init(_, _)).WillRepeatedly(Return(ESP_OK));
@@ -295,7 +295,7 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockArtNetSender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockNvsStorage, init(_)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
 
     esp_err_t ret = controllerWithQueue.init();
     EXPECT_EQ(ret, ESP_FAIL);

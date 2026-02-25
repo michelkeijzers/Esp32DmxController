@@ -6,7 +6,7 @@ C:\Users\i4studio\Esp32Test\main\Tasks\osc_sender.cpp;C:\Users\i4studio\Esp32Tes
 C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\seven_segment_display.obj
 C:\Users\i4studio\Esp32Test\main\Tasks\dmx_preset_changer.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\dmx_preset_changer.obj
 C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\foot_switch.obj
-C:\Users\i4studio\Esp32Test\main\Tasks\nvs_storage.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\nvs_storage.obj
+C:\Users\i4studio\Esp32Test\main\Tasks\nv_storage.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\nv_storage.obj
 C:\Users\i4studio\Esp32Test\main\Tasks\web_server.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\web_server.obj
 C:\Users\i4studio\Esp32Test\main\Tasks\max3485_sender.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\max3485_sender.obj
 C:\Users\i4studio\Esp32Test\main\Base\rtos_task.cpp;C:\Users\i4studio\Esp32Test\Unittests\main\run_tests.dir\Debug\rtos_task.obj

@@ -6,7 +6,7 @@
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
-#include "nvs_storage.hpp"
+#include "nv_storage.hpp"
 #include "osc_sender.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
@@ -25,7 +25,7 @@ class DmxController : public RtosTask
   public:
     DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
         FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
-        NvsStorage *nvsStorage);
+        NvStorage *nvStorage);
     ~DmxController();
     esp_err_t init();
     void taskLoop();
@@ -53,7 +53,7 @@ class DmxController : public RtosTask
     Max3485Sender *max3485Sender_;
     ArtNetSender *artnetSender_;
     WebServer *webServer_;
-    NvsStorage *nvsStorage_;
+    NvStorage *nvStorage_;
 
     TickType_t bootTime = 0;
 

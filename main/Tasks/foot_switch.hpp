@@ -19,14 +19,6 @@ class FootSwitch : public RtosTask
         InterruptEventType type;
     };
 
-    enum class State
-    {
-        BOOT,
-        OTA_CHECK,
-        OTA,
-        NORMAL_OPERATION
-    };
-
     FootSwitch();
     ~FootSwitch();
 
@@ -53,8 +45,6 @@ class FootSwitch : public RtosTask
 
     bool polarityInverted_;
     uint16_t longPressThresholdMs_;
-
-    State state_;
 
     void taskLoop();
 

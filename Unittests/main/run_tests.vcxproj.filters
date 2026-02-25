@@ -25,7 +25,7 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\nvs_storage.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\nv_storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\web_server.cpp">

@@ -9,16 +9,16 @@
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
 #include "messages.hpp"
-#include "nvs_storage.hpp"
+#include "nv_storage.hpp"
 #include "osc_sender.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
 DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
     FootSwitch *footSwitch, Max3485Sender *max3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
-    NvsStorage *nvsStorage)
+    NvStorage *nvStorage)
     : RtosTask(), presetChanger_(presetChanger), oscSender_(oscSender), display_(display), footSwitch_(footSwitch),
-      max3485Sender_(max3485Sender), artnetSender_(artnetSender), webServer_(webServer), nvsStorage_(nvsStorage)
+      max3485Sender_(max3485Sender), artnetSender_(artnetSender), webServer_(webServer), nvStorage_(nvStorage)
 {
 }
 
@@ -214,21 +214,21 @@ esp_err_t DmxController::init_sub_tasks()
         return ESP_FAIL;
     }
 
-    TaskProperties nvsStorageTaskProperties = {.taskName_ = "NvsStorageTask",
-        .logTag = "NvsStorage",
+    TaskProperties nvStorageTaskProperties = {.taskName_ = "NvStorageTask",
+        .logTag = "NvStorage",
         .taskPriority = 5,
         .stackSize = 4096,
         .queueCapacity = 20,
         .queueItemSize = sizeof(Messages::Event),
         .mainEventQueue = getEventQueue()};
-    if (!nvsStorage_)
+    if (!nvStorage_)
     {
-        ESP_LOGE(log_tag_, "nvsStorage_ is nullptr");
+        ESP_LOGE(log_tag_, "nvStorage_ is nullptr");
         return ESP_ERR_INVALID_ARG;
     }
-    if (nvsStorage_->init(nvsStorageTaskProperties) != ESP_OK)
+    if (nvStorage_->init(nvStorageTaskProperties) != ESP_OK)
     {
-        ESP_LOGE(log_tag_, "Failed to initialize NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to initialize NvStorage");
         return ESP_FAIL;
     }
 
@@ -237,24 +237,24 @@ esp_err_t DmxController::init_sub_tasks()
 
 esp_err_t DmxController::init_messages()
 {
-    // Send a message to NvsStorage to request config
+    // Send a message to NvStorage to request config
     Messages::Event event = Messages::Event();
     event.type = Messages::REQUEST_CONFIGURATION;
-    if (xQueueSend(nvsStorage_->getEventQueue(), &event, 0) != pdPASS)
+    if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
-        ESP_LOGE(log_tag_, "Failed to send configuration request to NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to send configuration request to NvStorage");
         return ESP_FAIL;
     }
 
     // Receive config response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
-        ESP_LOGE(log_tag_, "Failed to receive configuration response from NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to receive configuration response from NvStorage");
         return ESP_FAIL;
     }
     if (event.type != Messages::EventType::CONFIGURATION_RESPONSE)
     {
-        ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvsStorage: %d", event.type);
+        ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvStorage: %d", event.type);
         return ESP_FAIL;
     }
 
@@ -268,23 +268,23 @@ esp_err_t DmxController::init_messages()
         return ESP_FAIL;
     }
 
-    // Send a message to NvsStorage to request presets
+    // Send a message to NvStorage to request presets
     event.type = Messages::REQUEST_PRESETS;
-    if (xQueueSend(nvsStorage_->getEventQueue(), &event, 0) != pdPASS)
+    if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
-        ESP_LOGE(log_tag_, "Failed to send presets request to NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to send presets request to NvStorage");
         return ESP_FAIL;
     }
 
     // Receive presets response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
-        ESP_LOGE(log_tag_, "Failed to receive presets response from NvsStorage");
+        ESP_LOGE(log_tag_, "Failed to receive presets response from NvStorage");
         return ESP_FAIL;
     }
     if (event.type != Messages::EventType::PRESETS_RESPONSE)
     {
-        ESP_LOGE(log_tag_, "Received unexpected event type from NvsStorage: %d", event.type);
+        ESP_LOGE(log_tag_, "Received unexpected event type from NvStorage: %d", event.type);
         return ESP_FAIL;
     }
 

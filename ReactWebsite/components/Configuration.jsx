@@ -60,20 +60,18 @@ function Configuration({ config, onConfigChange }) {
           />
         </div>
         <div className="config-item">
-          <label htmlFor="blackoutLongPress">Blackout Preset Long Press time (ms):</label>
-          <input
-            id="blackoutLongPress"
-            type="number"
-            min={2000}
-            max={5000}
-            value={config.blackoutLongPress ?? 2000}
-            onChange={e => {
-              let value = parseInt(e.target.value, 10);
-              if (isNaN(value)) value = 2000;
-              value = Math.max(2000, Math.min(5000, value));
-              onConfigChange('blackoutLongPress', value);
-            }}
-          />
+          <label htmlFor="circularNavigation" className="circular-navigation-item">
+            <input
+              id="circularNavigation"
+              type="checkbox"
+              checked={!!config.circularNavigation}
+              onChange={e => onConfigChange('circularNavigation', e.target.checked)}
+            />
+            Circular Navigation
+          </label>
+        </div>
+        <div className="config-item">
+          {/* Removed Blackout Preset Long Press time (ms) */}
         </div>
       </div>
 

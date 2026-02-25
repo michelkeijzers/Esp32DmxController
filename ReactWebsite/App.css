@@ -1,3 +1,23 @@
+.blackout-active {
+  background: #222 !important;
+  border: 2px solid #646cff;
+}
+.blackout-button {
+  background: #fff;
+  border: none;
+  padding: 0.6rem 2rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.blackout-button:hover {
+  background: #e0e0e0;
+}
+.blackout-button:active {
+  background: #bbb;
+}
 /* User manual markdown table styling */
 .user-manual table {
   border-collapse: collapse;

@@ -1,0 +1,289 @@
+@startuml
+title Architecture
+
+legend right
+    |= Color |= Meaning |
+    |<back:LightBlue>                   | Manually optimized / Compiles |
+    |<back:Grey>                   | Future |
+endlegend
+
+class Main  { }
+class DmxController <<Task>>
+{
+    +DmxController()
+    +~DmxController()
+    +init() : esp_err_t
+    +taskLoop()
+}
+
+Main -> DmxController
+
+class RtosTaskBase <<abstract>>
+{
+    +RtosTask()
+    +~RtosTask(
+    +init() : esp_err_t
+    taskEntry()
+    getTaskHandle()
+    getEventQueue()
+    isInitialized()
+}
+
+class NvStorage <<Task>> {}
+DmxController *-- NvStorage
+NvStorage --> DmxPresets : Write
+NvStorage --> Configuration : Write
+
+class OscHandler <<Task>> {}
+DmxController *-- OscHandler
+
+class Max3485Sender <<Task>> {}
+DmxController *-- Max3485Sender
+Max3485Sender --> DmxPreset : Read
+
+class ArtNetSender <<Task>> {}
+DmxController *-- ArtNetSender
+ArtNetSender --> DmxPreset : Read
+
+class FootSwitch <<Task>> {}
+DmxController *-- FootSwitch
+
+class SevenSegmentDisplay <<Task>> {}
+DmxController *--- SevenSegmentDisplay
+
+class WebServer <<Task>> {}
+DmxController *-- WebServer
+WebServer ---> DmxPresets : Read
+
+class DmxPresets <<Data>> { }
+DmxController *-- DmxPresets
+class DmxPreset <<Data>> {}
+DmxPresets *--"20" DmxPreset
+
+class Configuration <<Data>>{}
+DmxController *--- Configuration
+
+class PresetsConfiguration <<Data>>{}
+Configuration *-- PresetsConfiguration
+
+class FootSwitchConfiguration <<Data>>{}
+Configuration *-- FootSwitchConfiguration
+FootSwitch -- FootSwitchConfiguration : Read
+
+class OscConfiguration <<Data>>{}
+Configuration *-- OscConfiguration
+OscHandler -- OscConfiguration : Read
+
+class Ota <<Task>> {}
+DmxController *-- Ota 
+@enduml
+
+
+@startuml 
+title Data Classes
+
+class DmxPresets <<Data>> 
+{ 
+    +uint8_t GetNumberOfPresets()
+    +SetNumberOfPresets(uint8_t numberOfPresets)
+    +uint8_t GetCurrentPresetIndex()
+    +SelectNextPreset()
+    +SelectPreviousPreset()
+    -uint8_t numberOfPresets
+    -uint8_t currentPresetIndex
+}
+
+class DmxPreset <<Data>> 
+{
+    +const char* getName()
+    +void setName(const char* name)
+    +uint8_t* getDmxData()
+    +void setDmxData(const uint8_t* data, size_t length)
+    -const char name[32]
+    -uint8_t dmxData[512]
+}
+DmxPresets *--"20" DmxPreset
+@enduml 
+
+
+@startuml 
+title Configuration Classes
+
+class PresetsConfiguration <<Data>>
+{
+    +bool IsCircularNavigation()
+    +void SetCircularNavigation(bool circular)
+    +uint8_t GetNumberOfPresets()
+    +void SetNumberOfPresets(uint8_t numberOfPresets)
+    -uint8_t numberOfPresets
+    -bool CircularNavigation
+}
+Configuration *-- PresetsConfiguration
+
+class FootSwitchConfiguration <<Data>>
+{
+    +uint16_t GetLongPressTime()
+    +void SetLongPressTime(uint16_t threshold)
+    +bool IsPolarityInverted()
+    +void SetPolarityInverted(bool inverted)
+    +bool IsSendFootSwitchStateChangesThroughOsc()
+    +void SetSendFootSwitchStateChangesThroughOsc(bool send)
+    -uint16_t longPressTime
+    -bool polarityInverted
+    -bool sendFootSwitchStateChangesThroughOsc
+}
+Configuration *-- FootSwitchConfiguration
+
+class OscConfiguration <<Data>>
+{
+    +const char* GetDestinationAddress()
+    +void SetDestinationAddress(const char* address)
+    +int GetReceivePort()
+    +void SetReceivePort(int port)
+    +void SetSendPort(int port)
+    +int GetSendPort()
+    -string destinationAddress
+    -int receivePort
+    -int sendPort
+}
+Configuration *-- OscConfiguration
+
+class DmxTransmission <<Data>>
+{
+    +bool IsSendViaArtNet()
+    +void SetSendViaArtNet(bool send)
+    +bool IsSendToDmxConnector()
+    +void SetSendToDmxConnector(bool send)
+    -bool sendViaArtNet
+    -bool sendToDmxConnector
+}
+Configuration *-- DmxTransmission
+@enduml 
+
+@startuml
+title NvRam Storage
+
+
+@enduml
+
+
+@startuml 
+title Init
+
+actor User
+participant Main
+participant DmxController
+participant WebServer
+participant SevenSegmentDisplay
+participant OscSender
+participant ArtNetSender
+participant FootSwitch
+participant NvStorage
+
+
+Main -> DmxController : DmxController()
+Main -> DmxController : init()
+activate DmxController
+    DmxController -> WebServer : WebServer()
+    DmxController -> WebServer : init() 
+    DmxController -> SevenSegmentDisplay: SevenSegmentDisplay()
+    DmxController -> SevenSegmentDisplay : init()
+    DmxController -> OscSender : OscSender()
+    DmxController -> OscSender : init()
+    DmxController -> ArtNetSender : ArtnetSender()
+    DmxController -> ArtNetSender : init()
+    DmxController -> FootSwitch : FootSwitch()
+    DmxController -> FootSwitch : init()
+    DmxController -> NvStorage : NvStorage()
+    DmxController -> NvStorage : init()
+deactivate DmxController
+
+Main -> DmxController : taskLoop()
+activate DmxController
+    group Load Configuration
+        DmxController -> NvStorage : LOAD_CONFIGURATION message
+        NvStorage -> DmxController : UPDATE_CONFIGURATION message
+        DmxController -> Configuration : Fills configuration
+        DmxController -> FootSwitch : SET_FOOT_SWITCH_CONFIGURATION message
+        DmxController -> OscSender : SET_OSC_CONFIGURATION message
+    end
+
+    group Load Presets
+        DmxController -> NvStorage : LOAD_PRESETS message 
+        NvStorage -> DmxController : UPDATE_PRESETS message
+        DmxController -> DmxPresets : Fills presets
+        ref over DmxController : Select Preset, see Message Queues Next/Prev Preset
+    end
+deactivate DmxController
+
+@enduml 
+
+@startuml
+
+title Message Queues Next/Prev Preset
+
+actor User
+participant DmxController
+participant FootSwitch
+participant OscSender
+participant ArtNetSender
+participant Max3485Sender
+participant SevenSegmentDisplay
+
+User -> FootSwitch : Short/Long press
+FootSwitch --> DmxController : SELECT_NEXT/PREVIOUS_\n PRESET message
+DmxController -> OscSender : FOOT_SWITCH_SHORT_PRESS, FOOT_SWITCH_LONG_PRESS message
+DmxController -> DmxController : Take mutex
+DmxController -> DmxController : Update current preset index
+DmxController -> DmxController : Release mutex
+group Update Preset Data (using group event for ArtNetSender, SevenSegmentDisplay, Max3485Sender)
+    
+    DmxController -> ArtNetSender : UPDATE_PRESET group event
+    ArtNetSender -> DmxController : copy_current_dmx_data_into(DmxPreset* )
+    ArtNetSender -> ArtNetSender : Internal handling
+
+    DmxController -> Max3485Sender : UPDATE_PRESET group event
+    Max3485Sender -> DmxController : copy_current_dmx_data_into(DmxPreset* )
+    Max3485Sender -> Max3485Sender : Internal handling
+    
+    DmxController -> SevenSegmentDisplay : UPDATE_PRESET group event
+    SevenSegmentDisplay -> DmxController : get_current_preset_index()
+    SevenSegmentDisplay -> SevenSegmentDisplay : Internal handling
+end
+
+@enduml
+
+@startuml
+
+title Webserver Update Config/Presets
+
+user -> WebServer : Transmit new configuration/presets
+WebServer --> DmxController : STORE_CONFIGURATION
+DmxController -> DmxController : Copy to internal configuration
+DmxController --> NvStorage : STORE_CONFIGURATION
+NvStorage -> DmxController : get_configuration()
+NvStorage -> NvStorage : Store configuration in NVRAM
+
+DmxController --> FootSwitch : SET_FOOT_SWITCH_CONFIGURATION (as Init)
+DmxController --> OscSender : SET_OSC_CONFIGURATION (as Init)
+
+WebServer --> DmxController : STORE_PRESETS
+DmxController -> DmxController : Copy to internal presets
+DmxController --> NvStorage : STORE_PRESETS
+NvStorage -> NvStorage : Store presets in NVRAM
+
+ref over DmxController : Update Preset Data (as in Message Queues Next/Prev Preset)
+
+@enduml
+
+
+@startuml 
+title OTA Update
+WebServer --> DmxController : START_OTA
+DmxController --> Ota : START_OTA 
+Ota --> DmxController : FINISH_OTA (success/failure)
+DmxController --> SevenSegmentDisplay : SHOW_OTA_RESULT
+DmxController --> DmxController : Delay
+DmxController --> RTOS: Reset
+@enduml 
+

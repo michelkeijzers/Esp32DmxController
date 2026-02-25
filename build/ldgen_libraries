@@ -1,4 +1,4 @@
-C:/Users/i4studio/Esp32Test/build/esp-idf/riscv/libriscv.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/xtensa/libxtensa.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_gpio/libesp_driver_gpio.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_pm/libesp_pm.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/mbedtls/libmbedtls.a
@@ -30,16 +30,19 @@ C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_uart/libesp_driver_uart.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/app_trace/libapp_trace.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_event/libesp_event.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/nvs_flash/libnvs_flash.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_pcnt/libesp_driver_pcnt.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_spi/libesp_driver_spi.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_mcpwm/libesp_driver_mcpwm.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_i2s/libesp_driver_i2s.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/sdmmc/libsdmmc.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_sdmmc/libesp_driver_sdmmc.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_sdspi/libesp_driver_sdspi.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_sdio/libesp_driver_sdio.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_dac/libesp_driver_dac.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_rmt/libesp_driver_rmt.a
-C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_tsens/libesp_driver_tsens.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_sdm/libesp_driver_sdm.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_i2c/libesp_driver_i2c.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_ledc/libesp_driver_ledc.a
-C:/Users/i4studio/Esp32Test/build/esp-idf/esp_driver_usb_serial_jtag/libesp_driver_usb_serial_jtag.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/driver/libdriver.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_phy/libesp_phy.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/esp_vfs_console/libesp_vfs_console.a
@@ -74,6 +77,7 @@ C:/Users/i4studio/Esp32Test/build/esp-idf/fatfs/libfatfs.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/json/libjson.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/mqtt/libmqtt.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/nvs_sec_provider/libnvs_sec_provider.a
+C:/Users/i4studio/Esp32Test/build/esp-idf/perfmon/libperfmon.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/rt/librt.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/spiffs/libspiffs.a
 C:/Users/i4studio/Esp32Test/build/esp-idf/wifi_provisioning/libwifi_provisioning.a

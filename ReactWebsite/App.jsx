@@ -6,6 +6,7 @@ import PresetEdit from './components/PresetEdit'
 import ValueEdit from './components/ValueEdit'
 import Configuration from './components/Configuration'
 import ManualButton from './components/ManualButton'
+import OTA from './components/OTA'
 import ManualPage from './components/ManualPage'
 
 // Helper function to generate values between 0 and 255
@@ -25,7 +26,7 @@ const generatePresets = (count) => {
 
 import { useNavigate } from 'react-router-dom'
 
-function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController, LoadFromDmxController }) {
+function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController, LoadFromDmxController, blackoutActive, setBlackoutActive }) {
   const location = useLocation();
   const navigate = useNavigate();
   const isEditPage = location.pathname.startsWith('/preset/') || location.pathname === '/config';
@@ -49,8 +50,17 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
         )}
       </div>
       <div className="config-button-container" style={{ display: 'flex', gap: '8px' }}>
+        <button
+          className={`config-button blackout-button${blackoutActive ? ' blackout-active' : ''}`}
+          onClick={() => setBlackoutActive(prev => !prev)}
+        >
+          <span style={{ color: blackoutActive ? '#fff' : 'black' }}>Blackout</span>
+        </button>
         <button className="config-button" onClick={() => navigate('/config')}>
           Configuration
+        </button>
+        <button className="config-button" onClick={() => navigate('/ota')}>
+          OTA
         </button>
         <ManualButton />
       </div>
@@ -308,65 +318,31 @@ function App() {
     }))
   }
 
+  const [blackoutActive, setBlackoutActive] = useState(false);
   return (
     <Router>
       <div className="app">
         <header>
-          <h1>DMX Controller</h1>
+          <h1>DMX Controller <span style={{fontSize:'0.5em', color:'#888', marginLeft:'0.5em'}}>v0.1</span></h1>
           <HeaderControls 
             esp32Ip={esp32Ip}
             sendStatus={sendStatus}
             presetCount={presetCount}
             SendToDmxController={SendToDmxController}
             LoadFromDmxController={LoadFromDmxController}
+            blackoutActive={blackoutActive}
+            setBlackoutActive={setBlackoutActive}
           />
         </header>
         
         <main>
           <Routes>
-            <Route 
-              path="/" 
-              element={
-                <PresetList 
-                  presets={presets.slice(0, presetCount)} 
-                  onDeletePreset={deletePreset}
-                  onInsertPreset={insertPreset}
-                  onMovePreset={movePreset}
-                  canInsert={presetCount < 20}
-                />} 
-            />
-            <Route 
-              path="/preset/:id" 
-              element={
-                <PresetEdit 
-                  presets={presets}
-                  onUpdateValue={updatePresetValue}
-                  onUpdateName={updatePresetName}
-                />
-              } 
-            />
-            <Route 
-              path="/preset/:presetId/:section/:index" 
-              element={
-                <ValueEdit 
-                  presets={presets}
-                  onUpdateValue={updatePresetValue}
-                />
-              } 
-            />
-            <Route 
-              path="/config" 
-              element={
-                <Configuration 
-                  config={config}
-                  onConfigChange={handleConfigChange}
-                />
-              } 
-            />
-            <Route 
-              path="/manual" 
-              element={<ManualPage />} 
-            />
+            <Route path="/config" element={<Configuration config={config} onConfigChange={handleConfigChange} />} />
+            <Route path="/manual" element={<ManualPage />} />
+            <Route path="/preset/:id" element={<PresetEdit presets={presets} setPresets={setPresets} />} />
+            <Route path="/value-edit/:presetId/:section/:index" element={<ValueEdit presets={presets} setPresets={setPresets} />} />
+            <Route path="/ota" element={<OTA />} />
+            <Route path="/" element={<PresetList presets={presets} presetCount={presetCount} setPresetCount={setPresetCount} />} />
           </Routes>
         </main>
       </div>
