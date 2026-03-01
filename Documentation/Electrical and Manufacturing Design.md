@@ -7,7 +7,7 @@ The ESP32 Devkit 2 board has a built-in USB-to-serial converter, which allows fo
 For the ESP32 C3, the following setting need to be made for ESP IDF:
 
 - idf.py menuconfig
-  Componentn config -> ESP System Settings -> Channel for console output -> Set to: USB Serial/JTAG Controller instead of UART0 (as UART0 is used for DMX transmission)
+  Component config -> ESP System Settings -> Channel for console output -> Set to: USB Serial/JTAG Controller instead of UART0 (as UART0 is used for DMX transmission)
 
 # General Design
 
@@ -90,10 +90,10 @@ A C3 Dev board only can be used when a TM1637 is used for the seven segments dis
  B│       o o o o o o o |                                        | │
  C│       o o o o o o o |                                        | │
  D│ +-----------------+ |                                        | │
- E│ |                 | |                                        | │
- F│ |   USB Plug for  | |       ESP32 DevKit Board               | │
- G│ |   ESP32 DevKit  | |                                        | │
- H│ |     Board       | |                                        | │
+ E│ |                 |=|                                        | │
+ F│ |   USB Plug for  |=|       ESP32 DevKit Board               | │
+ G│ |   ESP32 DevKit  |=|                                        | │
+ H│ |     Board       |=|                                        | │
  I│ +-----------------+ |                                        | │
  J│ o o o o o o o o o o |                                        | │
  K│ o o o o o o o o o o |                                        | │
