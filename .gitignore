@@ -61,4 +61,6 @@ Documentation/latex/
 *.junit.xml
 # Remove backup files
 *~
+Unittests/main/Debug/
+Unittests/main/X64/Debug/
 

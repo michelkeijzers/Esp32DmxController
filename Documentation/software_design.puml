@@ -30,7 +30,7 @@ class RtosTask <<abstract>> #lightYellow
     -TaskHandle_t task_handle_
     -QueueHandle_t event_queue_
     -bool initialized_
-   - QueueHandle_t main_event_queue_
+    -QueueHandle_t main_event_queue_
 }
 
 class DmxController <<Task>> #LightYellow
@@ -164,37 +164,42 @@ class DmxPreset <<Data>>
 }
 
 DmxPresets *-- "20" DmxPreset
-
 @enduml 
 
 @startuml 
 title Configuration Classes
 
-class PresetsConfiguration <<Data>>
-{
-    +bool IsCircularNavigation()
-    +void SetCircularNavigation(bool circular)
-    +uint8_t GetNumberOfFilledPresets()
-    +void SetNumberOfFilledPresets(uint8_t numberOfFilledPresets)
-    
-    -uint8_t numberOfFilledPresets
-    -bool CircularNavigation
-}
-Configuration *-- PresetsConfiguration
+class DmxController <<RtosTask>> #lightYellow {}
 
-class FootSwitchConfiguration <<Data>>
+class FootSwitchTask <<RtosTask>> #lightYellow {}
+
+class WebServer <<RtosTask>> #lightYellow {}
+
+class NvStorage <<RtosTask>> #lightYellow {}
+
+class Configuration 
 {
-    +uint16_t GetLongPressTime()
-    +void SetLongPressTime(uint16_t threshold)
-    +bool IsPolarityNormallyOpen()
-    +void SetPolarityNormallyOpen(bool normallyOpen)
-    '+bool IsSendFootSwitchStateChangesThroughOsc()
-    '+void SetSendFootSwitchStateChangesThroughOsc(bool send)
-    -uint16_t longPressTime
-    -bool polarityNormallyOpen
-    '-bool sendFootSwitchStateChangesThroughOsc
+    +bool footSwitchPolarityNormallyOpen()
+    +void setFootSwitchPolarityNormallyOpen(bool normallyOpen)
+    +uint16_t footSwitchLongPressTime()
+    +void setFootSwitchLongPressTime(uint16_t longPressTime)
+
+    +bool circularPresetNavigation()
+    +void setCircularPresetNavigation(bool circular)
+    +uint8_t numberOfFilledPresets()
+    +void setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
+    
+    -bool footSwitchPolarityNormallyOpen_
+    -uint16_t footSwitchLongPressTime_
+
+    -bool circularPresetNavigation_
+    -uint8_t numberOfFilledPresets_
 }
-Configuration *-- FootSwitchConfiguration
+
+DmxController *-- Configuration
+FootSwitchTask --> Configuration : read
+WebServer --> Configuration : read/write
+NvStorage --> Configuration : read/write
 
 ' class OscConfiguration <<Data>>
 ' {
@@ -222,34 +227,50 @@ Configuration *-- FootSwitchConfiguration
 ' Configuration *-- DmxTransmission
 @enduml 
 
-
 @startuml
 title NvRam Storage
 
 class RtosTask <<abstract>> #lightYellow 
 {
-    +RtosTask()
-    +~RtosTask()
-    +init() : esp_err_t
-    +taskEntry()
-    +getTaskHandle()
-    +getEventQueue()
-    +isInitialized()
+    +RtosTask();
+    +virtual ~RtosTask();
+
+    +esp_err_t init(TaskProperties taskProperties);
+    +virtual void taskEntry(void *param) = 0;
+    +TaskHandle_t getTaskHandle() const
+    +virtual QueueHandle_t getEventQueue() const
+    +QueueHandle_t getDmxControllerEventQueue() const
+    +const char *getTaskName() const
+    +bool isInitialized() const
+
+    -const char *task_name
+    -const char *log_tag_
+    -TaskHandle_t task_handle_
+    -QueueHandle_t event_queue_
+    -bool initialized_
+   - QueueHandle_t main_event_queue_
 }
 
 class NvStorage 
 {
     +NvStorage()
     +~NvStorage()
-    +init(QueueHandle_t configUpdateQueue) : esp_err_t
-    +storeConfiguration(const Configuration& config) : esp_err_t
-    +storePresets(const DmxPresets& presets) : esp_err_t
-    +getConfiguration(Configuration& config) : esp_err_t
-    +getPresets(DmxPresets& presets) : esp_err_t
+
+    +virtual esp_err_t init(RtosTask::TaskProperties taskProperties)
+
+    -const char *log_tag_
+    -int task_priority_
+    -int queue_capacity_
+
+    -nvs_handle_t configuration_nvs_handle
+    -nvs_handle_t presets_nvs_handle
+    -const char *configuration_namespace_name
+    -const char *presets_namespace_name
+
+    -void taskEntry(void *param) override
+    -void taskLoop()
 }
 NvStorage -u-|> RtosTask
-
-
 
 class NvPresetStorage
 {
@@ -270,9 +291,7 @@ class NvPresetStoragePart2
     -uint8_t dmxDataPart2[256]
 }
 NvPresetStorage *-- NvPresetStoragePart2
-
 @enduml
-
 
 @startuml 
 title Init
@@ -282,11 +301,8 @@ participant Main
 participant DmxController
 participant WebServer
 participant SevenSegmentDisplay
-participant OscSender
-participant ArtNetSender
 participant FootSwitch
 participant NvStorage
-
 
 Main -> DmxController : DmxController()
 Main -> DmxController : init()
@@ -295,31 +311,53 @@ activate DmxController
     DmxController -> WebServer : init() 
     DmxController -> SevenSegmentDisplay: SevenSegmentDisplay()
     DmxController -> SevenSegmentDisplay : init()
-    DmxController -> OscSender : OscSender()
-    DmxController -> OscSender : init()
-    DmxController -> ArtNetSender : ArtnetSender()
-    DmxController -> ArtNetSender : init()
     DmxController -> FootSwitch : FootSwitch()
     DmxController -> FootSwitch : init()
     DmxController -> NvStorage : NvStorage()
     DmxController -> NvStorage : init()
+    DmxController --> NvStorage : LOAD_CONFIGURATION
 deactivate DmxController
 
-Main -> DmxController : taskLoop()
+DmxController -> DmxController : taskLoop() 
+
 activate DmxController
+    NvStorage -> NvStorage : Load configuration \n from NVRAM and \n store in internal instance
     group Load Configuration
-        DmxController -> NvStorage : LOAD_CONFIGURATION message
-        NvStorage -> DmxController : UPDATE_CONFIGURATION message
-        DmxController -> Configuration : Fills configuration
-        DmxController -> FootSwitch : SET_FOOT_SWITCH_CONFIGURATION message
-        DmxController -> OscSender : SET_OSC_CONFIGURATION message
+        alt Configuration loaded successfully from NVRAM
+            NvStorage --> DmxController : UPDATE_CONFIGURATION
+            DmxController -> NvStorage : Configuration get_configuration()
+            NvStorage -> NvStorage : Take mutex
+            NvStorage -> NvStorage : Copy configuration
+            NvStorage -> NvStorage : Give mutex
+            NvStorage --> DmxController : configuration instance
+            DmxController --> FootSwitch : UPDATE_CONFIGURATION
+            FootSwitch -> DmxController : GetConfiguration()
+            DmxController -> DmxController : Take mutex
+            DmxController -> DmxController : Copy configuration 
+            DmxController -> DmxController : Release mutex
+            DmxController --> FootSwitch : configuration instance
+            FootSwitch -> FootSwitch : Copy to internal variables
+            
+        else error loading configuration from NVRAM 
+            NvStorage --> DmxController : ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
+            DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(\n NV_STORAGE_LOAD_CONFIGURATION_FAILED)
+        end
     end
 
-    group Load Presets
-        DmxController -> NvStorage : LOAD_PRESETS message 
-        NvStorage -> DmxController : UPDATE_PRESETS message
-        DmxController -> DmxPresets : Fills presets
-        ref over DmxController : Select Preset, see Message Queues Next/Prev Preset
+    DmxController --> NvStorage : LOAD_PRESETS
+    loop each filled preset
+        NvStorage -> NvStorage : Read preset part 1 from NVRAM
+        NvStorage -> NvStorage : Read preset part 2 from NVRAM
+    end
+
+    note left of NvStorage
+        In case of an error reading NVRAM, stop reading.
+    end note
+
+    group Load Presets (after NvStorage has loaded presets)
+        note right of DmxController
+            Similar flow as Load Configuration, but with presets instead of configuration.
+        end note
     end
 deactivate DmxController
 @enduml 
@@ -330,42 +368,46 @@ title Message Queues Next/Prev Preset
 actor User
 participant DmxController
 participant FootSwitch
-participant OscSender
-participant ArtNetSender
 participant Max3485Sender
 participant SevenSegmentDisplay
 
-User -> FootSwitch : Short/Long press
-FootSwitch --> DmxController : SELECT_NEXT/PREVIOUS_\n PRESET message
-DmxController -> OscSender : FOOT_SWITCH_SHORT_PRESS, FOOT_SWITCH_LONG_PRESS message
-DmxController -> DmxController : Take mutex
+User -> FootSwitch : Short/Long
+note right of FootSwitch
+    Assuming a short press, resulting in a 
+    SELECT_NEXT_PRESET message being sent to DmxController.
+    Similar flow for SELECT_PREVIOUS_PRESET.
+end note
+FootSwitch --> DmxController : SELECT_NEXT_PRESET
 DmxController -> DmxController : Update current preset index
+
+DmxController --> Max3485Sender : UPDATE_PRESET
+Max3485Sender -> DmxController : copy_current_dmx_data_into(DmxPreset* )
+DmxController -> DmxController : Take mutex
+DmxController -> DmxController : Copy DMX data to DmxPreset instance
 DmxController -> DmxController : Release mutex
-group Update Preset Data (using group event for ArtNetSender, SevenSegmentDisplay, Max3485Sender)
-    
-    DmxController -> ArtNetSender : UPDATE_PRESET group event
-    ArtNetSender -> DmxController : copy_current_dmx_data_into(DmxPreset* )
-    ArtNetSender -> ArtNetSender : Internal handling
+DmxController -> Max3485Sender : Filled DmxPreset instance
 
-    DmxController -> Max3485Sender : UPDATE_PRESET group event
-    Max3485Sender -> DmxController : copy_current_dmx_data_into(DmxPreset* )
-    Max3485Sender -> Max3485Sender : Internal handling
-    
-    DmxController -> SevenSegmentDisplay : UPDATE_PRESET group event
-    SevenSegmentDisplay -> DmxController : get_current_preset_index()
-    SevenSegmentDisplay -> SevenSegmentDisplay : Internal handling
-end
-
+DmxController --> SevenSegmentDisplay : UPDATE_PRESET
+SevenSegmentDisplay -> DmxController : get_current_preset_index()
+DmxController -> DmxController : Take mutex
+DmxController -> DmxController : Get current preset index
+DmxController -> DmxController : Release mutex
+DmxController --> SevenSegmentDisplay : current preset index
+SevenSegmentDisplay -> SevenSegmentDisplay : Internal handling
 @enduml
 
 @startuml
 title Webserver Update Config/Presets
 
-user -> WebServer : Transmit new configuration/presets
+user -> WebServer : Transmit new \n configuration/presets
 WebServer --> DmxController : STORE_CONFIGURATION
 DmxController -> DmxController : Copy to internal configuration
 DmxController --> NvStorage : STORE_CONFIGURATION
 NvStorage -> DmxController : get_configuration()
+DmxController -> DmxController : Take mutex
+DmxController -> DmxController : Copy configuration
+DmxController -> DmxController : Release mutex
+DmxController --> NvStorage : configuration
 NvStorage -> NvStorage : Store configuration in NVRAM
 
 DmxController --> FootSwitch : SET_FOOT_SWITCH_CONFIGURATION (as Init)
@@ -374,21 +416,47 @@ DmxController --> OscSender : SET_OSC_CONFIGURATION (as Init)
 WebServer --> DmxController : STORE_PRESETS
 DmxController -> DmxController : Copy to internal presets
 DmxController --> NvStorage : STORE_PRESETS
-NvStorage -> NvStorage : Store presets in NVRAM
+NvStorage -> DmxController : get_presets()
+DmxController -> DmxController : Take mutex
+DmxController -> DmxController : Copy presets
+DmxController -> DmxController : Release mutex
+DmxController --> NvStorage : presets
+
+loop For each preset
+    NvStorage -> NvStorage : Split preset into part 1 and part 2
+    NvStorage -> NvStorage : Store preset part 1 in NVRAM
+    alt Error storing preset part 1 in NVRAM
+        NvStorage --> DmxController : ERROR(NV_STORAGE_STORE_PRESET_FAILED)
+        DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(NV_STORAGE_STORE_PRESET_FAILED)
+    end
+    NvStorage -> NvStorage : Store preset part 2 in NVRAM
+    alt Error storing preset part 2 in NVRAM
+        NvStorage --> DmxController : ERROR(NV_STORAGE_STORE_PRESET_FAILED)
+        DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(NV_STORAGE_STORE_PRESET_FAILED)
+    end
+end
 
 ref over DmxController : Update Preset Data (as in Message Queues Next/Prev Preset)
-
 @enduml
-
 
 @startuml 
 title OTA Update
 
+participant WebServer
+participant RTOS
+participant DmxController
+participant Ota
+participant SevenSegmentDisplay
+
 WebServer --> DmxController : START_OTA
 DmxController --> Ota : START_OTA 
-Ota --> DmxController : FINISH_OTA (success/failure)
-DmxController --> SevenSegmentDisplay : SHOW_OTA_RESULT
-DmxController --> DmxController : Delay
-DmxController --> RTOS: Reset
+Ota -> Ota : Perform OTA update
+alt OTA update successful
+    Ota --> DmxController : OTA_SUCCESS
+    DmxController -> DmxController : Handle termination if needed
+    DmxController --> RTOS: Reset
+else OTA update failed
+    Ota --> DmxController : ERROR(OTA_UPDATE_FAILED)
+    DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(OTA_UPDATE_FAILED)
+end
 @enduml 
-
