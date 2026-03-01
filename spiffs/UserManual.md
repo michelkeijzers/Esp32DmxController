@@ -123,7 +123,7 @@ The website provides the following configuration options:
 The foot switch provides hands-free control and special functions:
 
 - **During power up:**
-  - **Long press:** Initiates OTA (Over-The-Air) firmware update mode.
+  - **Long press:** Initiates OTA (Over-The-Air)  Update firmware e mode.
 - **Normal operation:**
   - **Short press:** Selects the next preset.
   - **Long press:** Selects the previous preset.

@@ -6,7 +6,7 @@ import PresetEdit from './components/PresetEdit'
 import ValueEdit from './components/ValueEdit'
 import Configuration from './components/Configuration'
 import ManualButton from './components/ManualButton'
-import OTA from './components/OTA'
+import OtaUpdate from './components/OtaUpdate'
 import ManualPage from './components/ManualPage'
 
 // Helper function to generate values between 0 and 255
@@ -32,7 +32,7 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
   const isEditPage = location.pathname.startsWith('/preset/') || location.pathname === '/config';
   const isManualPage = location.pathname === '/manual';
   const isValueEditPage = location.pathname.startsWith('/value-edit/');
-  const isOtaPage = location.pathname === '/ota';
+  const isOtaPage = location.pathname === '/ota-update';
   if (isEditPage || isManualPage || isValueEditPage || isOtaPage) return null;
   return (
     <>
@@ -61,8 +61,8 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
         <button className="config-button" onClick={() => navigate('/config')}>
           Configuration
         </button>
-        <button className="config-button" onClick={() => navigate('/ota')}>
-          OTA
+        <button className="config-button" onClick={() => navigate('/ota-update')}>
+          OTA Update
         </button>
         <ManualButton />
       </div>
@@ -348,13 +348,13 @@ function App() {
           />
         </header>
         
-        <main style={{ marginTop: location.pathname === '/ota' ? '0.1rem' : undefined }}>
+        <main style={{ marginTop: location.pathname === '/ota-update' ? '0.1rem' : undefined }}>
           <Routes>
             <Route path="/config" element={<Configuration config={config} onConfigChange={handleConfigChange} />} />
             <Route path="/manual" element={<ManualPage />} />
             <Route path="/preset/:id" element={<PresetEdit presets={presets} setPresets={setPresets} />} />
             <Route path="/value-edit/:presetId/:section/:index" element={<ValueEdit presets={presets} setPresets={setPresets} />} />
-            <Route path="/ota" element={<OTA />} />
+            <Route path="/ota-update" element={<OtaUpdate />} />
             <Route path="/" element={<PresetList presets={presets} presetCount={presetCount} setPresetCount={setPresetCount} />} />
           </Routes>
         </main>

@@ -117,12 +117,12 @@ The website provides the following configuration options:
 The foot switch provides hands-free control and special functions:
 
 - **During power up:**
-  - **Long press:** Initiates OTA (Over-The-Air) firmware update mode.
+  - **Long press:** Initiates OTA (Over-The-Air) Update firmware update mode.
 - **Normal operation:**
   - **Short press:** Selects the next preset.
   - **Long press:** Selects the previous preset.
 
-To prevent accidental activation of the OTA update mode, the device will only enter this mode if the foot switch is held down for a long press during the boot sequence. If the foot switch is pressed after the device has fully booted, it will not trigger OTA mode.
+To prevent accidental activation of the OTA Update mode, the device will only enter this mode if the foot switch is held down for a long press during the boot sequence. If the foot switch is pressed after the device has fully booted, it will not trigger OTA Update mode.
 
 ### Blackout Preset
 
@@ -138,26 +138,14 @@ To prevent accidental activation of the OTA update mode, the device will only en
 
 The 4-digit 7-segment display provides feedback and status. Below is a table of each display item and its 4-character representation:
 
-| Function / Status        |      Displayed Text      |
-| ------------------------ | :----------------------: |
-| Preset number (e.g. 15)  |         `P  15`          |
-| Blackout preset          |     `P0-1` or `P---`     |
-| Booting                  |          `boot`          |
-| Boot ready               |          `rEAd`          |
-| OTA update in progress   |          `otAb`          |
-| OTA finished (success)   |     `otAF` or `donE`     |
-| OTA failed               |          `FAIL`          |
-| DMX transmit error       |          `dEr `          |
-| Artnet error             |          `AEr `          |
-| No WiFi                  |          `noFi`          |
-| WiFi connected           |          `ConF`          |
-| NVRAM error              |          `nEr `          |
-| Webserver error          |          `wEr `          |
-| Webserver connected      |          `wCon`          |
-| Number of presets loaded | `L  20` (for 20 presets) |
-| Preset removed           |          `rEM `          |
-| Preset added             |          `Add `          |
-| Preset changed           |          `CHAn`          |
-| Config changed           |          `CnFG`          |
+| Function / Status       |  Displayed Text  |
+| ----------------------- | :--------------: |
+| Preset number (e.g. 15) |     `P  15`      |
+| Blackout preset         | `P0-1` or `P---` |
+| Booting                 |      `boot`      |
+| DMX transmit error      |      `dEr `      |
+| No WiFi                 |      `noFi`      |
+| NVRAM error             |      `nEr `      |
+| Webserver error         |      `wEr `      |
 
 > Note: Some messages are abbreviated to fit the 4-digit display. Characters are shown as they would appear on a 7-segment display.

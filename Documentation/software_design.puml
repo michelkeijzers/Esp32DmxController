@@ -73,9 +73,9 @@ class SevenSegmentDisplay #lightYellow {}
 DmxController *-- SevenSegmentDisplay
 SevenSegmentDisplay -u-|> RtosTask
 
-class Ota #lightYellow {}
-DmxController *-- Ota 
-Ota -u-|> RtosTask
+class OtaUpdate #lightYellow {}
+DmxController *-- OtaUpdate
+OtaUpdate -u-|> RtosTask
 
 class WebServer #lightYellow {}
 DmxController *-- WebServer
@@ -445,18 +445,18 @@ title OTA Update
 participant WebServer
 participant RTOS
 participant DmxController
-participant Ota
+participant OtaUpdate
 participant SevenSegmentDisplay
 
 WebServer --> DmxController : START_OTA
-DmxController --> Ota : START_OTA 
-Ota -> Ota : Perform OTA update
+DmxController --> OtaUpdate : START_OTA 
+OtaUpdate -> OtaUpdate : Perform OTA update
 alt OTA update successful
-    Ota --> DmxController : OTA_SUCCESS
+    OtaUpdate --> DmxController : OTA_SUCCESS
     DmxController -> DmxController : Handle termination if needed
     DmxController --> RTOS: Reset
 else OTA update failed
-    Ota --> DmxController : ERROR(OTA_UPDATE_FAILED)
+    OtaUpdate --> DmxController : ERROR(OTA_UPDATE_FAILED)
     DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(OTA_UPDATE_FAILED)
 end
 @enduml 

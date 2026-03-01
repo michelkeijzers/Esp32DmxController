@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './ota.css';
+import './OtaUpdate.css';
 
-export default function OTA() {
+export default function OtaUpdate() {
   const [fileName, setFileName] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef();
@@ -32,17 +32,17 @@ export default function OTA() {
   };
 
   return (
-    <div className="ota-page">
+    <div className="ota-update-page">
       <div className="configuration-header">
         <h2>OTA Update</h2>
       </div>
-        <div className="ota-input-row" >
+        <div className="ota-update-input-row" >
           <input
             type="text"
             placeholder="Enter file name..."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
-            className="ota-file-name"
+            className="ota-update-file-name"
             readOnly
           />
           <input
@@ -51,13 +51,13 @@ export default function OTA() {
             ref={fileInputRef}
             onChange={handleFileChange}
           />
-          <button className="ota-file-dialog" onClick={showFileDialog}>
+          <button className="ota-update-file-dialog" onClick={showFileDialog}>
             Choose File
           </button>
         </div>
-        <div className="value-edit-actions" style={{ marginTop: '1rem' }}>
-          <button className="cancel-button" onClick={handleCancel}>Cancel</button>
-          <button className="save-button" onClick={handleConfirm}>Confirm</button>
+        <div className="ota-update-buttons" style={{ marginTop: '1rem' }}>
+          <button className="ota-update-cancel" onClick={handleCancel}>Cancel</button>
+          <button className="ota-update-confirm" onClick={handleConfirm}>Confirm</button>
         </div>
       </div>
   );

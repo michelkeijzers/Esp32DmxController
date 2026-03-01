@@ -146,7 +146,7 @@ Only when writing, the mutex shall be locked to prevent concurrent modifications
 An internal TM1637 driver will be used to control the display, to reduce the number of GPIO pins required. <br/>
 **Rationale:** _A seven segment display is a simple and effective way to display numeric information. When using a C3 with limited GPIO pins, a TM1637 driver allows for controlling the display with fewer pins, simplifying hardware design._
 
-# 800-899 OTA
+# 800-899 OTA Update
 
 ## FR-800 OTA Updates
 
@@ -162,7 +162,7 @@ An internal TM1637 driver will be used to control the display, to reduce the num
 
 ## FR-900 Generic Functionality
 
-**Description:** The web interface shall provide functionality for a Blackout, OTA support, showing the user manual and the ESP32 IP Address.<br/>
+**Description:** The web interface shall provide functionality for a Blackout, OTA Update support, showing the user manual and the ESP32 IP Address.<br/>
 **Rationale:** _These features provide essential functionality for controlling the system, performing maintenance, and accessing important information._
 
 ### DD-900 ESP32 IP Address Display
