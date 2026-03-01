@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './ota.css';
 
 export default function OTA() {
   const [fileName, setFileName] = useState('');
@@ -41,7 +42,7 @@ export default function OTA() {
             placeholder="Enter file name..."
             value={fileName}
             onChange={e => setFileName(e.target.value)}
-            className="ota-input"
+            className="ota-file-name"
             readOnly
           />
           <input
@@ -54,9 +55,9 @@ export default function OTA() {
             Choose File
           </button>
         </div>
-        <div className="ota-buttons">
-          <button className="ota-confirm" onClick={handleConfirm}>Confirm</button>
-          <button className="ota-cancel" onClick={handleCancel}>Cancel</button>
+        <div className="value-edit-actions" style={{ marginTop: '1rem' }}>
+          <button className="cancel-button" onClick={handleCancel}>Cancel</button>
+          <button className="save-button" onClick={handleConfirm}>Confirm</button>
         </div>
       </div>
   );
