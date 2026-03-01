@@ -1,9 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import './Configuration.css'
 
-
-
-
 function Configuration({ config, onConfigChange }) {
   const navigate = useNavigate();
 
@@ -19,14 +16,9 @@ function Configuration({ config, onConfigChange }) {
   };
 
 
-  // ...existing code...
-
   return (
     <div className="configuration">
       <div className="configuration-header">
-        <button className="manual-button" onClick={() => navigate('/')}> 
-          Home
-        </button>
         <h2>Configuration</h2>
         <div className="header-spacer"></div>
       </div>

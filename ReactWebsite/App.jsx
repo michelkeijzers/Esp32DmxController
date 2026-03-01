@@ -31,7 +31,9 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
   const navigate = useNavigate();
   const isEditPage = location.pathname.startsWith('/preset/') || location.pathname === '/config';
   const isManualPage = location.pathname === '/manual';
-  if (isEditPage || isManualPage) return null;
+  const isValueEditPage = location.pathname.startsWith('/value-edit/');
+  const isOtaPage = location.pathname === '/ota';
+  if (isEditPage || isManualPage || isValueEditPage || isOtaPage) return null;
   return (
     <>
       <div className="esp32-config">
@@ -328,7 +330,13 @@ function App() {
     <Router>
       <div className="app">
         <header>
-          <h1>DMX Controller <span style={{fontSize:'0.5em', color:'#888', marginLeft:'0.5em'}}>v0.1</span></h1>
+          <h1
+            style={{ cursor: 'pointer' }}
+            onClick={() => window.location.pathname = '/'}
+            title="Go to Home"
+          >
+            DMX Controller <span style={{fontSize:'0.5em', color:'#888', marginLeft:'0.5em'}}>v0.1</span>
+          </h1>
           <HeaderControls 
             esp32Ip={esp32Ip}
             sendStatus={sendStatus}
@@ -340,7 +348,7 @@ function App() {
           />
         </header>
         
-        <main>
+        <main style={{ marginTop: location.pathname === '/ota' ? '0.1rem' : undefined }}>
           <Routes>
             <Route path="/config" element={<Configuration config={config} onConfigChange={handleConfigChange} />} />
             <Route path="/manual" element={<ManualPage />} />

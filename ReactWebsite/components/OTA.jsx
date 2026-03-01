@@ -32,9 +32,10 @@ export default function OTA() {
 
   return (
     <div className="ota-page">
-      <div className="ota-input">
+      <div className="configuration-header">
         <h2>OTA Update</h2>
-        <div className="ota-input-row">
+      </div>
+        <div className="ota-input-row" >
           <input
             type="text"
             placeholder="Enter file name..."
@@ -58,6 +59,5 @@ export default function OTA() {
           <button className="ota-cancel" onClick={handleCancel}>Cancel</button>
         </div>
       </div>
-    </div>
   );
 }

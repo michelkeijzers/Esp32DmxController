@@ -24,10 +24,7 @@ function ManualPage() {
 
   const navigate = useNavigate();
   return (
-    <div className="manual-page">
-      <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
-        <button className="manual-button" style={{ marginRight: 16 }} onClick={() => navigate('/')}>Home</button>
-      </div>
+    <div className="manual-page" style={{ maxWidth: '450px', margin: '0 auto' }}>
       <UserManual manualText={manualText} />
     </div>
   );

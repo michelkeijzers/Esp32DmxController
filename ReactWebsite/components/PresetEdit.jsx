@@ -43,9 +43,8 @@ function PresetEdit({ presets, onUpdateName }) {
   }
 
   return (
-    <div className="preset-edit">
+    <div className="preset-edit" style={{ maxWidth: '450px', margin: '0 auto' }}>
       <div className="preset-edit-header">
-        <button className="manual-button" onClick={() => navigate('/')}>Home</button>
         <div className="preset-title-container">
           <span className="preset-number">Preset <span className="preset-number-value">{preset.id - 1}</span></span>
           <input
