@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 function ManualButton() {
   const navigate = useNavigate();
   return (
-    <button className="manual-button" onClick={() => navigate('/manual')}>
+    <button className="config-button" onClick={() => navigate('/manual')}>
       Manual
     </button>
   );

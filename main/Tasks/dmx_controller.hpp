@@ -1,7 +1,6 @@
 #pragma once
 #include "Base/rtos_task.hpp"
 #include "Data/dmx_presets.hpp"
-#include "artnet_sender.hpp"
 #include "dmx_preset_changer.hpp"
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
@@ -24,8 +23,7 @@ class DmxController : public RtosTask
 {
   public:
     DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
-        FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
-        NvStorage *nvStorage);
+        FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
     esp_err_t init();
     void taskLoop();
@@ -44,14 +42,12 @@ class DmxController : public RtosTask
     static constexpr const char *OTA_CERT_PEM = nullptr;
     static constexpr const char *OSC_DEST_IP = "192.168.1.100";
     static constexpr int OSC_DEST_PORT = 8000;
-    static constexpr const char *ARTNET_DEST_IP = "192.168.1.100";
 
     DmxPresetChanger *presetChanger_;
     OSCSender *oscSender_;
     SevenSegmentDisplay *display_;
     FootSwitch *footSwitch_;
     Max3485Sender *max3485Sender_;
-    ArtNetSender *artnetSender_;
     WebServer *webServer_;
     NvStorage *nvStorage_;
 

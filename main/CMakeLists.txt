@@ -9,7 +9,6 @@ idf_component_register(
         "Tasks/nv_storage.cpp"
         "Tasks/osc_sender.cpp"
         "Tasks/seven_segment_display.cpp"
-        "Tasks/artnet_sender.cpp"
         "Tasks/web_server.cpp"
         "Tasks/dmx_controller.cpp"
         "Base/rtos_task.cpp"

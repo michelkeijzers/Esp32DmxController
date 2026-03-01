@@ -1,5 +1,4 @@
 #include "dmx_controller.hpp"
-#include "artnet_sender.hpp"
 #include "dmx_preset_changer.hpp"
 #include "esp_app_desc.h"
 #include "esp_event.h"
@@ -15,10 +14,9 @@
 #include "web_server.hpp"
 
 DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
-    FootSwitch *footSwitch, Max3485Sender *max3485Sender, ArtNetSender *artnetSender, WebServer *webServer,
-    NvStorage *nvStorage)
+    FootSwitch *footSwitch, Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
     : RtosTask(), presetChanger_(presetChanger), oscSender_(oscSender), display_(display), footSwitch_(footSwitch),
-      max3485Sender_(max3485Sender), artnetSender_(artnetSender), webServer_(webServer), nvStorage_(nvStorage)
+      max3485Sender_(max3485Sender), webServer_(webServer), nvStorage_(nvStorage)
 {
 }
 
@@ -185,24 +183,6 @@ esp_err_t DmxController::init_sub_tasks()
         return ESP_FAIL;
     }
 
-    if (!artnetSender_)
-    {
-        ESP_LOGE(log_tag_, "artnetSender_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
-    }
-    TaskProperties artnetSenderTaskProperties = {.taskName_ = "ArtNetSenderTask",
-        .logTag = "ArtNetSender",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (artnetSender_->init(artnetSenderTaskProperties, ARTNET_DEST_IP, 6454) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize ArtNetSender");
-        return ESP_FAIL;
-    }
-
     if (!webServer_)
     {
         ESP_LOGE(log_tag_, "webServer_ is nullptr");
@@ -339,14 +319,7 @@ void DmxController::taskLoop()
 
             case Messages::EventType::USE_PRESET_DATA:
             {
-                // Forward to ArtNetSender
-                Messages::Event artNetEvent = Messages::Event();
-                artNetEvent.type = Messages::EventType::SEND_PRESET_DATA;
-                artNetEvent.data.presetData = event.data.presetData;
-                if (xQueueSend(artnetSender_->getEventQueue(), &artNetEvent, 0) != pdPASS)
-                {
-                    ESP_LOGE(log_tag_, "Failed to forward preset data to ArtNetSender");
-                }
+                // TODO: Send preset data to DMX output (via Max3485Sender).)
             }
             break;
 

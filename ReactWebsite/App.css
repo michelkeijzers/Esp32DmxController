@@ -1,11 +1,11 @@
 .blackout-active {
   background: #222 !important;
-  border: 2px solid #646cff;
+  border: 2px solid #4fc3f7;
 }
 .blackout-button {
   background: #fff;
   border: none;
-  padding: 0.6rem 2rem;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -32,14 +32,14 @@
   color: #fff;
 }
 .user-manual th {
-  background: #646cff;
+  background: #4fc3f7;
   color: #fff;
 }
 .user-manual tr:nth-child(even) td {
   background: #292a3a;
 }
 .manual-button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.6rem 2rem;
@@ -74,8 +74,9 @@ header {
 }
 
 header h1 {
+  margin-top: 0.2rem;
   margin-bottom: 0.5rem;
-  color: #646cff;
+  color: #4FC3F7;
 }
 
 header p {
@@ -113,11 +114,12 @@ main {
   margin-right: auto;
 }
 
-.config-button {
-  background: #646cff;
+.config-button,
+.manual-button {
+  background: #4FC3F7;
   color: white;
   border: none;
-  padding: 0.6rem 2rem;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -126,11 +128,11 @@ main {
 }
 
 .config-button:hover {
-  background: #747bff;
+  background: #81d4fa;
 }
 
 .config-button:active {
-  background: #535ac5;
+  background: #039be5;
 }
 
 .preset-selector label {
@@ -143,7 +145,7 @@ main {
   height: 40px;
   font-size: 1.5rem;
   font-weight: bold;
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   border-radius: 6px;
@@ -165,7 +167,7 @@ main {
 }
 
 .preset-count-display {
-  color: #646cff;
+  color: #4fc3f7;
   font-weight: 600;
   font-size: 1.2rem;
   min-width: 30px;
@@ -178,7 +180,7 @@ main {
   justify-content: center;
   gap: 1rem;
   margin-top: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.2rem;
   background: #1a1a1a;
   border-radius: 8px;
   max-width: 700px;
@@ -188,15 +190,16 @@ main {
 }
 
 .esp32-config label {
-  color: #999;
+  color: #bbb;
   font-weight: 500;
 }
 
 .esp32-ip-display {
-  color: #646cff;
-  font-weight: 600;
+  color: #cfc3f7;
   font-size: 1rem;
   font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  font-weight: bold;
 }
 
 .esp32-config input[type="text"] {
@@ -209,15 +212,16 @@ main {
   font-size: 1rem;
   text-align: center;
   font-family: 'Courier New', monospace;
+  font-weight: bold;
 }
 
 .esp32-config input[type="text"]:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
 }
 
 .send-status {
-  color: #646cff;
+  color: #4fc3f7;
   font-weight: 500;
   font-size: 0.9rem;
   flex-basis: 100%;
@@ -229,7 +233,7 @@ main {
 }
 
 .send-all-button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.5rem 1.5rem;
@@ -249,10 +253,10 @@ main {
 }
 
 .load-all-button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 0.5rem;
   border-radius: 6px;
   font-size: 0.9rem;
   font-weight: 600;

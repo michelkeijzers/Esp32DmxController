@@ -73,21 +73,15 @@ The website provides the following configuration options:
 
 #### Foot Switch
 
-- **Polarity**: Choose between Standard and Inverted polarity for the foot switch input.
+- **Polarity**: Choose between Normally Open and Normally Closed for the foot switch polarity.
 - **Long Press Time**: Set the duration (in milliseconds) required for a long press action on the foot switch (range: 500–2000 ms).
-- **Send Foot Switch State Changes through OSC**: Enable to send foot switch state changes as OSC messages.
+- **Send Foot Switch State Changes through OSC**: Enable to send foot switch state changes as OSC messages. (Unused for now, but may be implemented in the future).
 
-#### OSC (Open Sound Control)
+#### OSC (Open Sound Control) (Unused for now, but may be implemented in the future).
 
 - **OSC Address (IP)**: Set the destination IP address for OSC messages.
 - **OSC Receive Port**: Set the port to receive OSC messages (1–65535).
 - **OSC Send Port**: Set the port to send OSC messages (1–65535).
-
-#### DMX Transmission
-
-- **Send via ArtNET**: Enable or disable DMX transmission over ArtNET protocol.
-- **Send to DMX connector**: Enable or disable DMX output via the physical DMX connector.
-- At least one option must be enabled for DMX transmission. If both are disabled, a warning is shown: _"DMX will not be transmitted"_.
 
 ---
 

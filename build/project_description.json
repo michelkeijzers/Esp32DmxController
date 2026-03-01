@@ -1,7 +1,7 @@
 {
     "version":            "1.2",
     "project_name":       "DmxController",
-    "project_version":    "079601a-dirty",
+    "project_version":    "f90092d-dirty",
     "project_path":       "C:/Users/i4studio/Esp32Test",
     "idf_path":           "C:/Users/i4studio/esp/v5.4.1/esp-idf",
     "build_dir":          "C:/Users/i4studio/Esp32Test/build",
@@ -1195,7 +1195,7 @@
             "managed_reqs": [],
             "managed_priv_reqs": [],
             "file": "C:/Users/i4studio/Esp32Test/build/esp-idf/main/libmain.a",
-            "sources": [ "C:/Users/i4studio/Esp32Test/main/Tasks/max3485_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/foot_switch.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_preset_changer.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/nv_storage.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/osc_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/seven_segment_display.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/artnet_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/web_server.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_controller.cpp", "C:/Users/i4studio/Esp32Test/main/Base/rtos_task.cpp", "C:/Users/i4studio/Esp32Test/main/main.cpp", "C:/Users/i4studio/Esp32Test/main/Data/dmx_presets.cpp", "C:/Users/i4studio/Esp32Test/main/Data/dmx_preset.cpp" ],
+            "sources": [ "C:/Users/i4studio/Esp32Test/main/Tasks/max3485_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/foot_switch.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_preset_changer.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/nv_storage.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/osc_sender.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/seven_segment_display.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/web_server.cpp", "C:/Users/i4studio/Esp32Test/main/Tasks/dmx_controller.cpp", "C:/Users/i4studio/Esp32Test/main/Base/rtos_task.cpp", "C:/Users/i4studio/Esp32Test/main/main.cpp", "C:/Users/i4studio/Esp32Test/main/Data/dmx_presets.cpp", "C:/Users/i4studio/Esp32Test/main/Data/dmx_preset.cpp" ],
             "include_dirs": [ ".", "Tasks" ]
         },
         "mbedtls": {

@@ -1,19 +1,25 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
 import './PresetEdit.css'
+
+// Use a global variable to persist last edited index between pages
+window.lastEditedIndex = null;
 
 function PresetEdit({ presets, onUpdateName }) {
   const { id } = useParams()
   const navigate = useNavigate()
   const preset = presets.find(p => p.id === parseInt(id))
+  const valueGridRef = useRef(null)
 
-  if (!preset) {
-    return (
-      <div className="preset-edit-error">
-        <h2>Preset not found</h2>
-        <button className="manual-button" onClick={() => navigate('/')}>Home</button>
-      </div>
-    )
-  }
+  useEffect(() => {
+    if (window.lastEditedIndex !== null && valueGridRef.current) {
+      const el = valueGridRef.current.querySelector(`[data-index='${window.lastEditedIndex}']`)
+      if (el) {
+        el.scrollIntoView({ block: 'center', behavior: 'auto' })
+        window.lastEditedIndex = null
+      }
+    }
+  }, [presets])
 
   const handleNameChange = (event) => {
     onUpdateName(preset.id, event.target.value)
@@ -31,12 +37,17 @@ function PresetEdit({ presets, onUpdateName }) {
     }
   }
 
+  const handleIndexClick = (index) => {
+    window.lastEditedIndex = index
+    navigate(`/value-edit/${preset.id}/values1/${index}`)
+  }
+
   return (
     <div className="preset-edit">
       <div className="preset-edit-header">
         <button className="manual-button" onClick={() => navigate('/')}>Home</button>
         <div className="preset-title-container">
-          <span className="preset-number">Preset {preset.id - 1}</span>
+          <span className="preset-number">Preset <span className="preset-number-value">{preset.id - 1}</span></span>
           <input
             type="text"
             className="preset-name-edit-input"
@@ -68,15 +79,16 @@ function PresetEdit({ presets, onUpdateName }) {
       <div className="preset-sections">
         <div className="preset-section">
           {/* <h3>Universe 1</h3> */}
-          <div className="values-grid-full">
+          <div className="values-grid-full" ref={valueGridRef}>
             {preset.values1.map((value, index) => (
               <span 
                 key={index} 
                 className="value-small"
-                onClick={() => navigate(`/preset/${preset.id}/values1/${index}`)}
+                data-index={index}
+                onClick={() => handleIndexClick(index)}
                 style={{ cursor: 'pointer' }}
               >
-                <span className="index">[{index}]</span>
+                <span className="index">{index}</span>
                 <span className="value-display-inline">{value}</span>
               </span>
             ))}

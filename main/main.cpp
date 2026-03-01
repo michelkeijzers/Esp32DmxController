@@ -1,4 +1,3 @@
-#include "Tasks/artnet_sender.hpp"
 #include "Tasks/dmx_preset_changer.hpp"
 #include "Tasks/foot_switch.hpp"
 #include "Tasks/max3485_sender.hpp"
@@ -16,12 +15,10 @@ extern "C" void app_main()
     auto *display = new SevenSegmentDisplay();
     auto *footSwitch = new FootSwitch();
     auto *max3485Sender = new Max3485Sender();
-    auto *artnetSender = new ArtNetSender();
     auto *webServer = new WebServer();
     auto *nvStorage = new NvStorage();
 
-    DmxController controller(
-        presetChanger, oscSender, display, footSwitch, max3485Sender, artnetSender, webServer, nvStorage);
+    DmxController controller(presetChanger, oscSender, display, footSwitch, max3485Sender, webServer, nvStorage);
     controller.init();
     controller.taskLoop();
 }

@@ -40,6 +40,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #4FC3F7;
 }
 
 .preset-number-list {
@@ -52,7 +53,7 @@
   flex: 1;
   background: transparent;
   border: none;
-  color: #646cff;
+  color: #4fc3f7;
   font-size: 1rem;
   font-weight: 600;
   padding: 0.25rem;
@@ -92,9 +93,9 @@
 }
 
 .move-button:hover:not(:disabled) {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
-  border-color: #646cff;
+  border-color: #4fc3f7;
 }
 
 .move-button:disabled {
@@ -105,8 +106,8 @@
 
 .insert-button {
   background: transparent;
-  color: #646cff;
-  border: 1px solid #646cff;
+  color: #4fc3f7;
+  border: 1px solid #4fc3f7;
   padding: 0.25rem 0.6rem;
   border-radius: 4px;
   font-size: 1.2rem;
@@ -117,7 +118,7 @@
 }
 
 .insert-button:hover:not(:disabled) {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
 }
 
@@ -151,7 +152,7 @@
 
 .preset-item h3 {
   margin: 0;
-  color: #646cff;
+  color: #4fc3f7;
   font-size: 1rem;
   flex-shrink: 0;
 }
@@ -166,23 +167,23 @@
   flex: 1;
   background: #4a4a4a;
   color: white;
-  border: 1px solid #646cff;
+  border: 1px solid #4fc3f7;
   padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .edit-button:hover {
-  background: #646cff;
+  background: #4fc3f7;
   border-color: #747bff;
 }
 
 .send-button-small {
   flex: 1;
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.6rem 1rem;

@@ -37,10 +37,10 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
       <div className="esp32-config">
         <label htmlFor="esp32-ip">ESP32 IP Address:</label>
         <span className="esp32-ip-display">{esp32Ip}</span>
-        <button className="load-all-button" onClick={LoadFromDmxController}>
+        <button className="config-button" onClick={LoadFromDmxController}>
           Load
         </button>
-        <button className="send-all-button" onClick={SendToDmxController}>
+        <button className="config-button" onClick={SendToDmxController}>
           Save
         </button>
         {sendStatus && (
@@ -66,7 +66,12 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
       </div>
       <div className="preset-selector">
         <label htmlFor="preset-count">Number of Presets:</label>
-        <span className="preset-count-display">{presetCount}</span>
+        <span
+          className="preset-count-display"
+          style={{ color: '#4FC3F7' }} // lighter blue
+        >
+          {presetCount}
+        </span>
       </div>
     </>
   );
@@ -79,7 +84,7 @@ function App() {
   const [sendStatus, setSendStatus] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [config, setConfig] = useState({
-    expressionPedalPolarity: 'standard'
+    expressionPedalPolarity: 'normally'
   })
 
   const updatePresetValue = (presetId, section, index, newValue) => {

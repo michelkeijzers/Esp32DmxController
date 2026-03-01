@@ -19,15 +19,7 @@ function Configuration({ config, onConfigChange }) {
   };
 
 
-  const handleDmxTransmitChange = (e) => {
-    const { name, checked } = e.target;
-    // If unchecking and the other is already false, prevent both from being false
-    if (!checked) {
-      if (name === 'sendViaArtNet' && !config.sendToDmxConnector) return;
-      if (name === 'sendToDmxConnector' && !config.sendViaArtNet) return;
-    }
-    onConfigChange(name, checked);
-  };
+  // ...existing code...
 
   return (
     <div className="configuration">
@@ -87,21 +79,21 @@ function Configuration({ config, onConfigChange }) {
               <input
                 type="radio"
                 name="polarity"
-                value="standard"
-                checked={config.footSwitchPolarity === 'standard'}
+                value="normallyOpen"
+                checked={config.footSwitchPolarity === 'normallyOpen'}
                 onChange={(e) => handlePolarityChange(e.target.value)}
               />
-              <span>Standard</span>
+              <span>Normally Open</span>
             </label>
             <label className="radio-option">
               <input
                 type="radio"
                 name="polarity"
-                value="inverted"
-                checked={config.footSwitchPolarity === 'inverted'}
+                value="normallyClosed"
+                checked={config.footSwitchPolarity === 'normallyClosed'}
                 onChange={(e) => handlePolarityChange(e.target.value)}
               />
-              <span>Inverted</span>
+              <span>Normally Closed</span>
             </label>
           </div>
         </div>
@@ -117,22 +109,23 @@ function Configuration({ config, onConfigChange }) {
           />
         </div>
         <div className="config-item">
-          <label style={{ marginTop: '12px', display: 'inline-block' }}>
+          <label style={{ marginTop: '12px', display: 'inline-block', color: '#333' }}>
             <input
               type="checkbox"
               checked={!!config.oscSendFootSwitch}
-              onChange={e => onConfigChange('oscSendFootSwitch', e.target.checked)}
+              disabled
+              style={{ accentColor: '#111', filter: 'brightness(0.6)' }}
             />
-            <span>Send Foot Switch State Changes through OSC</span>
+            <span style={{ color: '#333' }}>Send Foot Switch State Changes through OSC</span>
           </label>
         </div>
       </div>
 
-      {/* OSC Section */}
-      <div className="config-section">
-        <h3>OSC (Open Sound Control)</h3>
+      {/* OSC Section - now darker */}
+      <div className="config-section" style={{ background: '#111', color: '#222', borderRadius: '8px', padding: '18px 16px', marginTop: '12px' }}>
+        <h3 style={{ color: '#222' }}>OSC (Open Sound Control)</h3>
         <div className="config-item">
-          <label htmlFor="oscAddress">OSC Address (IP):</label>
+          <label htmlFor="oscAddress" style={{ color: '#222' }}>OSC Address (IP):</label>
           <input
             id="oscAddress"
             type="text"
@@ -141,10 +134,11 @@ function Configuration({ config, onConfigChange }) {
             placeholder="e.g. 192.168.1.100"
             pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
             title="Enter a valid IP address"
+            style={{ background: '#222', color: '#fafafa', border: '1px solid #333' }}
           />
         </div>
         <div className="config-item">
-          <label htmlFor="oscReceivePort">OSC Receive Port:</label>
+          <label htmlFor="oscReceivePort" style={{ color: '#222' }}>OSC Receive Port:</label>
           <input
             id="oscReceivePort"
             type="number"
@@ -152,10 +146,11 @@ function Configuration({ config, onConfigChange }) {
             max={65535}
             value={config.oscReceivePort ?? ''}
             onChange={e => onConfigChange('oscReceivePort', parseInt(e.target.value, 10) || '')}
+            style={{ background: '#222', color: '#fafafa', border: '1px solid #333' }}
           />
         </div>
         <div className="config-item">
-          <label htmlFor="oscSendPort">OSC Send Port:</label>
+          <label htmlFor="oscSendPort" style={{ color: '#222' }}>OSC Send Port:</label>
           <input
             id="oscSendPort"
             type="number"
@@ -163,41 +158,12 @@ function Configuration({ config, onConfigChange }) {
             max={65535}
             value={config.oscSendPort ?? ''}
             onChange={e => onConfigChange('oscSendPort', parseInt(e.target.value, 10) || '')}
+            style={{ background: '#222', color: '#fafafa', border: '1px solid #333' }}
           />
         </div>
       </div>
 
-      {/* DMX Transmission Section (moved after Foot Switch) */}
-      <div className="config-section">
-        <h3>DMX Transmission</h3>
-        <div className="config-item">
-          <label>
-            <input
-              type="checkbox"
-              name="sendViaArtNet"
-              checked={!!config.sendViaArtNet}
-              onChange={handleDmxTransmitChange}
-            />
-            <span>Send via ArtNET</span>
-          </label>
-        </div>
-        <div className="config-item">
-          <label>
-            <input
-              type="checkbox"
-              name="sendToDmxConnector"
-              checked={!!config.sendToDmxConnector}
-              onChange={handleDmxTransmitChange}
-            />
-            <span>Send to DMX connector</span>
-          </label>
-        </div>
-        {(!config.sendViaArtNet && !config.sendToDmxConnector) && (
-          <div className="config-warning" style={{ color: 'red', marginTop: 8 }}>
-            DMX will not be transmitted
-          </div>
-        )}
-      </div>
+      {/* DMX Transmission menu and related code removed as requested */}
     </div>
   );
 }

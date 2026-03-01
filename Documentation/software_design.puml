@@ -124,12 +124,12 @@ class FootSwitchConfiguration <<Data>>
 {
     +uint16_t GetLongPressTime()
     +void SetLongPressTime(uint16_t threshold)
-    +bool IsPolarityInverted()
-    +void SetPolarityInverted(bool inverted)
+    +bool IsPolarityNormallyOpen()
+    +void SetPolarityNormallyOpen(bool normallyOpen)
     +bool IsSendFootSwitchStateChangesThroughOsc()
     +void SetSendFootSwitchStateChangesThroughOsc(bool send)
     -uint16_t longPressTime
-    -bool polarityInverted
+    -bool polarityNormallyOpen
     -bool sendFootSwitchStateChangesThroughOsc
 }
 Configuration *-- FootSwitchConfiguration
@@ -160,9 +160,40 @@ class DmxTransmission <<Data>>
 Configuration *-- DmxTransmission
 @enduml 
 
+
 @startuml
 title NvRam Storage
 
+class NvStorage <<Task>>
+{
+    +NvStorage()
+    +~NvStorage()
+    +init(QueueHandle_t configUpdateQueue) : esp_err_t
+    +storeConfiguration(const Configuration& config) : esp_err_t
+    +storePresets(const DmxPresets& presets) : esp_err_t
+    +getConfiguration(Configuration& config) : esp_err_t
+    +getPresets(DmxPresets& presets) : esp_err_t
+}
+
+class NvPresetStorage
+{
+    +SplitDmxPreset(in const DmxPreset& preset)
+    +CombineDmxPreset(out const DmxPreset& preset)
+}
+NvStorage *-- NvPresetStorage
+
+class NvPresetStoragePart1
+{
+    -char name[32]
+    -uint8_t dmxDataPart1[256]
+}
+NvPresetStorage *-- NvPresetStoragePart1
+
+class NvPresetStoragePart2
+{
+    -uint8_t dmxDataPart2[256]
+}
+NvPresetStorage *-- NvPresetStoragePart2
 
 @enduml
 
@@ -215,11 +246,9 @@ activate DmxController
         ref over DmxController : Select Preset, see Message Queues Next/Prev Preset
     end
 deactivate DmxController
-
 @enduml 
 
 @startuml
-
 title Message Queues Next/Prev Preset
 
 actor User
@@ -254,7 +283,6 @@ end
 @enduml
 
 @startuml
-
 title Webserver Update Config/Presets
 
 user -> WebServer : Transmit new configuration/presets
@@ -279,6 +307,7 @@ ref over DmxController : Update Preset Data (as in Message Queues Next/Prev Pres
 
 @startuml 
 title OTA Update
+
 WebServer --> DmxController : START_OTA
 DmxController --> Ota : START_OTA 
 Ota --> DmxController : FINISH_OTA (success/failure)

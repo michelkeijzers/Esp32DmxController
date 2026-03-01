@@ -73,7 +73,7 @@ The website provides the following configuration options:
 
 #### Foot Switch
 
-- **Polarity**: Choose between Standard and Inverted polarity for the foot switch input.
+- **Polarity**: Choose between Normally Open and Normally Closed for the foot switch input polarity.
 - **Long Press Time**: Set the duration (in milliseconds) required for a long press action on the foot switch (range: 500–2000 ms).
 - **Send Foot Switch State Changes through OSC**: Enable to send foot switch state changes as OSC messages.
 

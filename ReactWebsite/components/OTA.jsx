@@ -32,25 +32,27 @@ export default function OTA() {
 
   return (
     <div className="ota-page">
-      <div className="ota-box">
+      <div className="ota-input">
         <h2>OTA Update</h2>
-        <input
-          type="text"
-          placeholder="Enter file name..."
-          value={fileName}
-          onChange={e => setFileName(e.target.value)}
-          className="ota-input"
-          readOnly
-        />
-        <input
-          type="file"
-          style={{ display: 'none' }}
-          ref={fileInputRef}
-          onChange={handleFileChange}
-        />
-        <button className="ota-file-dialog" onClick={showFileDialog} style={{ marginBottom: '1rem' }}>
-          Choose File
-        </button>
+        <div className="ota-input-row">
+          <input
+            type="text"
+            placeholder="Enter file name..."
+            value={fileName}
+            onChange={e => setFileName(e.target.value)}
+            className="ota-input"
+            readOnly
+          />
+          <input
+            type="file"
+            style={{ display: 'none' }}
+            ref={fileInputRef}
+            onChange={handleFileChange}
+          />
+          <button className="ota-file-dialog" onClick={showFileDialog}>
+            Choose File
+          </button>
+        </div>
         <div className="ota-buttons">
           <button className="ota-confirm" onClick={handleConfirm}>Confirm</button>
           <button className="ota-cancel" onClick={handleCancel}>Cancel</button>
@@ -58,4 +60,4 @@ export default function OTA() {
       </div>
     </div>
   );
-  }
+}

@@ -85,9 +85,10 @@ esp_err_t NvStorage::setConfiguration(const Messages::ConfigurationEventData &co
     if (!configuration_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    if (nvs_set_u8(configuration_nvs_handle, "SwitchPolarityInv", configurationData.switchPolarityInverted) != ESP_OK)
+    if (nvs_set_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen",
+            configurationData.switchPolarityNormallyOpen) != ESP_OK)
     {
-        ESP_LOGE(log_tag_, "Failed to set switch polarity inverted");
+        ESP_LOGE(log_tag_, "Failed to set switch polarity normally open");
         return ESP_FAIL;
     }
 
@@ -110,13 +111,13 @@ esp_err_t NvStorage::requestConfiguration(Messages::ConfigurationEventData &conf
     if (!configuration_nvs_handle)
         return ESP_ERR_INVALID_STATE;
 
-    uint8_t switch_polarity_inverted;
-    if (nvs_get_u8(configuration_nvs_handle, "SwitchPolarityInv", &switch_polarity_inverted) != ESP_OK)
+    uint8_t switch_polarity_normally_open;
+    if (nvs_get_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen", &switch_polarity_normally_open) != ESP_OK)
     {
-        ESP_LOGE(log_tag_, "Failed to get switch polarity inverted");
+        ESP_LOGE(log_tag_, "Failed to get switch polarity normally open");
         return ESP_FAIL;
     }
-    configurationData.switchPolarityInverted = switch_polarity_inverted;
+    configurationData.switchPolarityNormallyOpen = switch_polarity_normally_open;
 
     uint16_t long_press_threshold_ms;
     if (nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms) != ESP_OK)

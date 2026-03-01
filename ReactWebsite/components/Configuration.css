@@ -11,7 +11,7 @@
 }
 .ota-box {
   background: #222;
-  border-radius: 8px;
+  border-radius: 4px;
   padding: 2rem;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
   display: flex;
@@ -19,16 +19,35 @@
   align-items: center;
 }
 .ota-input {
-  margin-bottom: 1.5rem;
+  padding: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 6px;
-  border: 1px solid #646cff;
+  border: 1px solid #4fc3f7;
   font-size: 1rem;
+}
+.ota-input-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
 }
 .ota-buttons {
   display: flex;
   gap: 1rem;
+  padding: 0.5rem;
 }
+
+.ota-file-dialog  {
+  background: #4fc3f7;
+  color: #fff;
+  padding: .5rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;  
+  gap: 0.5rem;
+}
+
 .ota-confirm, .ota-cancel {
   padding: 0.5rem 1.2rem;
   border-radius: 6px;
@@ -37,7 +56,7 @@
   cursor: pointer;
 }
 .ota-confirm {
-  background: #646cff;
+  background: #4fc3f7;
   color: #fff;
 }
 .ota-cancel {
@@ -61,7 +80,7 @@
 .configuration-header h2 {
   flex: 1;
   margin: 0;
-  color: #646cff;
+  color: #4fc3f7;
   text-align: center;
 }
 
@@ -82,7 +101,7 @@
 .config-section h3 {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #646cff;
+  color: #4fc3f7;
   font-size: 1.2rem;
 }
 
@@ -131,5 +150,5 @@
 }
 
 .radio-option input[type="radio"]:checked + span {
-  color: #646cff;
+  color: #4fc3f7;
 }

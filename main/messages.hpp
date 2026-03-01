@@ -25,8 +25,8 @@ class Messages
         SELECT_NEXT_PRESET,        // DMX Controller -> Preset Changer
         SELECT_PREVIOUS_PRESET,    // DMX Controller -> Preset Changer
         USE_PRESET_DATA,           // Preset Changer -> DMX Controller
-        SEND_PRESET_DATA,          // DMX Controller -> Art-Net Sender
-        SEND_PRESET_DATA_RESPONSE, // Art-Net Sender -> DMX Controller
+        SEND_PRESET_DATA,          // DMX Controller -> Max3485 Sender
+        SEND_PRESET_DATA_RESPONSE, // Max3485 Sender -> DMX Controller
         SHOW_PRESET_INDEX          // DMX Controller -> Seven Segment Display
 
     };

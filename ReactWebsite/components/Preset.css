@@ -16,11 +16,11 @@
 
 .preset-header h2 {
   margin: 0;
-  color: #646cff;
+  color: #4fc3f7;
 }
 
 .send-button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -41,7 +41,7 @@
 
 .preset-card h2 {
   margin-top: 0;
-  color: #646cff;
+  color: #4fc3f7;
 }
 
 .preset-info {
@@ -89,7 +89,7 @@
 }
 
 .index {
-  color: #646cff;
+  color: #4fc3f7;
   font-weight: 600;
   font-size: 0.75rem;
 }
@@ -113,7 +113,7 @@
 
 .value-input:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
   background: #0a0a0a;
 }
 
@@ -131,7 +131,7 @@
 
 .value-input-small:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
   background: #0a0a0a;
 }
 
@@ -150,7 +150,7 @@
 }
 
 .more {
-  color: #646cff;
+  color: #4fc3f7;
   font-style: italic;
   align-self: center;
 }
@@ -163,7 +163,7 @@
 
 .full-data summary {
   cursor: pointer;
-  color: #646cff;
+  color: #4fc3f7;
   font-weight: 500;
   user-select: none;
 }

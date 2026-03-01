@@ -15,7 +15,7 @@
 
 .preset-edit-header h1 {
   margin: 0;
-  color: #646cff;
+  color: #7daaff;
   flex: 1;
   text-align: center;
 }
@@ -35,13 +35,18 @@
   white-space: nowrap;
 }
 
+.preset-number-value {
+  color: #7daaff;
+  font-weight: 700;
+}
+
 .preset-name-edit-input {
   width: 100%;
   max-width: 400px;
   background: #1a1a1a;
   border: 1px solid #555;
   border-radius: 6px;
-  color: #646cff;
+  color: #4fc3f7;
   font-size: 1.5rem;
   font-weight: 600;
   padding: 0.5rem 1rem;
@@ -52,7 +57,7 @@
 
 .preset-name-edit-input:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
   background: #4a4a4a;
 }
 
@@ -84,8 +89,8 @@
 }
 
 .preset-nav-button:hover:not(:disabled) {
-  background: #646cff;
-  border-color: #646cff;
+  background: #4fc3f7;
+  border-color: #4fc3f7;
 }
 
 .preset-nav-button:disabled {
@@ -110,11 +115,11 @@
 
 .back-button:hover {
   background: #5a5a5a;
-  border-color: #646cff;
+  border-color: #4fc3f7;
 }
 
 .send-button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -155,7 +160,7 @@
 .preset-section h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
-  color: #646cff;
+  color: #4fc3f7;
   font-size: 1.2rem;
 }
 
@@ -194,9 +199,9 @@
 }
 
 .index {
-  color: #646cff;
-  font-weight: 600;
-  font-size: 0.75rem;
+  color: #ddd;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
 .value-input {
@@ -213,7 +218,7 @@
 
 .value-input:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
   background: #0a0a0a;
 }
 
@@ -224,7 +229,7 @@
 
 .full-data summary {
   cursor: pointer;
-  color: #646cff;
+  color: #4fc3f7;
   font-weight: 500;
   user-select: none;
   padding: 0.5rem;
@@ -267,12 +272,13 @@
 }
 
 .value-display-inline {
-  color: #fff;
+  color: #fdf;
   min-width: 45px;
   text-align: center;
-  padding: 0.2rem 0.5rem;
+  padding: 0.2rem 0.2rem;
   background: #2a2a2a;
   border-radius: 3px;
+  font-size: 1.5rem;
 }
 
 .value-input-small {
@@ -289,7 +295,7 @@
 
 .value-input-small:focus {
   outline: none;
-  border-color: #646cff;
+  border-color: #4fc3f7;
   background: #4a4a4a;
 }
 
@@ -318,7 +324,7 @@
 }
 
 .preset-edit-error button {
-  background: #646cff;
+  background: #4fc3f7;
   color: white;
   border: none;
   padding: 0.8rem 1.5rem;

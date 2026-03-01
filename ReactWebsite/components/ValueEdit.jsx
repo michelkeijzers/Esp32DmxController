@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import './ValueEdit.css'
 
-function ValueEdit({ presets, onUpdateValue }) {
+function ValueEdit({ presets, setPresets }) {
   const { presetId, section, index } = useParams()
   const navigate = useNavigate()
   
@@ -30,13 +30,29 @@ function ValueEdit({ presets, onUpdateValue }) {
   const handleSave = () => {
     const numValue = parseInt(value) || 0
     const clampedValue = Math.max(0, Math.min(255, numValue))
-    onUpdateValue(parseInt(presetId), section, parseInt(index), clampedValue)
+    setPresets(prevPresets =>
+      prevPresets.map(preset => {
+        if (preset.id === parseInt(presetId)) {
+          return {
+            ...preset,
+            [section]: preset[section].map((val, i) => i === parseInt(index) ? clampedValue : val)
+          }
+        }
+        return preset
+      })
+    )
+    // Restore scroll position after navigation
     navigate(`/preset/${presetId}`)
+    setTimeout(() => {
+      window.scrollTo({ top: lastScrollY, behavior: 'auto' });
+    }, 0);
   }
 
   const handleCancel = () => {
     navigate(`/preset/${presetId}`)
   }
+
+  let lastScrollY = 0;
 
   if (!preset) {
     return (
@@ -52,19 +68,17 @@ function ValueEdit({ presets, onUpdateValue }) {
 
   return (
     <div className="value-edit">
-      <div className="value-edit-header">
-        <h1>{preset.name}</h1>
-        <p className="value-edit-info">
-          DMX Address {index}
-        </p>
+      <div className="value-edit-header-row">
+        <span className="scene-title">{preset.name}</span>
+        <span className="dmx-address">DMX Address {index}</span>
       </div>
 
       <div className="value-display">
-        <div className={`value-display-number ${!isValid ? 'invalid' : ''}`}>
-          {value || '0'}
-        </div>
-        <div className="value-display-label">
-          {isValid ? 'Valid (0-255)' : 'Invalid! Max 255'}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+          <span className={`value-display-number ${!isValid ? 'invalid' : ''}`}>{value || '0'}</span>
+          <span className="value-display-label" style={{ marginLeft: '1rem' }}>
+            {isValid ? 'Valid (0-255)' : 'Invalid! Max 255'}
+          </span>
         </div>
       </div>
 
