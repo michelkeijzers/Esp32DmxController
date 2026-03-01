@@ -14,8 +14,8 @@ class DmxPresets
 
     esp_err_t init();
 
-    uint8_t getNumPresets() const { return numPresets_; }
-    esp_err_t setNumPresets(uint8_t numPresets);
+    uint8_t getNumberOfFilledPresets() const { return numberOfFilledPresets_; }
+    esp_err_t setNumberOfFilledPresets(uint8_t numberOfFilledPresets);
 
     DmxPreset &getCurrentPreset() { return presets_[currentPresetIndex_]; }
     DmxPreset &getPreset(uint8_t index);
@@ -29,7 +29,7 @@ class DmxPresets
     uint8_t selectPreviousPreset();
 
   private:
-    uint8_t numPresets_;
+    uint8_t numberOfFilledPresets_;
     uint8_t currentPresetIndex_;
     std::vector<DmxPreset> presets_;
 };

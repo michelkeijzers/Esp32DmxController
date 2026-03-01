@@ -7,52 +7,79 @@ legend right
     |<back:LightBlue>                | Data |
 endlegend
 
-class Main  { }
+class Main  
+{
+    extern "C" void app_main()
+}
 
 class RtosTask <<abstract>> #lightYellow 
 {
-    +RtosTask()
-    +~RtosTask()
-    +init() : esp_err_t
-    taskEntry()
-    getTaskHandle()
-    getEventQueue()
-    isInitialized()
+    +RtosTask();
+    +virtual ~RtosTask();
+
+    +esp_err_t init(TaskProperties taskProperties);
+    +virtual void taskEntry(void *param) = 0;
+    +TaskHandle_t getTaskHandle() const
+    +virtual QueueHandle_t getEventQueue() const
+    +QueueHandle_t getDmxControllerEventQueue() const
+    +const char *getTaskName() const
+    +bool isInitialized() const
+
+    -const char *task_name
+    -const char *log_tag_
+    -TaskHandle_t task_handle_
+    -QueueHandle_t event_queue_
+    -bool initialized_
+   - QueueHandle_t main_event_queue_
 }
 
 class DmxController <<Task>> #LightYellow
 {
-    +DmxController()
+    +DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, \n Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage)
     +~DmxController()
-    +init() : esp_err_t
-    +taskLoop()
+    +virtual esp_err_t init()
+    +void taskLoop()
+
+    -esp_err_t init_sub_tasks()
+    -esp_err_t init_messages()
+    -esp_err_t performOtaUpdate(const char *url)
+    -void printFirmwareInfo()
+
+    -SevenSegmentDisplay *display_
+    -FootSwitch *footSwitch_
+    -Max3485Sender *max3485Sender_
+    -WebServer *webServer_
+    -NvStorage *nvStorage_
+    
+    -void taskEntry(void *param) override
 }
-Main -> DmxController
+
+Main -d-> DmxController
 DmxController -|> RtosTask
 
 class NvStorage #lightYellow {}
 DmxController *-- NvStorage
-NvStorage -|> RtosTask
+NvStorage -u-|> RtosTask
 
 class Max3485Sender #lightYellow {}
 DmxController *- Max3485Sender
-Max3485Sender -|> RtosTask
+Max3485Sender -u-|> RtosTask
 
 class FootSwitch #lightYellow {}
 DmxController *-- FootSwitch
-FootSwitch -|> RtosTask
+FootSwitch -u-|> RtosTask
 
 class SevenSegmentDisplay #lightYellow {}
 DmxController *-- SevenSegmentDisplay
-SevenSegmentDisplay -|> RtosTask
+SevenSegmentDisplay -u-|> RtosTask
 
 class Ota #lightYellow {}
 DmxController *-- Ota 
-Ota -|> RtosTask
+Ota -u-|> RtosTask
 
 class WebServer #lightYellow {}
 DmxController *-- WebServer
-WebServer -|> RtosTask
+WebServer -u-|> RtosTask
 
 'class OscHandler <<RtosTask>> #lightYellow {}
 'DmxController *-- OscHandler
@@ -70,11 +97,6 @@ DmxPresets *--"20" DmxPreset
 class Configuration <<Data>> #lightBlue {}
 DmxController *-- Configuration
 
-class PresetsConfiguration <<Data>> #lightBlue {}
-Configuration *-- PresetsConfiguration 
-
-class FootSwitchConfiguration <<Data>> #lightBlue {}
-
 NvStorage --> DmxPresets : Write
 NvStorage --> Configuration : Write
 
@@ -82,8 +104,7 @@ NvStorage --> Configuration : Write
 'Configuration *-- OscConfiguration
 'OscHandler -- OscConfiguration : Read
 
-Configuration *-- FootSwitchConfiguration
-FootSwitch -- FootSwitchConfiguration : Read
+FootSwitch -- Configuration : Read
 
 WebServer --> DmxPresets : Read/ \n Write
 WebServer --> Configuration : Read/ \n Write
@@ -99,8 +120,8 @@ class DmxPresets <<Data>>
     +DmxPresets()
     +esp_err_t init()
 
-    +uint8_t getNumPresets() const
-    +esp_err_t setNumPresets(uint8_t numPresets)
+    +uint8_t getNumberOfFilledPresets() const
+    +esp_err_t setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 
     +DmxPreset &getCurrentPreset()
     +DmxPreset &getPreset(uint8_t index)
@@ -113,21 +134,35 @@ class DmxPresets <<Data>>
     +uint8_t selectNextPreset()
     +uint8_t selectPreviousPreset()
 
-    -uint8_t numPresets_
+    -uint8_t numberOfFilledPresets_
     -uint8_t currentPresetIndex_
     -std::vector<DmxPreset> presets_
 }
 
-
 class DmxPreset <<Data>> 
 {
-    +const char* getName()
-    +void setName(const char* name)
-    +uint8_t* getDmxData()
-    +void setDmxData(const uint8_t* data, size_t length)
-    -const char name[32]
-    -uint8_t dmxData[512]
+    +DmxPreset()
+
+    +void setIndex(uint16_t index)
+    +uint16_t getIndex() 
+
+    +void setName(const char *name)
+    +const char *getName() const
+
+    +uint8_t getDmxValue(uint16_t channel) const
+    +void setDmxValue(uint16_t channel, uint8_t value)
+    +const uint8_t *getDmxValues() const
+    +void setDmxValues(const uint8_t *values)
+
+    +void clear();
+
+    +void copyFrom(const DmxPreset &other)
+
+    -uint16_t index_
+    -char name_[32] 
+    -uint8_t dmxValues_[NR_OF_DMX_CHANNELS]
 }
+
 DmxPresets *-- "20" DmxPreset
 
 @enduml 
@@ -139,9 +174,10 @@ class PresetsConfiguration <<Data>>
 {
     +bool IsCircularNavigation()
     +void SetCircularNavigation(bool circular)
-    +uint8_t GetNumberOfPresets()
-    +void SetNumberOfPresets(uint8_t numberOfPresets)
-    -uint8_t numberOfPresets
+    +uint8_t GetNumberOfFilledPresets()
+    +void SetNumberOfFilledPresets(uint8_t numberOfFilledPresets)
+    
+    -uint8_t numberOfFilledPresets
     -bool CircularNavigation
 }
 Configuration *-- PresetsConfiguration
@@ -152,45 +188,56 @@ class FootSwitchConfiguration <<Data>>
     +void SetLongPressTime(uint16_t threshold)
     +bool IsPolarityNormallyOpen()
     +void SetPolarityNormallyOpen(bool normallyOpen)
-    +bool IsSendFootSwitchStateChangesThroughOsc()
-    +void SetSendFootSwitchStateChangesThroughOsc(bool send)
+    '+bool IsSendFootSwitchStateChangesThroughOsc()
+    '+void SetSendFootSwitchStateChangesThroughOsc(bool send)
     -uint16_t longPressTime
     -bool polarityNormallyOpen
-    -bool sendFootSwitchStateChangesThroughOsc
+    '-bool sendFootSwitchStateChangesThroughOsc
 }
 Configuration *-- FootSwitchConfiguration
 
-class OscConfiguration <<Data>>
-{
-    +const char* GetDestinationAddress()
-    +void SetDestinationAddress(const char* address)
-    +int GetReceivePort()
-    +void SetReceivePort(int port)
-    +void SetSendPort(int port)
-    +int GetSendPort()
-    -string destinationAddress
-    -int receivePort
-    -int sendPort
-}
-Configuration *-- OscConfiguration
+' class OscConfiguration <<Data>>
+' {
+'     +const char* GetDestinationAddress()
+'     +void SetDestinationAddress(const char* address)
+'     +int GetReceivePort()
+'     +void SetReceivePort(int port)
+'     +void SetSendPort(int port)
+'     +int GetSendPort()
+'     -string destinationAddress
+'     -int receivePort
+'     -int sendPort
+' }
+' Configuration *-- OscConfiguration
 
-class DmxTransmission <<Data>>
-{
-    +bool IsSendViaArtNet()
-    +void SetSendViaArtNet(bool send)
-    +bool IsSendToDmxConnector()
-    +void SetSendToDmxConnector(bool send)
-    -bool sendViaArtNet
-    -bool sendToDmxConnector
-}
-Configuration *-- DmxTransmission
+' class DmxTransmission <<Data>>
+' {
+'     +bool IsSendViaArtNet()
+'     +void SetSendViaArtNet(bool send)
+'     +bool IsSendToDmxConnector()
+'     +void SetSendToDmxConnector(bool send)
+'     -bool sendViaArtNet
+'     -bool sendToDmxConnector
+' }
+' Configuration *-- DmxTransmission
 @enduml 
 
 
 @startuml
 title NvRam Storage
 
-class NvStorage <<Task>>
+class RtosTask <<abstract>> #lightYellow 
+{
+    +RtosTask()
+    +~RtosTask()
+    +init() : esp_err_t
+    +taskEntry()
+    +getTaskHandle()
+    +getEventQueue()
+    +isInitialized()
+}
+
+class NvStorage 
 {
     +NvStorage()
     +~NvStorage()
@@ -200,6 +247,9 @@ class NvStorage <<Task>>
     +getConfiguration(Configuration& config) : esp_err_t
     +getPresets(DmxPresets& presets) : esp_err_t
 }
+NvStorage -u-|> RtosTask
+
+
 
 class NvPresetStorage
 {

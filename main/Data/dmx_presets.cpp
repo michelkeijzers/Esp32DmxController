@@ -5,29 +5,30 @@
 
 static const char *LOG_TAG = "DmxPresets";
 
-DmxPresets::DmxPresets() : numPresets_(20) // Default to 20 presets
+DmxPresets::DmxPresets() : numberOfFilledPresets_(20) // Default to 20 presets
 {
     presets_.resize(MAX_PRESETS);
 }
 
 esp_err_t DmxPresets::init()
 {
-    ESP_LOGI(LOG_TAG, "DmxPresets initialized with %d presets", numPresets_);
+    ESP_LOGI(LOG_TAG, "DmxPresets initialized with %d filled presets", numberOfFilledPresets_);
     return ESP_OK;
 }
 
-esp_err_t DmxPresets::setNumPresets(uint8_t numPresets)
+esp_err_t DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 {
-    if (numPresets < MIN_PRESETS || numPresets > MAX_PRESETS)
+    if (numberOfFilledPresets < MIN_PRESETS || numberOfFilledPresets > MAX_PRESETS)
     {
-        ESP_LOGE(LOG_TAG, "Invalid number of presets: %d (must be %d-%d)", numPresets, MIN_PRESETS, MAX_PRESETS);
+        ESP_LOGE(LOG_TAG, "Invalid number of filled presets: %d (must be %d-%d)", numberOfFilledPresets, MIN_PRESETS,
+            MAX_PRESETS);
         return ESP_ERR_INVALID_ARG;
     }
 
-    numPresets_ = numPresets;
+    numberOfFilledPresets_ = numberOfFilledPresets;
 
     // Ensure current preset index is valid
-    if (currentPresetIndex_ >= numPresets_)
+    if (currentPresetIndex_ >= numberOfFilledPresets_)
     {
         currentPresetIndex_ = 0;
     }
@@ -38,9 +39,9 @@ esp_err_t DmxPresets::setNumPresets(uint8_t numPresets)
 esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
     uint8_t index = static_cast<uint8_t>(presets_.size());
-    if (index >= numPresets_)
+    if (index >= numberOfFilledPresets_)
     {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -60,18 +61,18 @@ esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const ui
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)
 {
-    if (index >= numPresets_)
+    if (index >= numberOfFilledPresets_)
     {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
     }
     return presets_[index];
 }
 
 esp_err_t DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
 {
-    if (index >= numPresets_)
+    if (index >= numberOfFilledPresets_)
     {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -90,25 +91,25 @@ void DmxPresets::clearAll()
 
 void DmxPresets::setCurrentPresetIndex(uint8_t index)
 {
-    if (index < numPresets_)
+    if (index < numberOfFilledPresets_)
     {
         currentPresetIndex_ = index;
         // Note: We don't save to NVRAM here for performance, it will be saved when presets change
     }
     else
     {
-        ESP_LOGE(LOG_TAG, "Invalid preset index %d (max %d)", index, numPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Invalid preset index %d (max %d)", index, numberOfFilledPresets_ - 1);
     }
 }
 
 uint8_t DmxPresets::selectNextPreset()
 {
-    currentPresetIndex_ = (currentPresetIndex_ + 1) % numPresets_;
+    currentPresetIndex_ = (currentPresetIndex_ + 1) % numberOfFilledPresets_;
     return currentPresetIndex_;
 }
 
 uint8_t DmxPresets::selectPreviousPreset()
 {
-    currentPresetIndex_ = (currentPresetIndex_ - 1 + numPresets_) % numPresets_;
+    currentPresetIndex_ = (currentPresetIndex_ - 1 + numberOfFilledPresets_) % numberOfFilledPresets_;
     return currentPresetIndex_;
 }

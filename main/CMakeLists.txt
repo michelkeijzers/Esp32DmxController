@@ -6,7 +6,6 @@ idf_component_register(
         "main.cpp"
         "Base/rtos_task.cpp"
         "Tasks/dmx_controller.cpp"
-        "Tasks/dmx_preset_changer.cpp"
         "Tasks/max3485_sender.cpp"
         "Tasks/foot_switch.cpp"
         "Tasks/seven_segment_display.cpp"

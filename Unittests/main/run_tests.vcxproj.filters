@@ -13,9 +13,6 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_preset_changer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

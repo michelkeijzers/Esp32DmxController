@@ -1,5 +1,4 @@
 #include "dmx_controller.hpp"
-#include "dmx_preset_changer.hpp"
 #include "esp_app_desc.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
@@ -12,10 +11,10 @@
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
-DmxController::DmxController(DmxPresetChanger *presetChanger, SevenSegmentDisplay *display, FootSwitch *footSwitch,
-    Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
-    : RtosTask(), presetChanger_(presetChanger), display_(display), footSwitch_(footSwitch),
-      max3485Sender_(max3485Sender), webServer_(webServer), nvStorage_(nvStorage)
+DmxController::DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *max3485Sender,
+    WebServer *webServer, NvStorage *nvStorage)
+    : RtosTask(), display_(display), footSwitch_(footSwitch), max3485Sender_(max3485Sender), webServer_(webServer),
+      nvStorage_(nvStorage)
 {
 }
 
@@ -92,24 +91,6 @@ esp_err_t DmxController::init()
 
 esp_err_t DmxController::init_sub_tasks()
 {
-    if (!presetChanger_)
-    {
-        ESP_LOGE(log_tag_, "presetChanger_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
-    }
-    TaskProperties presetChangerTaskProperties = {.taskName_ = "DmxPresetChangerTask",
-        .logTag = "DmxPresetChanger",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (presetChanger_->init(presetChangerTaskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize DmxPresetChanger");
-        return ESP_FAIL;
-    }
-
     if (!display_)
     {
         ESP_LOGE(log_tag_, "display_ is nullptr");
@@ -249,16 +230,6 @@ esp_err_t DmxController::init_messages()
         return ESP_FAIL;
     }
 
-    // Send presets to DmxPresetChanger (no response needed)
-    Messages::Event presetChangerEvent = Messages::Event();
-    presetChangerEvent.type = Messages::SET_PRESETS;
-    presetChangerEvent.data.presetsData = event.data.presetsData;
-    if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
-    {
-        ESP_LOGE(log_tag_, "Failed to send presets to DmxPresetChanger");
-        return ESP_FAIL;
-    }
-
     return ESP_OK;
 }
 
@@ -276,25 +247,11 @@ void DmxController::taskLoop()
             {
             case Messages::EventType::USER_NEXT_PRESET:
             {
-                // Forward to DmxPresetChanger
-                Messages::Event presetChangerEvent = Messages::Event();
-                presetChangerEvent.type = Messages::EventType::SELECT_NEXT_PRESET;
-                if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
-                {
-                    ESP_LOGE(log_tag_, "Failed to forward next preset change event to DmxPresetChanger");
-                }
             }
             break;
 
             case Messages::EventType::USER_PREVIOUS_PRESET:
             {
-                // Forward to DmxPresetChanger
-                Messages::Event presetChangerEvent = Messages::Event();
-                presetChangerEvent.type = Messages::EventType::SELECT_PREVIOUS_PRESET;
-                if (xQueueSend(presetChanger_->getEventQueue(), &presetChangerEvent, 0) != pdPASS)
-                {
-                    ESP_LOGE(log_tag_, "Failed to forward previous preset change event to DmxPresetChanger");
-                }
             }
             break;
 

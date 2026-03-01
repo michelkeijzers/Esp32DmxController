@@ -85,5 +85,5 @@ void DmxPresetChanger::setPresets(const Messages::PresetsEventData &presetsData)
         dmxPresets_.addPreset(static_cast<uint8_t>(presetsData.presets[i].presetNumber), presetsData.presets[i].name,
             presetsData.presets[i].dmxValues);
     }
-    ESP_LOGI(log_tag_, "Presets updated: number of presets=%d", dmxPresets_.getNumPresets());
+    ESP_LOGI(log_tag_, "Presets updated: number of presets=%d", dmxPresets_.getNumberOfFilledPresets());
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include "Base/rtos_task.hpp"
 #include "Data/dmx_presets.hpp"
-#include "dmx_preset_changer.hpp"
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
@@ -21,8 +20,8 @@
 class DmxController : public RtosTask
 {
   public:
-    DmxController(DmxPresetChanger *presetChanger, SevenSegmentDisplay *display, FootSwitch *footSwitch,
-        Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
+    DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *dmx3485Sender,
+        WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
     virtual esp_err_t init();
     void taskLoop();
@@ -40,7 +39,6 @@ class DmxController : public RtosTask
     static constexpr const char *OTA_URL = "https://example.com/firmware.bin";
     static constexpr const char *OTA_CERT_PEM = nullptr;
 
-    DmxPresetChanger *presetChanger_;
     SevenSegmentDisplay *display_;
     FootSwitch *footSwitch_;
     Max3485Sender *max3485Sender_;

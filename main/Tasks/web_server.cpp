@@ -575,7 +575,7 @@ std::string WebServer::presets_to_json()
         return "[]";
     }
 
-    for (uint8_t i = 0; i < dmxPresets_->getNumPresets(); i++)
+    for (uint8_t i = 0; i < dmxPresets_->getNumberOfFilledPresets(); i++)
     {
         const DmxPreset &preset = dmxPresets_->getPreset(i);
 
@@ -631,7 +631,7 @@ esp_err_t WebServer::json_to_presets(const char *json)
     }
 
     // Set number of presets
-    esp_err_t ret = dmxPresets_->setNumPresets(num_presets);
+    esp_err_t ret = dmxPresets_->setNumberOfFilledPresets(num_presets);
     if (ret != ESP_OK)
     {
         cJSON_Delete(root);
