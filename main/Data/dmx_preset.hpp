@@ -4,8 +4,8 @@
 #include <cstring>
 #include <stdint.h>
 #include <string>
-// DMX Universe size
-const uint16_t DMX_UNIVERSE_SIZE = 512;
+
+const uint16_t NR_OF_DMX_CHANNELS = 512;
 
 class DmxPreset
 {
@@ -20,14 +20,10 @@ class DmxPreset
     void setName(const char *name);
     const char *getName() const;
 
-    // Set DMX values for a universe
-    void setUniverseValue(uint8_t universe, uint16_t channel, uint8_t value);
-    uint8_t getUniverseValue(uint8_t universe, uint16_t channel) const;
-
-    // Set entire universe data
-    void setUniverseData(uint8_t universe, const uint8_t *data, size_t length);
-    const uint8_t *getUniverseData(uint8_t universe) const;
-    uint16_t getUniverseLength(uint8_t universe) const;
+    uint8_t getDmxValue(uint16_t channel) const;
+    void setDmxValue(uint16_t channel, uint8_t value);
+    const uint8_t *getDmxValues() const { return dmxValues_; }
+    void setDmxValues(const uint8_t *values);
 
     // Clear/reset preset
     void clear();
@@ -37,9 +33,6 @@ class DmxPreset
 
   private:
     uint16_t index_;
-    char name_[32];                        // Preset name (max 31 chars + null)
-    uint8_t universe1_[DMX_UNIVERSE_SIZE]; // Universe 1 data (512 channels)
-    uint16_t universe1Length_;
-    uint8_t universe2_[DMX_UNIVERSE_SIZE]; // Universe 2 data (512 channels)
-    uint16_t universe2Length_;
+    char name_[32]; // Preset name (max 31 chars + null terminator)
+    uint8_t dmxValues_[NR_OF_DMX_CHANNELS];
 };

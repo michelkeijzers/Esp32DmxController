@@ -28,7 +28,7 @@ At the top of the web interface, you will find the following controls:
 - **Load button**: Loads the current configuration and presets from the device. Use this to refresh the interface with the latest data stored on the controller.
 - **Save button**: Saves any changes you have made to presets or configuration back to the device. Always click Save after making adjustments to ensure your changes are stored.
 - **Blackout button**: Instantly sets all DMX channels to 0, effectively turning off all connected lights. Press again to restore the previous preset values. When the foot pedal is used to change presets, the blackout state is automatically cleared, and the new preset values are applied. The blackout option can be used before and after shows and in gig breaks, without having to disconnect the DMX output or power.
-- **Configuration button**: Opens the configuration page, where you can adjust system settings such as DMX transmission, foot switch behavior, OSC, and more.
+- **Configuration button**: Opens the configuration page, where you can adjust system settings such as DMX transmission, foot switch behavior, and more.
 - **OTA button** : Opens the OTA (Over-The-Air) update page, allowing you to upload new firmware to the device directly from your computer without needing a physical connection.
 - **Manual button**: Opens this user manual directly in the web interface for quick reference and help.
 

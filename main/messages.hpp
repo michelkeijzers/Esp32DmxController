@@ -33,7 +33,7 @@ class Messages
 
     struct ConfigurationEventData
     {
-        bool switchPolarityInverted;
+        bool switchPolarityNormallyOpen;
         uint16_t longPressThresholdMs;
     };
 
@@ -41,11 +41,9 @@ class Messages
     {
         uint8_t presetNumber;
         const char *name;
-        uint8_t universe1Data[512];
-        uint16_t universe1Length;
-        uint8_t universe2Data[512];
-        uint16_t universe2Length;
+        uint8_t *dmxValues;
     };
+
     struct PresetsEventData
     {
         uint8_t numberOfPresets;

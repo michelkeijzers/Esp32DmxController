@@ -35,8 +35,7 @@ esp_err_t DmxPresets::setNumPresets(uint8_t numPresets)
     return ESP_OK; // TODO
 }
 
-esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, uint16_t universe11Length,
-    const uint8_t *universe1Data, uint16_t universe2Length, const uint8_t *universe2Data)
+esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
     uint8_t index = static_cast<uint8_t>(presets_.size());
     if (index >= numPresets_)
@@ -45,7 +44,7 @@ esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, uint16_t
         return ESP_ERR_INVALID_ARG;
     }
 
-    if (!name || !universe1Data || !universe2Data)
+    if (!name || !dmxValues)
     {
         ESP_LOGE(LOG_TAG, "Invalid pointer arguments");
         return ESP_ERR_INVALID_ARG;
@@ -53,8 +52,7 @@ esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, uint16_t
 
     presets_[index].setIndex(presetNumber);
     presets_[index].setName(name);
-    presets_[index].setUniverseData(0, universe1Data, universe11Length);
-    presets_[index].setUniverseData(1, universe2Data, universe2Length);
+    presets_[index].setDmxValues(dmxValues);
 
     ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", index, name);
     return ESP_OK;

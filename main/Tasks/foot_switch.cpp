@@ -40,7 +40,7 @@ static void IRAM_ATTR isr_handler(void *arg)
 FootSwitch::FootSwitch()
     : RtosTask(), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
       longPressTimeMs_(1000), // Default long press time
-      polarityInverted_(false), longPressThresholdMs_(1000)
+      polarityNormallyOpen_(true), longPressThresholdMs_(1000)
 {
 }
 
@@ -171,10 +171,10 @@ void FootSwitch::taskLoop()
             {
                 if (configEvent.type == Messages::EventType::SET_CONFIGURATION)
                 {
-                    polarityInverted_ = configEvent.data.configurationData.switchPolarityInverted;
+                    polarityNormallyOpen_ = configEvent.data.configurationData.switchPolarityNormallyOpen;
                     longPressThresholdMs_ = configEvent.data.configurationData.longPressThresholdMs;
-                    ESP_LOGI(log_tag_, "Configuration updated: polarityInverted=%d, longPressThresholdMs=%d",
-                        polarityInverted_, longPressThresholdMs_);
+                    ESP_LOGI(log_tag_, "Configuration updated: polarityNormallyOpen=%d, longPressThresholdMs=%d",
+                        polarityNormallyOpen_, longPressThresholdMs_);
                 }
                 else
                 {
@@ -230,10 +230,10 @@ void FootSwitch::taskLoop()
         {
             if (configEvent.type == Messages::EventType::SET_CONFIGURATION)
             {
-                polarityInverted_ = configEvent.data.configurationData.switchPolarityInverted;
+                polarityNormallyOpen_ = configEvent.data.configurationData.switchPolarityNormallyOpen;
                 longPressThresholdMs_ = configEvent.data.configurationData.longPressThresholdMs;
-                ESP_LOGI(log_tag_, "Configuration updated: polarityInverted=%d, longPressThresholdMs=%d",
-                    polarityInverted_, longPressThresholdMs_);
+                ESP_LOGI(log_tag_, "Configuration updated: polarityNormallyOpen=%d, longPressThresholdMs=%d",
+                    polarityNormallyOpen_, longPressThresholdMs_);
             }
             else
             {

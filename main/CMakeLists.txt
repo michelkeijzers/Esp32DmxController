@@ -3,16 +3,15 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 idf_component_register(
     SRCS 
+        "main.cpp"
+        "Base/rtos_task.cpp"
+        "Tasks/dmx_controller.cpp"
+        "Tasks/dmx_preset_changer.cpp"
         "Tasks/max3485_sender.cpp"
         "Tasks/foot_switch.cpp"
-        "Tasks/dmx_preset_changer.cpp"
-        "Tasks/nv_storage.cpp"
-        "Tasks/osc_sender.cpp"
         "Tasks/seven_segment_display.cpp"
+        "Tasks/nv_storage.cpp"
         "Tasks/web_server.cpp"
-        "Tasks/dmx_controller.cpp"
-        "Base/rtos_task.cpp"
-        "main.cpp"
         "Data/dmx_presets.cpp"
         "Data/dmx_preset.cpp"
     INCLUDE_DIRS "." "Tasks"

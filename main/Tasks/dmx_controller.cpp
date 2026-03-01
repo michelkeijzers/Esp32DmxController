@@ -9,13 +9,12 @@
 #include "max3485_sender.hpp"
 #include "messages.hpp"
 #include "nv_storage.hpp"
-#include "osc_sender.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
-DmxController::DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
-    FootSwitch *footSwitch, Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
-    : RtosTask(), presetChanger_(presetChanger), oscSender_(oscSender), display_(display), footSwitch_(footSwitch),
+DmxController::DmxController(DmxPresetChanger *presetChanger, SevenSegmentDisplay *display, FootSwitch *footSwitch,
+    Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
+    : RtosTask(), presetChanger_(presetChanger), display_(display), footSwitch_(footSwitch),
       max3485Sender_(max3485Sender), webServer_(webServer), nvStorage_(nvStorage)
 {
 }
@@ -108,24 +107,6 @@ esp_err_t DmxController::init_sub_tasks()
     if (presetChanger_->init(presetChangerTaskProperties) != ESP_OK)
     {
         ESP_LOGE(log_tag_, "Failed to initialize DmxPresetChanger");
-        return ESP_FAIL;
-    }
-
-    if (!oscSender_)
-    {
-        ESP_LOGE(log_tag_, "oscSender_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
-    }
-    TaskProperties oscSenderTaskProperties = {.taskName_ = "OSCSenderTask",
-        .logTag = "OSCSender",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (oscSender_->init(oscSenderTaskProperties, OSC_DEST_IP, OSC_DEST_PORT) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize OSCSender");
         return ESP_FAIL;
     }
 

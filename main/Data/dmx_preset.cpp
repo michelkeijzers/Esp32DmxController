@@ -26,144 +26,48 @@ void DmxPreset::setName(const char *name)
 
 const char *DmxPreset::getName() const { return name_; }
 
-void DmxPreset::setUniverseValue(uint8_t universe, uint16_t channel, uint8_t value)
+void DmxPreset::setDmxValue(uint16_t channel, uint8_t value)
 {
-    if (channel >= DMX_UNIVERSE_SIZE)
+    if (channel >= NR_OF_DMX_CHANNELS)
     {
-        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, DMX_UNIVERSE_SIZE - 1);
+        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, NR_OF_DMX_CHANNELS - 1);
         return;
     }
 
-    if (universe == 0)
-    {
-        universe1_[channel] = value;
-    }
-    else if (universe == 1)
-    {
-        universe2_[static_cast<uint8_t>(channel)] = value;
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
-    }
+    dmxValues_[channel] = value;
 }
 
-uint8_t DmxPreset::getUniverseValue(uint8_t universe, uint16_t channel) const
+uint8_t DmxPreset::getDmxValue(uint16_t channel) const
 {
-    if (channel >= DMX_UNIVERSE_SIZE)
+    if (channel >= NR_OF_DMX_CHANNELS)
     {
-        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, DMX_UNIVERSE_SIZE - 1);
+        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, NR_OF_DMX_CHANNELS - 1);
         return 0;
     }
 
-    if (universe == 0)
-    {
-        if (channel >= universe1Length_)
-        {
-            ESP_LOGE(TAG, "Channel %d exceeds universe 1 length %d", channel, universe1Length_);
-            return 0;
-        }
-        return universe1_[channel];
-    }
-    else if (universe == 1)
-    {
-        if (channel >= universe2Length_)
-        {
-            ESP_LOGE(TAG, "Channel %d exceeds universe 2 length %d", channel, universe2Length_);
-            return 0;
-        }
-        return universe2_[channel];
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
-        return 0;
-    }
+    return dmxValues_[channel];
 }
 
-void DmxPreset::setUniverseData(uint8_t universe, const uint8_t *data, size_t length)
+void DmxPreset::setDmxValues(const uint8_t *values)
 {
-    if (!data)
+    if (!values)
     {
         ESP_LOGE(TAG, "Invalid data pointer");
         return;
     }
 
-    uint16_t copyLength = static_cast<uint16_t>((length > DMX_UNIVERSE_SIZE) ? DMX_UNIVERSE_SIZE : length);
-
-    if (universe == 0)
-    {
-        memcpy(universe1_, data, copyLength);
-        if (copyLength < DMX_UNIVERSE_SIZE)
-        {
-            memset(universe1_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
-        }
-        universe1Length_ = static_cast<uint16_t>(length);
-    }
-    else if (universe == 1)
-    {
-        memcpy(universe2_, data, copyLength);
-        if (copyLength < DMX_UNIVERSE_SIZE)
-        {
-            memset(universe2_ + copyLength, 0, DMX_UNIVERSE_SIZE - copyLength);
-        }
-        universe2Length_ = static_cast<uint16_t>(length);
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
-    }
-}
-
-const uint8_t *DmxPreset::getUniverseData(uint8_t universe) const
-{
-    if (universe == 0)
-    {
-        return universe1_;
-    }
-    else if (universe == 1)
-    {
-        return universe2_;
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
-        return nullptr;
-    }
-}
-
-uint16_t DmxPreset::getUniverseLength(uint8_t universe) const
-{
-    if (universe == 0)
-    {
-        return universe1Length_;
-    }
-    else if (universe == 1)
-    {
-        return universe2Length_;
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Universe %d out of range (max 1)", universe);
-        return 0;
-    }
+    memcpy(dmxValues_, values, NR_OF_DMX_CHANNELS);
 }
 
 void DmxPreset::clear()
 {
     memset(name_, 0, sizeof(name_));
-    memset(universe1_, 0, sizeof(universe1_));
-    universe1Length_ = 0;
-    memset(universe2_, 0, sizeof(universe2_));
-    universe2Length_ = 0;
+    memset(dmxValues_, 0, NR_OF_DMX_CHANNELS);
 }
 
 void DmxPreset::copyFrom(const DmxPreset &other)
 {
     index_ = other.getIndex();
-    memcpy(name_, other.getName(), sizeof(name_));
-    memcpy(universe1_, other.universe1_, sizeof(universe1_));
-    universe1Length_ = other.universe1Length_;
-    memcpy(universe2_, other.universe2_, sizeof(universe2_));
-    universe2Length_ = other.universe2Length_;
+    memcpy(name_, other.getName(), sizeof(name_)); // TODO: +1 for \0 ?
+    memcpy(dmxValues_, other.getDmxValues(), NR_OF_DMX_CHANNELS);
 }

@@ -586,23 +586,13 @@ std::string WebServer::presets_to_json()
         cJSON_AddNumberToObject(preset_obj, "index", preset.getIndex());
         cJSON_AddStringToObject(preset_obj, "name", preset.getName());
 
-        // Universe 1
         cJSON *universe1 = cJSON_CreateArray();
-        const uint8_t *u1_data = preset.getUniverseData(0);
-        for (int j = 0; j < DMX_UNIVERSE_SIZE; j++)
+        const uint8_t *u1_data = preset.getDmxValues();
+        for (int j = 0; j < NR_OF_DMX_CHANNELS; j++)
         {
             cJSON_AddItemToArray(universe1, cJSON_CreateNumber(u1_data[j]));
         }
         cJSON_AddItemToObject(preset_obj, "universe1", universe1);
-
-        // Universe 2
-        cJSON *universe2 = cJSON_CreateArray();
-        const uint8_t *u2_data = preset.getUniverseData(1);
-        for (int j = 0; j < DMX_UNIVERSE_SIZE; j++)
-        {
-            cJSON_AddItemToArray(universe2, cJSON_CreateNumber(u2_data[j]));
-        }
-        cJSON_AddItemToObject(preset_obj, "universe2", universe2);
 
         cJSON_AddItemToArray(root, preset_obj);
     }
@@ -673,40 +663,22 @@ esp_err_t WebServer::json_to_presets(const char *json)
             preset.setName(name->valuestring);
         }
 
-        // Universe 1
+        // DMX Values
         cJSON *universe1 = cJSON_GetObjectItem(preset_obj, "universe1");
         if (universe1 && cJSON_IsArray(universe1))
         {
-            uint8_t u1_data[DMX_UNIVERSE_SIZE] = {0};
-            int u1_size = cJSON_GetArraySize(universe1);
-            int copy_size = u1_size < DMX_UNIVERSE_SIZE ? u1_size : DMX_UNIVERSE_SIZE;
+            uint8_t dmx_values[NR_OF_DMX_CHANNELS] = {0};
+            int dmx_values_size = cJSON_GetArraySize(universe1);
+            int copy_size = dmx_values_size < NR_OF_DMX_CHANNELS ? dmx_values_size : NR_OF_DMX_CHANNELS;
             for (int j = 0; j < copy_size; j++)
             {
                 cJSON *val = cJSON_GetArrayItem(universe1, j);
                 if (val && cJSON_IsNumber(val))
                 {
-                    u1_data[j] = (uint8_t)val->valuedouble;
+                    dmx_values[j] = (uint8_t)val->valuedouble;
                 }
             }
-            preset.setUniverseData(0, u1_data, DMX_UNIVERSE_SIZE);
-        }
-
-        // Universe 2
-        cJSON *universe2 = cJSON_GetObjectItem(preset_obj, "universe2");
-        if (universe2 && cJSON_IsArray(universe2))
-        {
-            uint8_t u2_data[DMX_UNIVERSE_SIZE] = {0};
-            int u2_size = cJSON_GetArraySize(universe2);
-            int copy_size = u2_size < DMX_UNIVERSE_SIZE ? u2_size : DMX_UNIVERSE_SIZE;
-            for (int j = 0; j < copy_size; j++)
-            {
-                cJSON *val = cJSON_GetArrayItem(universe2, j);
-                if (val && cJSON_IsNumber(val))
-                {
-                    u2_data[j] = (uint8_t)val->valuedouble;
-                }
-            }
-            preset.setUniverseData(1, u2_data, DMX_UNIVERSE_SIZE);
+            preset.setDmxValues(dmx_values);
         }
 
         // Save preset

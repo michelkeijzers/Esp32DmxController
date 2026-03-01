@@ -10,12 +10,6 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\artnet_sender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\osc_sender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

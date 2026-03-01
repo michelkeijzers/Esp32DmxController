@@ -9,6 +9,7 @@
 #include "esp_log.h"
 #include "esp_rom_sys.h"
 #endif
+#include "../Data/dmx_preset.hpp"
 #include <messages.hpp>
 
 static const uart_port_t DMX_UART_PORT = UART_NUM_1;
@@ -92,7 +93,7 @@ void Max3485Sender::taskLoop()
             switch (event.type)
             {
             case Messages::SEND_PRESET_DATA:
-                sendDmx(event.data.presetData.universe1Data, event.data.presetData.universe1Length);
+                sendDmx(event.data.presetData.dmxValues, NR_OF_DMX_CHANNELS);
                 // Optionally send response event
                 break;
             default:

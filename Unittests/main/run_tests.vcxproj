@@ -432,8 +432,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\custom_main.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\dmx_controller_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\artnet_sender.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\osc_sender.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_preset_changer.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp" />

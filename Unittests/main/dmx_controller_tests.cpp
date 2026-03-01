@@ -1,164 +1,43 @@
-// ...existing code...
 // Force linker to include DmxControllerQueueFailTest
 extern "C" void __force_link_DmxControllerQueueFailTest() {}
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "../../main/Tasks/artnet_sender.hpp"
 #include "../../main/Tasks/dmx_controller.hpp"
 #include "../../main/Tasks/dmx_preset_changer.hpp"
 #include "../../main/Tasks/foot_switch.hpp"
 #include "../../main/Tasks/max3485_sender.hpp"
 #include "../../main/Tasks/nv_storage.hpp"
-#include "../../main/Tasks/osc_sender.hpp"
 #include "../../main/Tasks/seven_segment_display.hpp"
 #include "../../main/Tasks/web_server.hpp"
 
 #include "driver/gpio.h"
 #include "esp_err.h"
 #include "freertos/queue.h"
-typedef int (*xQueueSend_fn)(QueueHandle_t, const void *, unsigned int);
-typedef int (*xQueueReceive_fn)(QueueHandle_t, void *, unsigned int);
-extern "C"
-{
-    extern xQueueSend_fn xQueueSend_ptr;
-    extern xQueueReceive_fn xQueueReceive_ptr;
-    extern QueueHandle_t (*xQueueCreate_ptr)(portBASE_TYPE, portBASE_TYPE);
-    extern void (*vQueueDelete_ptr)(void *);
-    extern int (*xQueueSendFromISR_ptr)(void *, const void *, int *);
-}
 
 // All GoogleMock mock classes for DmxController dependencies
-#include "Mocks/artnet_sender_mock.hpp"
 #include "Mocks/dmx_preset_changer_mock.hpp"
 #include "Mocks/foot_switch_mock.hpp"
 #include "Mocks/max3485_sender_mock.hpp"
 #include "Mocks/nv_storage_mock.hpp"
-#include "Mocks/osc_sender_mock.hpp"
 #include "Mocks/seven_segment_display_mock.hpp"
 #include "Mocks/web_server_mock.hpp"
 
-using ::testing::_;
-using ::testing::Return;
-
-// Patch xQueueReceive for this test file to simulate correct event types for init_messages
+// Patch xQueueReceive to simulate correct event sequence for init_messages
 #include "messages.hpp"
 // ...existing code...
 // All includes and macros are now ASCII and UTF-8 encoded
 using ::testing::_;
 using ::testing::Return;
 
+typedef int (*xQueueSend_fn)(QueueHandle_t, const void *, unsigned int);
+typedef int (*xQueueReceive_fn)(QueueHandle_t, void *, unsigned int);
 extern "C"
 {
-    extern xQueueSend_fn xQueueSend_ptr;
-    extern xQueueReceive_fn xQueueReceive_ptr;
-}
+    extern void (*vQueueDelete_ptr)(void *);
+    extern int (*xQueueSendFromISR_ptr)(void *, const void *, int *);
 
-// Test fixture for DmxController
-class DmxControllerTest : public ::testing::Test
-{
-  protected:
-    MockPresetChanger *mockPresetChanger;
-    MockOSCSender *mockOscSender;
-    MockSevenSegmentDisplay *mockDisplay;
-    MockFootSwitch *mockFootSwitch;
-    MockMax3485Sender *mockMax3485Sender;
-    MockArtNetSender *mockArtNetSender;
-    MockWebServer *mockWebServer;
-    MockNvStorage *mockNvStorage;
-
-    DmxControllerTest()
-        : mockPresetChanger(new MockPresetChanger()), mockOscSender(new MockOSCSender()),
-          mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
-          mockMax3485Sender(new MockMax3485Sender()), mockArtNetSender(new MockArtNetSender()),
-          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage())
-    {
-        testing::Mock::AllowLeak(mockPresetChanger);
-        testing::Mock::AllowLeak(mockOscSender);
-        testing::Mock::AllowLeak(mockDisplay);
-        testing::Mock::AllowLeak(mockFootSwitch);
-        testing::Mock::AllowLeak(mockMax3485Sender);
-        testing::Mock::AllowLeak(mockArtNetSender);
-        testing::Mock::AllowLeak(mockWebServer);
-        testing::Mock::AllowLeak(mockNvStorage);
-    }
-
-    void SetUp() override { std::cout << "TEST_F SetUp()\n"; }
-    void TearDown() override
-    {
-        std::cout << "TEST_F TearDown()\n";
-        // Do not delete mocks here; DmxController will delete them
-    }
-};
-
-// Test full DmxController::init (including message handling)
-TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
-{
-    std::cout << "TEST_F (init) is running!\n";
-    QueueHandle_t dummyQueue = reinterpret_cast<QueueHandle_t>(0x1);
-    struct ControllerTestDouble : DmxController
-    {
-        QueueHandle_t testQueue;
-        ControllerTestDouble(DmxPresetChanger *pc, OSCSender *os, SevenSegmentDisplay *sd, FootSwitch *fs,
-            Max3485Sender *ms, ArtNetSender *an, WebServer *ws, NvStorage *ns, QueueHandle_t q)
-            : DmxController(pc, os, sd, fs, ms, an, ws, ns), testQueue(q)
-        {
-        }
-        QueueHandle_t getEventQueue() const override { return testQueue; }
-        ~ControllerTestDouble() override = default;
-    };
-
-    ASSERT_NE(mockPresetChanger, nullptr);
-    ASSERT_NE(mockOscSender, nullptr);
-    ASSERT_NE(mockDisplay, nullptr);
-    ASSERT_NE(mockFootSwitch, nullptr);
-    ASSERT_NE(mockMax3485Sender, nullptr);
-    ASSERT_NE(mockArtNetSender, nullptr);
-    ASSERT_NE(mockWebServer, nullptr);
-    ASSERT_NE(mockNvStorage, nullptr);
-
-    ControllerTestDouble controllerWithQueue(mockPresetChanger, mockOscSender, mockDisplay, mockFootSwitch,
-        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvStorage, dummyQueue);
-
-    EXPECT_CALL(*mockPresetChanger, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockDisplay, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockArtNetSender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-
-    EXPECT_CALL(*mockPresetChanger, init(_)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockOscSender, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockDisplay, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockFootSwitch, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockArtNetSender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
-
-    controllerWithQueue.init(); // TODO: Check return value (messaging)
-
-    // Restore default stubs after test
-    xQueueSend_ptr = nullptr;
-    xQueueReceive_ptr = nullptr;
-}
-
-// Add more tests for error cases, message handling, etc.
-
-// MSVC weak symbol emulation: Use function pointers for queue stubs
-#include "freertos/queue.h"
-namespace
-{
-QueueHandle_t queuefail_xQueueCreate(portBASE_TYPE, portBASE_TYPE) { return nullptr; }
-int queuefail_xQueueSend(QueueHandle_t, const void *, unsigned int) { return 0; }
-int queuefail_xQueueReceive(QueueHandle_t, void *, unsigned int) { return 0; }
-void queuefail_vQueueDelete(void *) {}
-int queuefail_xQueueSendFromISR(void *, const void *, int *) { return 0; }
-} // namespace
-
-extern "C"
-{
     typedef QueueHandle_t (*xQueueCreate_fn)(portBASE_TYPE, portBASE_TYPE);
     typedef int (*xQueueSend_fn)(QueueHandle_t, const void *, unsigned int);
     typedef int (*xQueueReceive_fn)(QueueHandle_t, void *, unsigned int);
@@ -173,12 +52,7 @@ extern "C"
     vQueueDelete_fn vQueueDelete_ptr = nullptr;
     xQueueSendFromISR_fn xQueueSendFromISR_ptr = nullptr;
 
-    QueueHandle_t xQueueCreate(portBASE_TYPE a, portBASE_TYPE b)
-    {
-        if (xQueueCreate_ptr)
-            return xQueueCreate_ptr(a, b);
-        return (QueueHandle_t)1; // default stub
-    }
+    // xQueueCreate is defined globally above, do not redefine here
     int xQueueSend(QueueHandle_t q, const void *d, unsigned int t)
     {
         if (xQueueSend_ptr)
@@ -204,31 +78,194 @@ extern "C"
     }
 }
 
+// MSVC weak symbol emulation: Use function pointers for queue stubs
+QueueHandle_t queuefail_xQueueCreate(portBASE_TYPE, portBASE_TYPE) { return nullptr; }
+int queuefail_xQueueSend(QueueHandle_t, const void *, unsigned int) { return 0; }
+int queuefail_xQueueReceive(QueueHandle_t, void *, unsigned int) { return 0; }
+void queuefail_vQueueDelete(void *) {}
+int queuefail_xQueueSendFromISR(void *, const void *, int *) { return 0; }
+
+// Patch xQueueSendFromISR for this test to always succeed
+class XQueueSendFromISRRestorer
+{
+  public:
+    int (*origPtr)(void *, const void *, int *);
+    XQueueSendFromISRRestorer()
+    {
+        origPtr = xQueueSendFromISR_ptr;
+        xQueueSendFromISR_ptr = [](void *, const void *, int *) { return 1; };
+    }
+    ~XQueueSendFromISRRestorer() { xQueueSendFromISR_ptr = origPtr; }
+};
+
+// Patch xQueueCreate for this test to always succeed
+class XQueueCreateRestorer
+{
+  public:
+    QueueHandle_t (*origPtr)(portBASE_TYPE, portBASE_TYPE);
+    XQueueCreateRestorer()
+    {
+        origPtr = xQueueCreate_ptr;
+        xQueueCreate_ptr = [](portBASE_TYPE, portBASE_TYPE) { return reinterpret_cast<QueueHandle_t>(0xDEADBEEF); };
+    }
+    ~XQueueCreateRestorer() { xQueueCreate_ptr = origPtr; }
+};
+
+// File-scope stub for xQueueReceive event sequence
+struct ConfigAndPresetsResponseStub
+{
+    static int call_count;
+    static int xQueueReceive(QueueHandle_t, void *event, unsigned int)
+    {
+        auto *msg = static_cast<Messages::Event *>(event);
+        if (call_count == 0)
+        {
+            msg->type = Messages::EventType::CONFIGURATION_RESPONSE;
+        }
+        else
+        {
+            msg->type = Messages::EventType::PRESETS_RESPONSE;
+        }
+        ++call_count;
+        return 1; // pdTRUE
+    }
+};
+int ConfigAndPresetsResponseStub::call_count = 0;
+
+// Global override for xQueueCreate to ensure all calls use the stub
+extern "C" QueueHandle_t xQueueCreate(portBASE_TYPE a, portBASE_TYPE b)
+{
+    if (xQueueCreate_ptr)
+        return xQueueCreate_ptr(a, b);
+    return reinterpret_cast<QueueHandle_t>(static_cast<uintptr_t>(0xDEADBEEF)); // default stub, pointer-sized value
+}
+// Removed stray assignment to xQueueCreate_ptr
+
+extern "C"
+{
+    extern xQueueSend_fn xQueueSend_ptr;
+    extern xQueueReceive_fn xQueueReceive_ptr;
+}
+
+// Test fixture for DmxController
+class DmxControllerTest : public ::testing::Test
+{
+  protected:
+    MockPresetChanger *mockPresetChanger;
+    MockSevenSegmentDisplay *mockDisplay;
+    MockFootSwitch *mockFootSwitch;
+    MockMax3485Sender *mockMax3485Sender;
+    MockWebServer *mockWebServer;
+    MockNvStorage *mockNvStorage;
+
+    DmxControllerTest()
+        : mockPresetChanger(new MockPresetChanger()), mockDisplay(new MockSevenSegmentDisplay()),
+          mockFootSwitch(new MockFootSwitch()), mockMax3485Sender(new MockMax3485Sender()),
+          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage())
+    {
+        testing::Mock::AllowLeak(mockPresetChanger);
+        testing::Mock::AllowLeak(mockDisplay);
+        testing::Mock::AllowLeak(mockFootSwitch);
+        testing::Mock::AllowLeak(mockMax3485Sender);
+        testing::Mock::AllowLeak(mockWebServer);
+        testing::Mock::AllowLeak(mockNvStorage);
+    }
+
+    void SetUp() override { std::cout << "TEST_F SetUp()\n"; }
+    void TearDown() override
+    {
+        std::cout << "TEST_F TearDown()\n";
+        // Prevent double deletion by nulling out pointers after controller destruction
+        mockPresetChanger = nullptr;
+        mockDisplay = nullptr;
+        mockFootSwitch = nullptr;
+        mockMax3485Sender = nullptr;
+        mockWebServer = nullptr;
+        mockNvStorage = nullptr;
+    }
+};
+
+// Test full DmxController::init (including message handling)
+TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
+{
+    XQueueCreateRestorer queueCreateStub;
+    XQueueSendFromISRRestorer isrSendStub;
+    std::cout << "TEST_F (init) is running!\n";
+    QueueHandle_t dummyQueue = reinterpret_cast<QueueHandle_t>(0x1);
+    // Test double for DmxController that does NOT override destructor or set member pointers to nullptr
+    struct ControllerTestDouble : DmxController
+    {
+        QueueHandle_t testQueue;
+        ControllerTestDouble(DmxPresetChanger *pc, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms,
+            WebServer *ws, NvStorage *ns, QueueHandle_t q)
+            : DmxController(pc, sd, fs, ms, ws, ns), testQueue(q)
+        {
+        }
+        QueueHandle_t getEventQueue() const override { return testQueue; }
+    };
+
+    ASSERT_NE(mockPresetChanger, nullptr);
+    ASSERT_NE(mockDisplay, nullptr);
+    ASSERT_NE(mockFootSwitch, nullptr);
+    ASSERT_NE(mockMax3485Sender, nullptr);
+    ASSERT_NE(mockWebServer, nullptr);
+    ASSERT_NE(mockNvStorage, nullptr);
+
+    ControllerTestDouble controllerWithQueue(
+        mockPresetChanger, mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
+
+    // Null checks before dereferencing mocks
+    ASSERT_NE(mockPresetChanger, nullptr);
+    ASSERT_NE(mockDisplay, nullptr);
+    ASSERT_NE(mockFootSwitch, nullptr);
+    ASSERT_NE(mockMax3485Sender, nullptr);
+    ASSERT_NE(mockWebServer, nullptr);
+    ASSERT_NE(mockNvStorage, nullptr);
+
+    EXPECT_CALL(*mockPresetChanger, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockDisplay, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+    EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
+
+    EXPECT_CALL(*mockPresetChanger, init(_)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockDisplay, init(_, _)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockFootSwitch, init(_, _)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
+    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
+
+    // Patch xQueueReceive to simulate correct event sequence for init_messages
+    xQueueReceive_ptr = &ConfigAndPresetsResponseStub::xQueueReceive;
+
+    auto result = controllerWithQueue.DmxController::init();
+    EXPECT_EQ(result, ESP_OK);
+
+    // Restore default stubs after test
+    xQueueSend_ptr = nullptr;
+    xQueueReceive_ptr = nullptr;
+}
+
 // DmxControllerQueueFailTest merged from dmx_controller_queuefail_tests.cpp
 class DmxControllerQueueFailTest : public ::testing::Test
 {
   protected:
     MockPresetChanger *mockPresetChanger;
-    MockOSCSender *mockOscSender;
     MockSevenSegmentDisplay *mockDisplay;
     MockFootSwitch *mockFootSwitch;
     MockMax3485Sender *mockMax3485Sender;
-    MockArtNetSender *mockArtNetSender;
     MockWebServer *mockWebServer;
     MockNvStorage *mockNvStorage;
 
     DmxControllerQueueFailTest()
-        : mockPresetChanger(new MockPresetChanger()), mockOscSender(new MockOSCSender()),
-          mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
-          mockMax3485Sender(new MockMax3485Sender()), mockArtNetSender(new MockArtNetSender()),
+        : mockPresetChanger(new MockPresetChanger()), mockDisplay(new MockSevenSegmentDisplay()),
+          mockFootSwitch(new MockFootSwitch()), mockMax3485Sender(new MockMax3485Sender()),
           mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage())
     {
         testing::Mock::AllowLeak(mockPresetChanger);
-        testing::Mock::AllowLeak(mockOscSender);
         testing::Mock::AllowLeak(mockDisplay);
         testing::Mock::AllowLeak(mockFootSwitch);
         testing::Mock::AllowLeak(mockMax3485Sender);
-        testing::Mock::AllowLeak(mockArtNetSender);
         testing::Mock::AllowLeak(mockWebServer);
         testing::Mock::AllowLeak(mockNvStorage);
     }
@@ -248,36 +285,23 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
-        ControllerTestDouble(DmxPresetChanger *pc, OSCSender *os, SevenSegmentDisplay *sd, FootSwitch *fs,
-            MockMax3485Sender *ms, ArtNetSender *an, WebServer *ws, NvStorage *ns, QueueHandle_t q)
-            : DmxController(pc, os, sd, fs, ms, an, ws, ns), testQueue(q)
+        ControllerTestDouble(DmxPresetChanger *pc, SevenSegmentDisplay *sd, FootSwitch *fs, MockMax3485Sender *ms,
+            WebServer *ws, NvStorage *ns, QueueHandle_t q)
+            : DmxController(pc, sd, fs, ms, ws, ns), testQueue(q)
         {
         }
         QueueHandle_t getEventQueue() const override { return testQueue; }
-        ~ControllerTestDouble() override
-        {
-            presetChanger_ = nullptr;
-            oscSender_ = nullptr;
-            display_ = nullptr;
-            footSwitch_ = nullptr;
-            max3485Sender_ = nullptr;
-            artnetSender_ = nullptr;
-            webServer_ = nullptr;
-            nvStorage_ = nullptr;
-        }
     };
 
     QueueHandle_t dummyQueue = reinterpret_cast<QueueHandle_t>(0x1);
-    ControllerTestDouble controllerWithQueue(mockPresetChanger, mockOscSender, mockDisplay, mockFootSwitch,
-        mockMax3485Sender, mockArtNetSender, mockWebServer, mockNvStorage, dummyQueue);
+    ControllerTestDouble controllerWithQueue(
+        mockPresetChanger, mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
 
     // Null checks before dereferencing mocks
     ASSERT_NE(mockPresetChanger, nullptr);
-    ASSERT_NE(mockOscSender, nullptr);
     ASSERT_NE(mockDisplay, nullptr);
     ASSERT_NE(mockFootSwitch, nullptr);
     ASSERT_NE(mockMax3485Sender, nullptr);
-    ASSERT_NE(mockArtNetSender, nullptr);
     ASSERT_NE(mockWebServer, nullptr);
     ASSERT_NE(mockNvStorage, nullptr);
 
@@ -285,15 +309,12 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     EXPECT_CALL(*mockDisplay, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-    EXPECT_CALL(*mockArtNetSender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
 
     EXPECT_CALL(*mockPresetChanger, init(_)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockOscSender, init(_, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockDisplay, init(_, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockFootSwitch, init(_, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockArtNetSender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
     EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
 

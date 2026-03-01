@@ -6,7 +6,6 @@
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
 #include "nv_storage.hpp"
-#include "osc_sender.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 #include <esp_err.h>
@@ -22,10 +21,10 @@
 class DmxController : public RtosTask
 {
   public:
-    DmxController(DmxPresetChanger *presetChanger, OSCSender *oscSender, SevenSegmentDisplay *display,
-        FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
+    DmxController(DmxPresetChanger *presetChanger, SevenSegmentDisplay *display, FootSwitch *footSwitch,
+        Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
-    esp_err_t init();
+    virtual esp_err_t init();
     void taskLoop();
 
   private:
@@ -40,11 +39,8 @@ class DmxController : public RtosTask
         GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7, GPIO_NUM_8, GPIO_NUM_9};
     static constexpr const char *OTA_URL = "https://example.com/firmware.bin";
     static constexpr const char *OTA_CERT_PEM = nullptr;
-    static constexpr const char *OSC_DEST_IP = "192.168.1.100";
-    static constexpr int OSC_DEST_PORT = 8000;
 
     DmxPresetChanger *presetChanger_;
-    OSCSender *oscSender_;
     SevenSegmentDisplay *display_;
     FootSwitch *footSwitch_;
     Max3485Sender *max3485Sender_;

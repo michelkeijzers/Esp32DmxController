@@ -30,7 +30,7 @@ class FootSwitch : public RtosTask
     int queueCapacity_;
 
     uint16_t getLongPressThresholdMs();
-    bool getPolarityInverted();
+    bool getPolarityNormallyOpen();
 
     void taskEntry(void *param) override;
 
@@ -43,7 +43,7 @@ class FootSwitch : public RtosTask
     TickType_t pressStartTime_;
     uint32_t longPressTimeMs_;
 
-    bool polarityInverted_;
+    bool polarityNormallyOpen_;
     uint16_t longPressThresholdMs_;
 
     void taskLoop();
