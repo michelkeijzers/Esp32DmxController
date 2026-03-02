@@ -7,6 +7,9 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\dmx_controller_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\web_server_api_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -19,7 +19,7 @@ function Preset({ preset, onUpdateValue, onSendToESP32 }) {
       </div>
       <div className="preset-info">
         <span>ID: {preset.id}</span>
-        <span>Total values: {preset.values1.length + preset.values2.length}</span>
+        <span>Total values: {preset.dmx_values.length}</span>
       </div>
       
       <div className="preset-sections">

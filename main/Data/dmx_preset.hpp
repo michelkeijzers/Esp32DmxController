@@ -20,6 +20,8 @@ class DmxPreset
     void setName(const char *name);
     const char *getName() const;
 
+    bool isInitialized() const { return name_[0] != '\0'; }
+
     uint8_t getDmxValue(uint16_t channel) const;
     void setDmxValue(uint16_t channel, uint8_t value);
     const uint8_t *getDmxValues() const { return dmxValues_; }
@@ -33,6 +35,6 @@ class DmxPreset
 
   private:
     uint16_t index_;
-    char name_[32]; // Preset name (max 31 chars + null terminator)
+    char name_[32];
     uint8_t dmxValues_[NR_OF_DMX_CHANNELS];
 };

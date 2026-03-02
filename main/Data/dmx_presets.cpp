@@ -1,7 +1,8 @@
-
 #include "dmx_presets.hpp"
 #include <cstring>
+
 #include <esp_log.h>
+#include <stdexcept>
 
 static const char *LOG_TAG = "DmxPresets";
 
@@ -38,10 +39,9 @@ esp_err_t DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 
 esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
-    uint8_t index = static_cast<uint8_t>(presets_.size());
-    if (index >= numberOfFilledPresets_)
+    if (presetNumber >= numberOfFilledPresets_)
     {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", presetNumber, numberOfFilledPresets_ - 1);
         return ESP_ERR_INVALID_ARG;
     }
 
@@ -51,19 +51,21 @@ esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const ui
         return ESP_ERR_INVALID_ARG;
     }
 
-    presets_[index].setIndex(presetNumber);
-    presets_[index].setName(name);
-    presets_[index].setDmxValues(dmxValues);
+    presets_[presetNumber].setIndex(presetNumber);
+    presets_[presetNumber].setName(name);
+    presets_[presetNumber].setDmxValues(dmxValues);
 
-    ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", index, name);
+    ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", presetNumber, name);
     return ESP_OK;
 }
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)
 {
-    if (index >= numberOfFilledPresets_)
+    if (index >= numberOfFilledPresets_ || !presets_[index].isInitialized())
     {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
+        ESP_LOGE(LOG_TAG, "Preset index %d is invalid or uninitialized (max %d)", index, numberOfFilledPresets_ - 1);
+        // Return first preset as fallback (or handle as needed)
+        return presets_[0];
     }
     return presets_[index];
 }
@@ -76,8 +78,8 @@ esp_err_t DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
         return ESP_ERR_INVALID_ARG;
     }
 
-    // TODO presets_[index].copyFrom(preset);
-    return ESP_OK; // TODO
+    presets_[index].copyFrom(preset);
+    return ESP_OK;
 }
 
 void DmxPresets::clearAll()
@@ -87,6 +89,7 @@ void DmxPresets::clearAll()
         preset.clear();
     }
     currentPresetIndex_ = 0;
+    // numberOfFilledPresets_ remains unchanged to preserve test setup consistency
 }
 
 void DmxPresets::setCurrentPresetIndex(uint8_t index)

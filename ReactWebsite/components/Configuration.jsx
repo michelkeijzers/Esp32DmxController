@@ -28,18 +28,18 @@ function Configuration({ config, onConfigChange }) {
       <div className="config-section">
         <h3>Presets</h3>
         <div className="config-item">
-          <label htmlFor="maxPresets">Maximum Number of Presets:</label>
+          <label htmlFor="maxNumberOfPresets">Maximum Number of Presets:</label>
           <input
-            id="maxPresets"
+            id="maxNumberOfPresets"
             type="number"
             min={20}
             max={50}
-            value={config.maxPresets ?? 20}
+            value={config.maxNumberOfPresets ?? 20}
             onChange={e => {
               let value = parseInt(e.target.value, 10);
               if (isNaN(value)) value = 20;
               value = Math.max(20, Math.min(50, value));
-              onConfigChange('maxPresets', value);
+              onConfigChange('maxNumberOfPresets', value);
             }}
           />
         </div>

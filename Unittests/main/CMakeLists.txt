@@ -34,6 +34,7 @@ add_executable(
   run_tests
   custom_main.cpp
   dmx_controller_tests.cpp
+  web_server_api_tests.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/dmx_controller.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/seven_segment_display.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/foot_switch.cpp

@@ -1,3 +1,5 @@
+
+
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
@@ -15,7 +17,6 @@ void DmxPreset::setName(const char *name)
     if (name)
     {
         strncpy(name_, name, sizeof(name_) - 1);
-        name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
         name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
     }
     else
@@ -57,6 +58,11 @@ void DmxPreset::setDmxValues(const uint8_t *values)
     }
 
     memcpy(dmxValues_, values, NR_OF_DMX_CHANNELS);
+    // Mark as initialized if DMX values are set
+    if (name_[0] == '\0')
+    {
+        strcpy(name_, "Preset");
+    }
 }
 
 void DmxPreset::clear()

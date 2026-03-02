@@ -19,8 +19,7 @@ const generatePresets = (count) => {
   return Array.from({ length: count }, (_, i) => ({
     id: i + 1,
     name: `Scene ${i + 1}`,
-    values1: generateValues(512),
-    values2: generateValues(512)
+    dmx_values: generateValues(512),
   }))
 }
 
@@ -131,16 +130,14 @@ function App() {
       for (let i = deleteIndex; i < newPresets.length - 1; i++) {
         newPresets[i] = {
           ...newPresets[i],
-          values1: newPresets[i + 1].values1,
-          values2: newPresets[i + 1].values2
+          dmx_values: newPresets[i + 1].dmx_values
         }
       }
       
       // Reset the last preset
       newPresets[newPresets.length - 1] = {
         ...newPresets[newPresets.length - 1],
-        values1: generateValues(512),
-        values2: generateValues(512)
+        dmx_values: generateValues(512)
       }
       
       return newPresets
@@ -162,8 +159,7 @@ function App() {
       for (let i = newPresets.length - 1; i > insertIndex; i--) {
         newPresets[i] = {
           ...newPresets[i],
-          values1: newPresets[i - 1].values1,
-          values2: newPresets[i - 1].values2,
+          dmx_values: newPresets[i - 1].dmx_values,
           name: newPresets[i - 1].name
         }
       }
@@ -171,8 +167,7 @@ function App() {
       // Insert empty preset at insertIndex with default name
       newPresets[insertIndex] = {
         ...newPresets[insertIndex],
-        values1: generateValues(512),
-        values2: generateValues(512),
+        dmx_values: generateValues(512),
         name: 'New Preset'
       }
       
@@ -191,21 +186,18 @@ function App() {
       const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
       
       // Swap the two presets' data including name
-      const tempValues1 = newPresets[currentIndex].values1
-      const tempValues2 = newPresets[currentIndex].values2
+      const tempDmxValues = newPresets[currentIndex].dmx_values
       const tempName = newPresets[currentIndex].name
       
       newPresets[currentIndex] = {
         ...newPresets[currentIndex],
-        values1: newPresets[targetIndex].values1,
-        values2: newPresets[targetIndex].values2,
+        dmx_values: newPresets[targetIndex].dmx_values,
         name: newPresets[targetIndex].name
       }
       
       newPresets[targetIndex] = {
         ...newPresets[targetIndex],
-        values1: tempValues1,
-        values2: tempValues2,
+        dmx_values: tempDmxValues,
         name: tempName
       }
       

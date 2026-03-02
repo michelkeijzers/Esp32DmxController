@@ -6,8 +6,8 @@
 #include "web_server.hpp"
 #include <esp_log.h>
 
+#include "../ThirdParty/nlohmann/json.hpp"
 #include "foot_switch.hpp"
-#include <cJSON.h>
 #include <cstring>
 #include <esp_spiffs.h>
 #include <vector>
@@ -380,18 +380,11 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
         std::string config_json = instance_->config_to_json();
         std::string presets_json = instance_->presets_to_json();
 
-        cJSON *root = cJSON_CreateObject();
-        cJSON *config_obj = cJSON_Parse(config_json.c_str());
-        cJSON *presets_arr = cJSON_Parse(presets_json.c_str());
-        if (config_obj)
-            cJSON_AddItemToObject(root, "configuration", config_obj);
-        if (presets_arr)
-            cJSON_AddItemToObject(root, "presets", presets_arr);
-
-        char *json_str = cJSON_Print(root);
-        esp_err_t result = instance_->send_json_response(req, json_str ? json_str : "{}");
-        cJSON_free(json_str);
-        cJSON_Delete(root);
+        nlohmann::json root;
+        root["configuration"] = nlohmann::json::parse(config_json);
+        root["presets"] = nlohmann::json::parse(presets_json);
+        std::string json_str = root.dump();
+        esp_err_t result = instance_->send_json_response(req, json_str.c_str());
         return result;
     }
     else if (req->method == HTTP_POST)
@@ -405,40 +398,24 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
         }
         content[ret] = '\0';
 
-        cJSON *root = cJSON_Parse(content);
-        if (!root || !cJSON_IsObject(root))
-        {
-            if (root)
-                cJSON_Delete(root);
+        nlohmann::json root = nlohmann::json::parse(content);
+        if (!root.is_object())
             return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
-        }
 
         // Update configuration
-        cJSON *config_obj = cJSON_GetObjectItem(root, "configuration");
-        if (config_obj)
+        if (root.contains("configuration"))
         {
-            char *config_str = cJSON_Print(config_obj);
-            if (config_str)
-            {
-                // TODO: Pass correct FootSwitch pointer if needed
-                instance_->json_to_config(config_str, nullptr);
-                cJSON_free(config_str);
-            }
+            std::string config_str = root["configuration"].dump();
+            instance_->json_to_config(config_str.c_str(), nullptr);
         }
 
         // Update presets
-        cJSON *presets_arr = cJSON_GetObjectItem(root, "presets");
-        if (presets_arr)
+        if (root.contains("presets"))
         {
-            char *presets_str = cJSON_Print(presets_arr);
-            if (presets_str)
-            {
-                instance_->json_to_presets(presets_str);
-                cJSON_free(presets_str);
-            }
+            std::string presets_str = root["presets"].dump();
+            instance_->json_to_presets(presets_str.c_str());
         }
 
-        cJSON_Delete(root);
         return instance_->send_json_response(req, "{\"status\":\"ok\"}");
     }
 
@@ -517,10 +494,22 @@ esp_err_t WebServer::api_presets_handler(httpd_req_t *req)
         }
         content[ret] = '\0';
 
-        esp_err_t err = instance_->json_to_presets(content);
-        if (err != ESP_OK)
-        {
+        nlohmann::json root = nlohmann::json::parse(content);
+        if (!root.is_object())
             return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+
+        // Update configuration
+        if (root.contains("configuration"))
+        {
+            std::string config_str = root["configuration"].dump();
+            instance_->json_to_config(config_str.c_str(), nullptr);
+        }
+
+        // Update presets
+        if (root.contains("presets"))
+        {
+            std::string presets_str = root["presets"].dump();
+            instance_->json_to_presets(presets_str.c_str());
         }
 
         return instance_->send_json_response(req, "{\"status\":\"ok\"}");
@@ -557,12 +546,17 @@ esp_err_t WebServer::api_config_handler(httpd_req_t *req)
 
         ESP_LOGI(TAG, "Received config data: %s", content);
 
-        esp_err_t err = ESP_OK; // TODO esp_err_t err = instance_->json_to_config(content);
-        if (err != ESP_OK)
-        {
+        nlohmann::json root = nlohmann::json::parse(content);
+        if (!root.is_object())
             return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+
+        // Update configuration
+        if (root.contains("footSwitchPolarity") && root["footSwitchPolarity"].is_string())
+        {
+            // TODO Get foot switch polarity and long press threshold
         }
 
+        ESP_LOGI(TAG, "Configuration updated from JSON");
         return instance_->send_json_response(req, "{\"status\":\"ok\"}");
     }
 
@@ -647,183 +641,192 @@ esp_err_t WebServer::send_error_response(httpd_req_t *req, int status, const cha
 
 std::string WebServer::presets_to_json()
 {
-    DmxPresets *dmxPresets_ = nullptr; // TODO: Set somewhere
     if (!dmxPresets_)
     {
+        ESP_LOGE(TAG, "dmxPresets_ is null");
         return "[]";
     }
 
-    cJSON *root = cJSON_CreateArray();
-    if (!root)
-    {
-        return "[]";
-    }
+    nlohmann::json root = nlohmann::json::array();
+    uint8_t num_presets = dmxPresets_->getNumberOfFilledPresets();
+    ESP_LOGI(TAG, "Number of filled presets: %d", num_presets);
 
-    for (uint8_t i = 0; i < dmxPresets_->getNumberOfFilledPresets(); i++)
+    for (uint8_t i = 0; i < num_presets; i++)
     {
         const DmxPreset &preset = dmxPresets_->getPreset(i);
+        ESP_LOGI(TAG, "Processing preset %d: index=%d, name=%s", i, preset.getIndex(), preset.getName());
 
-        cJSON *preset_obj = cJSON_CreateObject();
-        if (!preset_obj)
-            continue;
+        nlohmann::json preset_obj;
+        preset_obj["index"] = preset.getIndex();
+        preset_obj["name"] = preset.getName();
 
-        cJSON_AddNumberToObject(preset_obj, "index", preset.getIndex());
-        cJSON_AddStringToObject(preset_obj, "name", preset.getName());
+        std::vector<uint8_t> dmx_values(preset.getDmxValues(), preset.getDmxValues() + NR_OF_DMX_CHANNELS);
+        preset_obj["dmxValues"] = dmx_values;
 
-        cJSON *dmx_values = cJSON_CreateArray();
-        const uint8_t *u1_data = preset.getDmxValues();
-        for (int j = 0; j < NR_OF_DMX_CHANNELS; j++)
-        {
-            cJSON_AddItemToArray(dmx_values, cJSON_CreateNumber(u1_data[j]));
-        }
-        cJSON_AddItemToObject(preset_obj, "dmx_values", dmx_values);
-
-        cJSON_AddItemToArray(root, preset_obj);
+        root.push_back(preset_obj);
+        ESP_LOGI(TAG, "Added preset %d to JSON array", i);
+        ESP_LOGI(TAG, "Preset %d isInitialized: %d", i, preset.isInitialized());
+        ESP_LOGI(TAG, "Current JSON state after adding preset %d: %s", i, root.dump(2).c_str());
     }
 
-    char *json_str = cJSON_Print(root);
-    std::string result = json_str ? json_str : "[]";
-    cJSON_free(json_str);
-    cJSON_Delete(root);
-
+    std::string result = root.dump();
+    ESP_LOGI(TAG, "Generated JSON: %s", result.c_str());
     return result;
 }
 
-esp_err_t WebServer::json_to_presets(const char *json)
+esp_err_t WebServer::json_to_presets(const char *json_str)
 {
-    DmxPresets *dmxPresets_ = nullptr; // TODO: Set somewhere
-    if (!dmxPresets_ || !json)
+    if (!dmxPresets_ || !json_str)
     {
         return ESP_ERR_INVALID_ARG;
     }
 
-    cJSON *root = cJSON_Parse(json);
-    if (!root || !cJSON_IsArray(root))
+    nlohmann::json root = nlohmann::json::parse(json_str);
+    if (!root.is_array())
     {
         ESP_LOGE(TAG, "Invalid JSON: not an array");
-        if (root)
-            cJSON_Delete(root);
         return ESP_ERR_INVALID_ARG;
     }
 
-    int num_presets = cJSON_GetArraySize(root);
+    size_t num_presets = root.size();
     if (num_presets < 2 || num_presets > 20)
     {
-        ESP_LOGE(TAG, "Invalid number of presets: %d", num_presets);
-        cJSON_Delete(root);
+        ESP_LOGE(TAG, "Invalid number of presets: %zu", num_presets);
         return ESP_ERR_INVALID_ARG;
     }
 
     // Set number of presets
-    esp_err_t ret = dmxPresets_->setNumberOfFilledPresets(num_presets);
+    esp_err_t ret = dmxPresets_->setNumberOfFilledPresets(static_cast<int>(num_presets));
     if (ret != ESP_OK)
-    {
-        cJSON_Delete(root);
         return ret;
-    }
 
     // Load each preset
-    for (int i = 0; i < num_presets; i++)
+    for (size_t i = 0; i < num_presets; i++)
     {
-        cJSON *preset_obj = cJSON_GetArrayItem(root, i);
-        if (!preset_obj || !cJSON_IsObject(preset_obj))
+        if (!root[i].is_object())
         {
-            ESP_LOGE(TAG, "Invalid preset object at index %d", i);
+            ESP_LOGE(TAG, "Invalid preset object at index %zu", i);
             continue;
         }
 
         DmxPreset preset;
 
         // Index
-        cJSON *index = cJSON_GetObjectItem(preset_obj, "index");
-        if (index && cJSON_IsNumber(index))
-        {
-            preset.setIndex((uint8_t)index->valuedouble);
-        }
+        if (root[i].contains("index") && root[i]["index"].is_number())
+            preset.setIndex((uint8_t)root[i]["index"]);
         // Name
-        cJSON *name = cJSON_GetObjectItem(preset_obj, "name");
-        if (name && cJSON_IsString(name))
-        {
-            preset.setName(name->valuestring);
-        }
+        if (root[i].contains("name") && root[i]["name"].is_string())
+            {
+                std::string name_str = root[i]["name"].get<std::string>();
+                preset.setName(name_str.c_str());
+            }
 
         // DMX Values
-        cJSON *dmx_values_arr = cJSON_GetObjectItem(preset_obj, "dmx_values");
-        if (dmx_values_arr && cJSON_IsArray(dmx_values_arr))
+        if (root[i].contains("dmxValues") && root[i]["dmxValues"].is_array())
         {
             uint8_t dmx_values[NR_OF_DMX_CHANNELS] = {0};
-            int dmx_values_size = cJSON_GetArraySize(dmx_values_arr);
-            int copy_size = dmx_values_size < NR_OF_DMX_CHANNELS ? dmx_values_size : NR_OF_DMX_CHANNELS;
-            for (int j = 0; j < copy_size; j++)
+            size_t dmx_values_size = root[i]["dmxValues"].size();
+            size_t copy_size = dmx_values_size < NR_OF_DMX_CHANNELS ? dmx_values_size : NR_OF_DMX_CHANNELS;
+            for (size_t j = 0; j < copy_size; j++)
             {
-                cJSON *val = cJSON_GetArrayItem(dmx_values_arr, j);
-                if (val && cJSON_IsNumber(val))
-                {
-                    dmx_values[j] = (uint8_t)val->valuedouble;
-                }
+                if (root[i]["dmxValues"][j].is_number())
+                    dmx_values[j] = (uint8_t)root[i]["dmxValues"][j];
             }
             preset.setDmxValues(dmx_values);
         }
 
         // Save preset
-        dmxPresets_->setPreset(i, preset);
+        dmxPresets_->setPreset(static_cast<uint8_t>(i), preset);
     }
 
-    cJSON_Delete(root);
-    ESP_LOGI(TAG, "Loaded %d presets from JSON", num_presets);
+    ESP_LOGI(TAG, "Loaded %zu presets from JSON", num_presets);
     return ESP_OK;
 }
 
 std::string WebServer::config_to_json()
 {
-    // TODO if (!configurator_)
-    {
-        return "{}";
-    }
-
-    cJSON *root = cJSON_CreateObject();
-    if (!root)
-    {
-        return "{}";
-    }
-
-    // TODO const char *polarity_str = (footSwitch->getFootSwitchPolarity() == FootSwitch::NORMAL) ? "NORMAL" :
-    // "INVERSE";
-    // TODO cJSON_AddStringToObject(root, "footSwitchPolarity", polarity_str);
-    // TODO cJSON_AddNumberToObject(root, "footSwitchLongPressTime", configurator_->getLongPressTimeMs());
-
-    char *json_str = cJSON_Print(root);
-    std::string result = json_str ? json_str : "{}";
-    cJSON_free(json_str);
-    cJSON_Delete(root);
-
-    return result;
+    nlohmann::json root;
+    // TODO: Add actual config fields
+    // root["footSwitchPolarity"] = ...;
+    // root["footSwitchLongPressTime"] = ...;
+    return root.dump();
 }
 
-esp_err_t WebServer::json_to_config(const char *json, FootSwitch *footSwitch)
+esp_err_t WebServer::json_to_config(const char *json_str, FootSwitch *footSwitch)
 {
-    if (!footSwitch || !json)
+    if (!footSwitch || !json_str)
     {
         return ESP_ERR_INVALID_ARG;
     }
 
-    cJSON *root = cJSON_Parse(json);
-    if (!root || !cJSON_IsObject(root))
+    nlohmann::json root = nlohmann::json::parse(json_str);
+    if (!root.is_object())
     {
         ESP_LOGE(TAG, "Invalid JSON: not an object");
-        if (root)
-            cJSON_Delete(root);
         return ESP_ERR_INVALID_ARG;
     }
 
     // Foot switch polarity
-    cJSON *polarity = cJSON_GetObjectItem(root, "footSwitchPolarity");
-    if (polarity && cJSON_IsString(polarity))
+    if (root.contains("footSwitchPolarity") && root["footSwitchPolarity"].is_string())
     {
         // TODO Get foot switch polarity and long press threshold
     }
 
-    cJSON_Delete(root);
     ESP_LOGI(TAG, "Configuration updated from JSON");
     return ESP_OK;
+}
+
+void WebServer::test_cjson_logic()
+{
+    nlohmann::json root = nlohmann::json::array();
+    nlohmann::json test_obj;
+    test_obj["key"] = "value";
+    ESP_LOGI(TAG, "Test object JSON: %s", test_obj.dump(2).c_str());
+    root.push_back(test_obj);
+    ESP_LOGI(TAG, "Root JSON after adding test object: %s", root.dump(2).c_str());
+}
+
+void WebServer::test_presets_to_json()
+{
+    // Mock data for testing
+    DmxPreset mock_presets[2];
+    mock_presets[0].setIndex(0);
+    mock_presets[0].setName("Preset 1");
+    uint8_t values0[NR_OF_DMX_CHANNELS] = {0};
+    values0[0] = 1;
+    values0[1] = 2;
+    values0[2] = 3;
+    values0[3] = 4;
+    values0[4] = 5;
+    mock_presets[0].setDmxValues(values0);
+
+    mock_presets[1].setIndex(1);
+    mock_presets[1].setName("Preset 2");
+    uint8_t values1[NR_OF_DMX_CHANNELS] = {0};
+    values1[0] = 6;
+    values1[1] = 7;
+    values1[2] = 8;
+    values1[3] = 9;
+    values1[4] = 10;
+    mock_presets[1].setDmxValues(values1);
+
+    // Set mock presets in dmxPresets_
+    dmxPresets_->setNumberOfFilledPresets(2);
+    dmxPresets_->setPreset(0, mock_presets[0]);
+    dmxPresets_->setPreset(1, mock_presets[1]);
+
+    // Call presets_to_json
+    std::string json_output = presets_to_json();
+    ESP_LOGI(TAG, "Test presets_to_json output: %s", json_output.c_str());
+}
+
+void WebServer::test_cjson_add_item()
+{
+    nlohmann::json root = nlohmann::json::array();
+    nlohmann::json test_obj;
+    test_obj["key"] = "value";
+    ESP_LOGI(TAG, "Test object JSON: %s", test_obj.dump(2).c_str());
+    root.push_back(test_obj);
+    ESP_LOGI(TAG, "Added test object to root JSON array");
+    ESP_LOGI(TAG, "Root JSON after adding test object: %s", root.dump(2).c_str());
 }

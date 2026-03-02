@@ -31,6 +31,12 @@ class WebServer
 
     virtual esp_err_t init();
 
+  public:
+    std::string presets_to_json();
+
+  public:
+    DmxPresets *dmxPresets_ = nullptr;
+
   private:
     const char *logTag_;
     int taskPriority_;
@@ -60,10 +66,15 @@ class WebServer
 
     esp_err_t send_json_response(httpd_req_t *req, const char *json);
     esp_err_t send_error_response(httpd_req_t *req, int status, const char *message);
-    std::string presets_to_json();
+    // removed duplicate declaration
     esp_err_t json_to_presets(const char *json);
     std::string config_to_json();
     esp_err_t json_to_config(const char *json, FootSwitch *footSwitch);
 
     static WebServer *instance_;
+
+  public:
+    void test_cjson_logic();
+    void test_presets_to_json();
+    void test_cjson_add_item();
 };
