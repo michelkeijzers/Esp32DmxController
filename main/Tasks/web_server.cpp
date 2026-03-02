@@ -29,7 +29,7 @@ __attribute__((unused)) static const char *INDEX_HTML = R"html(
         body { font-family: Arial, sans-serif; margin: 20px; }
         .container { max-width: 1200px; margin: 0 auto; }
         .preset { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
-        .universe { display: flex; flex-wrap: wrap; gap: 2px; margin: 10px 0; }
+        .dmx_values { display: flex; flex-wrap: wrap; gap: 2px; margin: 10px 0; }
         .channel { width: 20px; height: 20px; border: 1px solid #ddd; display: inline-block; }
         .channel.on { background-color: #ffff00; }
         input, button { margin: 5px; padding: 5px; }
@@ -144,23 +144,11 @@ class DMXController {
                 <h3>Preset ${index}: <input type="text" value="${preset.name || ''}" onchange="app.updatePresetName(${index}, this.value)"></h3>
                 <button onclick="app.deletePreset(${index})">Delete</button>
                 <div>
-                    <h4>Universe 1</h4>
-                    <div class="universe">
+                    <div class="dmx_values">
                         ${Array.from({length: 512}, (_, i) => `
-                            <div class="channel ${preset.universe1[i] > 0 ? 'on' : ''}"
-                                 style="background-color: rgb(${preset.universe1[i]}, ${preset.universe1[i]}, ${preset.universe1[i]})"
-                                 onclick="app.toggleChannel(${index}, 0, ${i})">
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div>
-                    <h4>Universe 2</h4>
-                    <div class="universe">
-                        ${Array.from({length: 512}, (_, i) => `
-                            <div class="channel ${preset.universe2[i] > 0 ? 'on' : ''}"
-                                 style="background-color: rgb(${preset.universe2[i]}, ${preset.universe2[i]}, ${preset.universe2[i]})"
-                                 onclick="app.toggleChannel(${index}, 1, ${i})">
+                            <div class="channel ${preset.dmx_values[i] > 0 ? 'on' : ''}"
+                                 style="background-color: rgb(${preset.dmx_values[i]}, ${preset.dmx_values[i]}, ${preset.dmx_values[i]})"
+                                 onclick="app.toggleChannel(${index}, ${i})">
                             </div>
                         `).join('')}
                     </div>
@@ -185,8 +173,7 @@ class DMXController {
         }
         this.presets.push({
             name: `Preset ${this.presets.length}`,
-            universe1: new Array(512).fill(0),
-            universe2: new Array(512).fill(0)
+            dmx_values: new Array(512).fill(0)
         });
         this.render();
     }
@@ -204,10 +191,10 @@ class DMXController {
         this.presets[index].name = name;
     }
 
-    toggleChannel(presetIndex, universe, channel) {
+    toggleChannel(presetIndex, channel) {
         const preset = this.presets[presetIndex];
-        const universeData = universe === 0 ? preset.universe1 : preset.universe2;
-        universeData[channel] = universeData[channel] > 0 ? 0 : 255;
+        const dmxValues = preset.dmx_values;
+        dmxValues[channel] = dmxValues[channel] > 0 ? 0 : 255;
         this.render();
     }
 }
@@ -352,6 +339,20 @@ esp_err_t WebServer::init()
     api_config_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_config_post_uri);
 
+    httpd_uri_t api_all_data_get_uri;
+    api_all_data_get_uri.uri = "/all_data";
+    api_all_data_get_uri.method = HTTP_GET;
+    api_all_data_get_uri.handler = api_all_data_handler;
+    api_all_data_get_uri.user_ctx = nullptr;
+    httpd_register_uri_handler(server_, &api_all_data_get_uri);
+
+    httpd_uri_t api_all_data_post_uri;
+    api_all_data_post_uri.uri = "/all_data";
+    api_all_data_post_uri.method = HTTP_POST;
+    api_all_data_post_uri.handler = api_all_data_handler;
+    api_all_data_post_uri.user_ctx = nullptr;
+    httpd_register_uri_handler(server_, &api_all_data_post_uri);
+
     httpd_uri_t static_file_uri;
     static_file_uri.uri = "/*";
     static_file_uri.method = HTTP_GET;
@@ -359,9 +360,89 @@ esp_err_t WebServer::init()
     static_file_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &static_file_uri);
 
-    initialized_ = true;
-    ESP_LOGI(TAG, "Web server initialized on port 80");
     return ESP_OK;
+}
+
+// /all_data handler: GET returns { configuration, presets }, POST updates both
+// Move this function outside of init()
+
+esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
+{
+    if (!instance_)
+    {
+        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
+        return ESP_FAIL;
+    }
+
+    if (req->method == HTTP_GET)
+    {
+        // Compose JSON with both configuration and presets
+        std::string config_json = instance_->config_to_json();
+        std::string presets_json = instance_->presets_to_json();
+
+        cJSON *root = cJSON_CreateObject();
+        cJSON *config_obj = cJSON_Parse(config_json.c_str());
+        cJSON *presets_arr = cJSON_Parse(presets_json.c_str());
+        if (config_obj)
+            cJSON_AddItemToObject(root, "configuration", config_obj);
+        if (presets_arr)
+            cJSON_AddItemToObject(root, "presets", presets_arr);
+
+        char *json_str = cJSON_Print(root);
+        esp_err_t result = instance_->send_json_response(req, json_str ? json_str : "{}");
+        cJSON_free(json_str);
+        cJSON_Delete(root);
+        return result;
+    }
+    else if (req->method == HTTP_POST)
+    {
+        // Parse JSON and update both configuration and presets
+        char content[8192];
+        int ret = httpd_req_recv(req, content, sizeof(content) - 1);
+        if (ret <= 0)
+        {
+            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+        }
+        content[ret] = '\0';
+
+        cJSON *root = cJSON_Parse(content);
+        if (!root || !cJSON_IsObject(root))
+        {
+            if (root)
+                cJSON_Delete(root);
+            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        }
+
+        // Update configuration
+        cJSON *config_obj = cJSON_GetObjectItem(root, "configuration");
+        if (config_obj)
+        {
+            char *config_str = cJSON_Print(config_obj);
+            if (config_str)
+            {
+                // TODO: Pass correct FootSwitch pointer if needed
+                instance_->json_to_config(config_str, nullptr);
+                cJSON_free(config_str);
+            }
+        }
+
+        // Update presets
+        cJSON *presets_arr = cJSON_GetObjectItem(root, "presets");
+        if (presets_arr)
+        {
+            char *presets_str = cJSON_Print(presets_arr);
+            if (presets_str)
+            {
+                instance_->json_to_presets(presets_str);
+                cJSON_free(presets_str);
+            }
+        }
+
+        cJSON_Delete(root);
+        return instance_->send_json_response(req, "{\"status\":\"ok\"}");
+    }
+
+    return instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
 }
 
 esp_err_t WebServer::start()
@@ -450,6 +531,7 @@ esp_err_t WebServer::api_presets_handler(httpd_req_t *req)
 
 esp_err_t WebServer::api_config_handler(httpd_req_t *req)
 {
+    ESP_LOGI(TAG, "Received config request: method=%d, uri=%s", req->method, req->uri);
     if (!instance_)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
@@ -472,6 +554,8 @@ esp_err_t WebServer::api_config_handler(httpd_req_t *req)
             return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
         }
         content[ret] = '\0';
+
+        ESP_LOGI(TAG, "Received config data: %s", content);
 
         esp_err_t err = ESP_OK; // TODO esp_err_t err = instance_->json_to_config(content);
         if (err != ESP_OK)
@@ -586,13 +670,13 @@ std::string WebServer::presets_to_json()
         cJSON_AddNumberToObject(preset_obj, "index", preset.getIndex());
         cJSON_AddStringToObject(preset_obj, "name", preset.getName());
 
-        cJSON *universe1 = cJSON_CreateArray();
+        cJSON *dmx_values = cJSON_CreateArray();
         const uint8_t *u1_data = preset.getDmxValues();
         for (int j = 0; j < NR_OF_DMX_CHANNELS; j++)
         {
-            cJSON_AddItemToArray(universe1, cJSON_CreateNumber(u1_data[j]));
+            cJSON_AddItemToArray(dmx_values, cJSON_CreateNumber(u1_data[j]));
         }
-        cJSON_AddItemToObject(preset_obj, "universe1", universe1);
+        cJSON_AddItemToObject(preset_obj, "dmx_values", dmx_values);
 
         cJSON_AddItemToArray(root, preset_obj);
     }
@@ -664,15 +748,15 @@ esp_err_t WebServer::json_to_presets(const char *json)
         }
 
         // DMX Values
-        cJSON *universe1 = cJSON_GetObjectItem(preset_obj, "universe1");
-        if (universe1 && cJSON_IsArray(universe1))
+        cJSON *dmx_values_arr = cJSON_GetObjectItem(preset_obj, "dmx_values");
+        if (dmx_values_arr && cJSON_IsArray(dmx_values_arr))
         {
             uint8_t dmx_values[NR_OF_DMX_CHANNELS] = {0};
-            int dmx_values_size = cJSON_GetArraySize(universe1);
+            int dmx_values_size = cJSON_GetArraySize(dmx_values_arr);
             int copy_size = dmx_values_size < NR_OF_DMX_CHANNELS ? dmx_values_size : NR_OF_DMX_CHANNELS;
             for (int j = 0; j < copy_size; j++)
             {
-                cJSON *val = cJSON_GetArrayItem(universe1, j);
+                cJSON *val = cJSON_GetArrayItem(dmx_values_arr, j);
                 if (val && cJSON_IsNumber(val))
                 {
                     dmx_values[j] = (uint8_t)val->valuedouble;

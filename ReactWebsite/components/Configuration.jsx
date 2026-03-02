@@ -123,7 +123,7 @@ function Configuration({ config, onConfigChange }) {
             type="text"
             value={config.oscAddress ?? ''}
             onChange={e => onConfigChange('oscAddress', e.target.value)}
-            placeholder="e.g. 192.168.1.100"
+            placeholder="e.g. 192.168.1.254"
             pattern="^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"
             title="Enter a valid IP address"
             style={{ background: '#222', color: '#fafafa', border: '1px solid #333' }}

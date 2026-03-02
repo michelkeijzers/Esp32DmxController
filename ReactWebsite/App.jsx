@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
 import PresetList from './components/PresetList'
@@ -82,7 +82,7 @@ function HeaderControls({ esp32Ip, sendStatus, presetCount, SendToDmxController,
 function App() {
   const [presetCount, setPresetCount] = useState(3)
   const [presets, setPresets] = useState(() => generatePresets(20))
-  const [esp32Ip] = useState('192.168.1.100')
+  const [esp32Ip] = useState('192.168.1.254')
   const [sendStatus, setSendStatus] = useState('')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [config, setConfig] = useState({
@@ -224,27 +224,24 @@ function App() {
       }
     }
 
-    setSendStatus('Loading presets from DMX Controller...')
-    
+    setSendStatus('Loading presets and configuration from DMX Controller...')
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 5000)
-      
-      const response = await fetch(`http://${esp32Ip}/api/presets`, {
+      const response = await fetch(`http://${esp32Ip}/all_data`, {
         method: 'GET',
         signal: controller.signal
       })
-      
       clearTimeout(timeoutId)
-      
       if (response.ok) {
         const data = await response.json()
-        // data should be { count: number, presets: array }
-        if (data.presets && Array.isArray(data.presets)) {
+        // data should be { configuration, presets }
+        if (data.presets && Array.isArray(data.presets) && data.configuration) {
           setPresets(data.presets)
-          setPresetCount(data.count || data.presets.length)
+          setPresetCount(data.presets.length)
+          setConfig(data.configuration)
           setHasUnsavedChanges(false)
-          setSendStatus(`✓ Loaded ${data.presets.length} presets successfully`)
+          setSendStatus(`✓ Loaded ${data.presets.length} presets and configuration successfully`)
         } else {
           setSendStatus('✗ Invalid data format from controller')
         }
@@ -258,63 +255,22 @@ function App() {
 
   const SendToDmxController = async () => {
     setSendStatus('Sending all presets and configuration...')
-    
-    // First send configuration
     try {
-      const configController = new AbortController()
-      const configTimeoutId = setTimeout(() => configController.abort(), 5000)
-      
-      await fetch(`http://${esp32Ip}/api/config`, {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000)
+      await fetch(`http://${esp32Ip}/all_data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(config),
-        signal: configController.signal
+        body: JSON.stringify({ configuration: config, presets: presets.slice(0, presetCount) }),
+        signal: controller.signal
       })
-      
-      clearTimeout(configTimeoutId)
-    } catch {
-      // Continue even if config fails
-    }
-    
-    // Then send presets
-    const sendPreset = async (preset) => {
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000)
-        
-        const response = await fetch(`http://${esp32Ip}/api/preset`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            id: preset.id,
-            name: preset.name,
-            values1: preset.values1,
-            values2: preset.values2
-          }),
-          signal: controller.signal
-        })
-        
-        clearTimeout(timeoutId)
-        return response.ok
-      } catch {
-        return false
-      }
-    }
-    
-    const activePresets = presets.slice(0, presetCount)
-    const results = await Promise.all(activePresets.map(preset => sendPreset(preset)))
-    const successCount = results.filter(success => success).length
-    const failCount = results.filter(success => !success).length
-    
-    if (failCount === 0) {
+      clearTimeout(timeoutId)
       setHasUnsavedChanges(false)
-      setSendStatus(`✓ All ${successCount} presets sent successfully`)
-    } else {
-      setSendStatus(`✓ ${successCount} sent, ✗ ${failCount} failed`)
+      setSendStatus('✓ All presets and configuration sent successfully')
+    } catch {
+      setSendStatus('✗ Failed to send all data to controller')
     }
   }
 

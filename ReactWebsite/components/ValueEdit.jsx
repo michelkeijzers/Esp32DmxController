@@ -6,8 +6,11 @@ function ValueEdit({ presets, setPresets }) {
   const { presetId, section, index } = useParams()
   const navigate = useNavigate()
   
-  const preset = presets.find(p => p.id === parseInt(presetId))
-  const currentValue = preset ? preset[section][parseInt(index)] : 0
+  const preset = presets.find(p => p.id === parseInt(presetId));
+  let currentValue = 0;
+  if (preset && preset[section] && Array.isArray(preset[section])) {
+    currentValue = preset[section][parseInt(index)] ?? 0;
+  }
   
   const [value, setValue] = useState(currentValue === 0 ? '' : currentValue.toString())
 
@@ -33,14 +36,15 @@ function ValueEdit({ presets, setPresets }) {
     setPresets(prevPresets =>
       prevPresets.map(preset => {
         if (preset.id === parseInt(presetId)) {
+          let sectionArray = Array.isArray(preset[section]) ? preset[section] : Array(512).fill(0);
           return {
             ...preset,
-            [section]: preset[section].map((val, i) => i === parseInt(index) ? clampedValue : val)
-          }
+            [section]: sectionArray.map((val, i) => i === parseInt(index) ? clampedValue : val)
+          };
         }
-        return preset
+        return preset;
       })
-    )
+    );
     // Restore scroll position after navigation
     navigate(`/preset/${presetId}`)
     setTimeout(() => {

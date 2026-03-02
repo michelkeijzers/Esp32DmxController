@@ -8,19 +8,16 @@ export const samplePresets = [
   {
     id: 1,
     name: 'Preset Alpha',
-    values1: generateValues(512),
-    values2: generateValues(512)
+    dmx_values: generateValues(512),
   },
   {
     id: 2,
     name: 'Preset Beta',
-    values1: generateValues(512),
-    values2: generateValues(512)
+    dmx_values: generateValues(512)
   },
   {
     id: 3,
     name: 'Preset Gamma',
-    values1: generateValues(512),
-    values2: generateValues(512)
+    dmx_values: generateValues(512)
   }
 ]

@@ -6,9 +6,21 @@ import './PresetEdit.css'
 window.lastEditedIndex = null;
 
 function PresetEdit({ presets, onUpdateName }) {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const preset = presets.find(p => p.id === parseInt(id))
+  const { id } = useParams();
+  const navigate = useNavigate();
+  let preset = presets.find(p => p.id === parseInt(id));
+  // Ensure dmx_values is always an array of 512 values
+  if (preset && (!Array.isArray(preset.dmx_values) || preset.dmx_values.length !== 512)) {
+    preset = {
+      ...preset,
+      dmx_values: Array.isArray(preset.dmx_values)
+        ? [...preset.dmx_values, ...Array(512 - preset.dmx_values.length).fill(0)].slice(0, 512)
+        : Array(512).fill(0)
+    };
+  }
+  if (!preset) {
+    return <div>Preset not found.</div>;
+  }
   const valueGridRef = useRef(null)
 
   useEffect(() => {
@@ -39,7 +51,7 @@ function PresetEdit({ presets, onUpdateName }) {
 
   const handleIndexClick = (index) => {
     window.lastEditedIndex = index
-    navigate(`/value-edit/${preset.id}/values1/${index}`)
+    navigate(`/value-edit/${preset.id}/dmx_values/${index}`)
   }
 
   return (
@@ -77,24 +89,38 @@ function PresetEdit({ presets, onUpdateName }) {
 
       <div className="preset-sections">
         <div className="preset-section">
-          {/* <h3>Universe 1</h3> */}
           <div className="values-grid-full" ref={valueGridRef}>
-            {preset.values1.map((value, index) => (
-              <span 
-                key={index} 
-                className="value-small"
-                data-index={index}
-                onClick={() => handleIndexClick(index)}
-                style={{ cursor: 'pointer' }}
-              >
-                <span className="index">{index}</span>
-                <span className="value-display-inline">{value}</span>
-              </span>
-            ))}
+            {Array.isArray(preset.dmx_values) ? (
+              preset.dmx_values.map((value, index) => (
+                <span 
+                  key={index}
+                  className="value-small"
+                  data-index={index}
+                  onClick={() => handleIndexClick(index)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <span className="index">{index}</span>
+                  <span 
+                    className="value-display-inline"
+                    style={{
+                      border: value !== 0 ? '2px solid #2196f3' : '1px solid #ccc',
+                      borderRadius: '4px',
+                      background: value !== 0 ? '#2196f3' : 'transparent',
+                      color: value !== 0 ? '#fff' : 'inherit',
+                      padding: '2px 6px',
+                      marginLeft: '4px',
+                      display: 'inline-block'
+                    }}
+                  >
+                    {value}
+                  </span>
+                </span>
+              ))
+            ) : (
+              <span>No DMX values available.</span>
+            )}
           </div>
         </div>
-
-        {/* Universe 2 removed */}
       </div>
     </div>
   )

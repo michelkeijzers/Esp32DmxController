@@ -55,6 +55,7 @@ class WebServer
     static esp_err_t root_handler(httpd_req_t *req);
     static esp_err_t api_presets_handler(httpd_req_t *req);
     static esp_err_t api_config_handler(httpd_req_t *req);
+    static esp_err_t api_all_data_handler(httpd_req_t *req);
     static esp_err_t static_file_handler(httpd_req_t *req);
 
     esp_err_t send_json_response(httpd_req_t *req, const char *json);

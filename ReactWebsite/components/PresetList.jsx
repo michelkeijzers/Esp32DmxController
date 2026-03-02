@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import './PresetList.css'
+import React from 'react'
 
 function PresetList({ presets, onDeletePreset, onInsertPreset, onMovePreset, canInsert }) {
   const navigate = useNavigate()
