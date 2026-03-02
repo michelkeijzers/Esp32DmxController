@@ -35,7 +35,6 @@ TEST_F(WebServerApiTest, AllDataGetResponseFormat)
 {
     // Simulate the /all_data GET response
     std::string json = server->presets_to_json();
-    printf("Generated JSON: %s\n", json.c_str());
     nlohmann::json root = nlohmann::json::parse(json);
     ASSERT_TRUE(root.is_array());
     size_t num_presets = root.size();
@@ -61,12 +60,10 @@ TEST_F(WebServerApiTest, AllDataPostRequestValidation)
                             "]"
                             "}";
     json root = json::parse(post_json);
-    printf("Parsed JSON: %s\n", root.dump(2).c_str());
     ASSERT_TRUE(root.is_object());
     ASSERT_TRUE(root.contains("configuration") && root["configuration"].is_object());
     ASSERT_TRUE(root.contains("presets") && root["presets"].is_array());
     int num_presets = root["presets"].size();
-    printf("Presets array: %s\n", root["presets"].dump(2).c_str());
     EXPECT_EQ(num_presets, 2);
     for (const auto &preset : root["presets"])
     {

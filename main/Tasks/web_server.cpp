@@ -666,11 +666,10 @@ std::string WebServer::presets_to_json()
         root.push_back(preset_obj);
         ESP_LOGI(TAG, "Added preset %d to JSON array", i);
         ESP_LOGI(TAG, "Preset %d isInitialized: %d", i, preset.isInitialized());
-        ESP_LOGI(TAG, "Current JSON state after adding preset %d: %s", i, root.dump(2).c_str());
     }
 
     std::string result = root.dump();
-    ESP_LOGI(TAG, "Generated JSON: %s", result.c_str());
+    // ESP_LOGI(TAG, "Generated JSON: %s", result.c_str());
     return result;
 }
 
@@ -716,10 +715,10 @@ esp_err_t WebServer::json_to_presets(const char *json_str)
             preset.setIndex((uint8_t)root[i]["index"]);
         // Name
         if (root[i].contains("name") && root[i]["name"].is_string())
-            {
-                std::string name_str = root[i]["name"].get<std::string>();
-                preset.setName(name_str.c_str());
-            }
+        {
+            std::string name_str = root[i]["name"].get<std::string>();
+            preset.setName(name_str.c_str());
+        }
 
         // DMX Values
         if (root[i].contains("dmxValues") && root[i]["dmxValues"].is_array())

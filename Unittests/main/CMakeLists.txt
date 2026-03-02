@@ -58,6 +58,13 @@ target_link_libraries(
   GTest::gmock
 )
 
+if(WIN32)
+  add_custom_command(TARGET run_tests POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy -t $<TARGET_FILE_DIR:run_tests> $<TARGET_RUNTIME_DLLS:run_tests>
+    COMMAND_EXPAND_LISTS
+  )
+endif()
+
 # Force MSVC linker to include all symbols to ensure test registration
 
 
