@@ -22,9 +22,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{C82D043C-70A9-338E-B0FB-044BEAF5BA1B}</ProjectGuid>
+    <ProjectGuid>{9BE74AEB-C73C-36A7-BFE7-D6B9894810FC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <VcpkgEnabled>false</VcpkgEnabled>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
     <ProjectName>run_tests</ProjectName>
@@ -55,30 +54,30 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="do_not_import_user.props" Condition="exists('do_not_import_user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">run_tests.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">run_tests</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">run_tests.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">run_tests</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\MinSizeRel\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">run_tests.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">run_tests</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
     <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\RelWithDebInfo\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">run_tests.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">run_tests</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
@@ -87,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -116,10 +115,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -129,7 +128,7 @@
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/tools/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/i4studio/Esp32Test/Unittests/main/Debug/run_tests.exe -installedDir C:/tools/vcpkg/installed/x64-windows/debug/bin -OutVariable out
+"C:\Program Files\CMake\bin\cmake.exe" -E copy -t C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug C:/tools/vcpkg/installed/x64-windows/debug/bin/gtest.dll C:/tools/vcpkg/installed/x64-windows/debug/bin/gmock.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -146,9 +145,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/i4studio/Esp32Test/Unittests/main/Debug/run_tests.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Unittests/main/Debug/run_tests.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -158,7 +157,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -188,10 +187,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -201,7 +200,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/tools/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/i4studio/Esp32Test/Unittests/main/Release/run_tests.exe -installedDir C:/tools/vcpkg/installed/x64-windows/bin -OutVariable out
+"C:\Program Files\CMake\bin\cmake.exe" -E copy -t C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Release C:/tools/vcpkg/installed/x64-windows/bin/gtest.dll C:/tools/vcpkg/installed/x64-windows/bin/gmock.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -218,9 +217,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/i4studio/Esp32Test/Unittests/main/Release/run_tests.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Release/run_tests.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Unittests/main/Release/run_tests.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Release/run_tests.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -230,7 +229,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -260,10 +259,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -273,7 +272,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/tools/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/i4studio/Esp32Test/Unittests/main/MinSizeRel/run_tests.exe -installedDir C:/tools/vcpkg/installed/x64-windows/bin -OutVariable out
+"C:\Program Files\CMake\bin\cmake.exe" -E copy -t C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/MinSizeRel C:/tools/vcpkg/installed/x64-windows/debug/bin/gtest.dll C:/tools/vcpkg/installed/x64-windows/debug/bin/gmock.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -283,16 +282,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\tools\vcpkg\installed\x64-windows\lib\gtest.lib;C:\tools\vcpkg\installed\x64-windows\lib\gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\tools\vcpkg\installed\x64-windows\debug\lib\gtest.lib;C:\tools\vcpkg\installed\x64-windows\debug\lib\gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/i4studio/Esp32Test/Unittests/main/MinSizeRel/run_tests.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/MinSizeRel/run_tests.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Unittests/main/MinSizeRel/run_tests.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/MinSizeRel/run_tests.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -302,7 +301,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -331,10 +330,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -344,7 +343,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message></Message>
       <Command>setlocal
-C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -noprofile -executionpolicy Bypass -file C:/tools/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary C:/Users/i4studio/Esp32Test/Unittests/main/RelWithDebInfo/run_tests.exe -installedDir C:/tools/vcpkg/installed/x64-windows/bin -OutVariable out
+"C:\Program Files\CMake\bin\cmake.exe" -E copy -t C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/RelWithDebInfo C:/tools/vcpkg/installed/x64-windows/debug/bin/gtest.dll C:/tools/vcpkg/installed/x64-windows/debug/bin/gmock.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -354,16 +353,16 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\tools\vcpkg\installed\x64-windows\lib\gtest.lib;C:\tools\vcpkg\installed\x64-windows\lib\gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\tools\vcpkg\installed\x64-windows\debug\lib\gtest.lib;C:\tools\vcpkg\installed\x64-windows\debug\lib\gmock.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <DataExecutionPrevention></DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImageHasSafeExceptionHandlers></ImageHasSafeExceptionHandlers>
-      <ImportLibrary>C:/Users/i4studio/Esp32Test/Unittests/main/RelWithDebInfo/run_tests.lib</ImportLibrary>
+      <ImportLibrary>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/RelWithDebInfo/run_tests.lib</ImportLibrary>
       <LinkErrorReporting></LinkErrorReporting>
-      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Unittests/main/RelWithDebInfo/run_tests.pdb</ProgramDataBaseFile>
+      <ProgramDataBaseFile>C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/RelWithDebInfo/run_tests.pdb</ProgramDataBaseFile>
       <RandomizedBaseAddress></RandomizedBaseAddress>
       <SubSystem>Console</SubSystem>
     </Link>
@@ -372,11 +371,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ProjectReference>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\i4studio\Esp32Test\Unittests\main\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Unittests/main/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Unittests/main -BC:/Users/i4studio/Esp32Test/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Unittests/main/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main -BC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -384,12 +383,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Unittests/main/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Unittests/main -BC:/Users/i4studio/Esp32Test/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Unittests/main/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main -BC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -397,12 +396,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Unittests/main/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Unittests/main -BC:/Users/i4studio/Esp32Test/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Unittests/main/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main -BC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -410,12 +409,12 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Unittests/main/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Unittests/main -BC:/Users/i4studio/Esp32Test/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Unittests/main/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main -BC:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main --check-stamp-file C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -423,32 +422,32 @@ endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
 exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeDependentOption.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake;%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\i4studio\Esp32Test\Unittests\main\CMakeFiles\generate.stamp</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCXXInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeFindDependencyMacro.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeGenericSystem.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeInitializeConfigs.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeLanguageInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeRCInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\CMakeSystemSpecificInitialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\CMakeCommonCompilerMacros.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Compiler\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCXXLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Internal\CMakeCommonLinkerInformation.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Linker\MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Linker\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-Initialize.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows-MSVC.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\Windows.cmake;C:\Program Files\CMake\share\cmake-4.2\Modules\Platform\WindowsPaths.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeCXXCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeRCCompiler.cmake;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\4.2.3\CMakeSystem.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfig.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestConfigVersion.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-debug.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets-release.cmake;C:\tools\vcpkg\installed\x64-windows\share\gtest\GTestTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\custom_main.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\dmx_controller_tests.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\web_server_api_tests.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\nv_storage.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\web_server.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\max3485_sender.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Base\rtos_task.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_presets.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_preset.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queue.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\task.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\custom_main.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_controller_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\web_server_api_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\foot_switch.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\nv_storage.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\web_server.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_presets.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_preset.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queue.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\task.cpp" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Unittests\main\ZERO_CHECK.vcxproj">
-      <Project>{58DA258B-5A18-3D55-934F-C7ED240ABBB2}</Project>
+    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\ZERO_CHECK.vcxproj">
+      <Project>{A8F1B6C0-5FF7-3175-9942-185198A9B6B0}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

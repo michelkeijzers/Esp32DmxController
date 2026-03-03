@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\9349c9fb1d93f47f2ae5e7d436fb6eec\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{631D3887-923B-32ED-8C9D-08CC75F40AB5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

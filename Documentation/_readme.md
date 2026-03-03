@@ -7,6 +7,20 @@
   - C/C++ (Microsoft)
   - Plant UML (jebbs)
 
+# VS Code:
+
+MAKE SURE TO OPEN THE FOLDER:
+
+```
+<....\Esp32Test\Esp32DmxController\>
+```
+
+and not
+
+```
+<....\Esp32Test>
+```
+
 - In Powershell:
   ```
   cd <ESP-IDF installation path\>
@@ -17,6 +31,10 @@
 Ask GitHub Copilot to install:
 
 - jest
+
+Install manually:
+
+- OpenCppCoverage
 
 # Production Build
 
@@ -64,19 +82,26 @@ cmake --build . --config Debug
 Run unit tests:
 
 ```
-.\Debug\run_tests.exe
+.\Debug\Debug\run_tests.exe
 ```
 
 or
 
 ```
-.\Debug\run_tests.exe
+.\Debug\Debug\run_tests.exe
 ```
 
 or
 
 ```
 F5
+```
+
+Run with code coverage:
+
+```
+cmake --build . --config Debug --target coverage
+C:\OpenCppCoverage\OpenCppCoverage.exe --export_type html:coverage_report --sources "C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" -- Debug\Debug\run_tests.exe
 ```
 
 Run Reactor tests:

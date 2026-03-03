@@ -1,58 +1,58 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\custom_main.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\custom_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\dmx_controller_tests.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_controller_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\web_server_api_tests.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\web_server_api_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\dmx_controller.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\seven_segment_display.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\foot_switch.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\foot_switch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\nv_storage.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\nv_storage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\web_server.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\web_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Tasks\max3485_sender.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Base\rtos_task.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_presets.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_presets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\main\Data\dmx_preset.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_preset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queue.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Unittests\main\esp_idf_stubs\freertos\task.cpp">
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\i4studio\Esp32Test\Unittests\main\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{1CC72AA2-763F-3902-8C39-2B867EA2F09A}</UniqueIdentifier>
+      <UniqueIdentifier>{1A62DF15-020B-371B-89C3-9866F8480294}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

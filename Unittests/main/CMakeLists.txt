@@ -1,3 +1,16 @@
+# Optional: Set path to OpenCppCoverage.exe if not in PATH
+set(OPENCOVERAGE_EXE "C:/OpenCppCoverage/OpenCppCoverage.exe" CACHE STRING "Path to OpenCppCoverage.exe")
+
+# Custom target to run coverage for dmx_controller.cpp
+add_custom_target(coverage
+  COMMAND ${OPENCOVERAGE_EXE}
+    --export_type=html:coverage_report
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\dmx_controller.cpp"
+    -- "${CMAKE_CURRENT_BINARY_DIR}/build/Debug/run_tests.exe"
+  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  COMMENT "Running OpenCppCoverage for dmx_controller.cpp"
+  VERBATIM
+)
 
 cmake_minimum_required(VERSION 3.14)
 project(UnitTests)
@@ -64,7 +77,5 @@ if(WIN32)
     COMMAND_EXPAND_LISTS
   )
 endif()
-
-# Force MSVC linker to include all symbols to ensure test registration
 
 

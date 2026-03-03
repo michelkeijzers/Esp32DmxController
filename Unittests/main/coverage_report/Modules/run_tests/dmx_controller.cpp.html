@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>dmx_controller.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#include "dmx_controller.hpp"
+#include "esp_app_desc.h"
+#include "esp_event.h"
+#include "esp_http_client.h"
+#include "esp_netif.h"
+#include "esp_system.h"
+#include "foot_switch.hpp"
+#include "max3485_sender.hpp"
+#include "messages.hpp"
+#include "nv_storage.hpp"
+#include "seven_segment_display.hpp"
+#include "web_server.hpp"
+
+DmxController::DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *max3485Sender,
+    WebServer *webServer, NvStorage *nvStorage)
+<span style = "background-color:#dfd">    : RtosTask(), display_(display), footSwitch_(footSwitch), max3485Sender_(max3485Sender), webServer_(webServer),
+      nvStorage_(nvStorage)
+{
+}</span>
+
+<span style = "background-color:#dfd">DmxController::~DmxController() {}</span>
+
+void DmxController::printFirmwareInfo()
+<span style = "background-color:#dfd">{
+    const esp_app_desc_t *app_desc = esp_app_get_description();
+    ESP_LOGW(log_tag_, "Current firmware version: %s", app_desc-&gt;version);
+    ESP_LOGW(log_tag_, "Project name: %s", app_desc-&gt;project_name);
+    ESP_LOGW(log_tag_, "Compile time: %s %s", app_desc-&gt;date, app_desc-&gt;time);
+}</span>
+
+esp_err_t DmxController::performOtaUpdate(const char *url)
+<span style = "background-color:#fdd">{
+    printf("Starting OTA update from: %s\n", url);
+    esp_https_ota_config_t ota_config = {};</span>
+    // ota_config.http_config = NULL;
+    // ota_config.http_client_init_cb = NULL;
+<span style = "background-color:#fdd">    esp_err_t ret = esp_https_ota(&amp;ota_config);
+    if (ret == ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGW(log_tag_, "OTA update successful, restarting...");
+        esp_restart();
+    }</span>
+    else
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "OTA update failed: %s\n", esp_err_to_name(ret));</span>
+    }
+<span style = "background-color:#fdd">    return ret;
+}</span>
+
+esp_err_t DmxController::init()
+<span style = "background-color:#dfd">{
+    printf("Initializing DmxController...\n");
+    QueueHandle_t queue = getEventQueue(); // Unused
+    printf("DmxController init: queue handle = %p\n", (void *)queue);
+    TaskProperties dmxControllerTaskProperties = {.taskName_ = "DmxControllerTask",
+        .logTag = "DmxController",
+        .taskPriority = 4,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = queue};</span>
+
+<span style = "background-color:#dfd">    if (RtosTask::init(dmxControllerTaskProperties) != ESP_OK)</span>
+    {
+<span style = "background-color:#dfd">        ESP_LOGE(log_tag_, "Failed to initialize DmxControllerTask");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    printf("DmxController initialized successfully, bootTime=%lu\n", bootTime);</span>
+
+<span style = "background-color:#dfd">    bootTime = xTaskGetTickCount();
+    printFirmwareInfo();
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());</span>
+
+<span style = "background-color:#dfd">    printf("Initializing sub-tasks...\n");
+    if (init_sub_tasks() != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize sub-tasks");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    if (init_messages() != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize message handling");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    return ESP_OK;
+}</span>
+
+esp_err_t DmxController::init_sub_tasks()
+<span style = "background-color:#dfd">{
+    if (!display_)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "display_ is nullptr");
+        return ESP_ERR_INVALID_ARG;</span>
+    }
+<span style = "background-color:#dfd">    TaskProperties taskProperties = {.taskName_ = "SevenSegmentDisplayTask",
+        .logTag = "SevenSegmentDisplay",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (display_-&gt;init(taskProperties, DISPLAY_PINS) != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize SevenSegmentDisplay");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    if (!footSwitch_)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "footSwitch_ is nullptr");
+        return ESP_ERR_INVALID_ARG;</span>
+    }
+<span style = "background-color:#dfd">    TaskProperties footSwitchTaskProperties = {.taskName_ = "FootSwitchTask",
+        .logTag = "FootSwitch",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (footSwitch_-&gt;init(footSwitchTaskProperties, FOOT_SWITCH_PIN) != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize FootSwitch");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    if (!max3485Sender_)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "max3485Sender_ is nullptr");
+        return ESP_ERR_INVALID_ARG;</span>
+    }
+<span style = "background-color:#dfd">    TaskProperties max3485SenderTaskProperties = {.taskName_ = "Max3485SenderTask",
+        .logTag = "Max3485Sender",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (max3485Sender_-&gt;init(max3485SenderTaskProperties) != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize Max3485Sender");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    if (!webServer_)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "webServer_ is nullptr");
+        return ESP_ERR_INVALID_ARG;</span>
+    }
+<span style = "background-color:#dfd">    if (webServer_-&gt;init() != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize WebServer");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    TaskProperties nvStorageTaskProperties = {.taskName_ = "NvStorageTask",
+        .logTag = "NvStorage",
+        .taskPriority = 5,
+        .stackSize = 4096,
+        .queueCapacity = 20,
+        .queueItemSize = sizeof(Messages::Event),
+        .mainEventQueue = getEventQueue()};
+    if (!nvStorage_)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "nvStorage_ is nullptr");
+        return ESP_ERR_INVALID_ARG;</span>
+    }
+<span style = "background-color:#dfd">    if (nvStorage_-&gt;init(nvStorageTaskProperties) != ESP_OK)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to initialize NvStorage");
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    return ESP_OK;
+}</span>
+
+esp_err_t DmxController::init_messages()
+<span style = "background-color:#dfd">{</span>
+    // Send a message to NvStorage to request config
+<span style = "background-color:#dfd">    Messages::Event event = Messages::Event();
+    event.type = Messages::REQUEST_CONFIGURATION;
+    if (xQueueSend(nvStorage_-&gt;getEventQueue(), &amp;event, 0) != pdPASS)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to send configuration request to NvStorage");
+        return ESP_FAIL;</span>
+    }
+
+    // Receive config response (blocking)
+<span style = "background-color:#dfd">    if (xQueueReceive(getEventQueue(), &amp;event, portMAX_DELAY) != pdTRUE)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to receive configuration response from NvStorage");
+        return ESP_FAIL;</span>
+    }
+<span style = "background-color:#dfd">    if (event.type != Messages::EventType::CONFIGURATION_RESPONSE)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvStorage: %d", event.type);
+        return ESP_FAIL;</span>
+    }
+
+    // Send config response to FootSwitch (no response needed)
+<span style = "background-color:#dfd">    Messages::Event footSwitchEvent = Messages::Event();
+    footSwitchEvent.type = Messages::SET_CONFIGURATION;
+    footSwitchEvent.data.configurationData = event.data.configurationData;
+    if (xQueueSend(footSwitch_-&gt;getEventQueue(), &amp;footSwitchEvent, 0) != pdPASS)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to send configuration to FootSwitch");
+        return ESP_FAIL;</span>
+    }
+
+    // Send a message to NvStorage to request presets
+<span style = "background-color:#dfd">    event.type = Messages::REQUEST_PRESETS;
+    if (xQueueSend(nvStorage_-&gt;getEventQueue(), &amp;event, 0) != pdPASS)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to send presets request to NvStorage");
+        return ESP_FAIL;</span>
+    }
+
+    // Receive presets response (blocking)
+<span style = "background-color:#dfd">    if (xQueueReceive(getEventQueue(), &amp;event, portMAX_DELAY) != pdTRUE)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Failed to receive presets response from NvStorage");
+        return ESP_FAIL;</span>
+    }
+<span style = "background-color:#dfd">    if (event.type != Messages::EventType::PRESETS_RESPONSE)</span>
+    {
+<span style = "background-color:#fdd">        ESP_LOGE(log_tag_, "Received unexpected event type from NvStorage: %d", event.type);
+        return ESP_FAIL;</span>
+    }
+
+<span style = "background-color:#dfd">    return ESP_OK;
+}</span>
+
+void DmxController::taskLoop()
+<span style = "background-color:#fdd">{
+    while (true)</span>
+    {
+        // TODO: call performOtaUpdate, etc.
+
+        // Handle next preset event from FootSwitch
+        Messages::Event event;
+<span style = "background-color:#fdd">        if (xQueueReceive(getEventQueue(), &amp;event, 0) == pdTRUE)</span>
+        {
+<span style = "background-color:#fdd">            switch (event.type)</span>
+            {
+            case Messages::EventType::USER_NEXT_PRESET:
+            {
+            }
+<span style = "background-color:#fdd">            break;</span>
+
+            case Messages::EventType::USER_PREVIOUS_PRESET:
+            {
+            }
+<span style = "background-color:#fdd">            break;</span>
+
+            case Messages::EventType::USE_PRESET_DATA:
+            {
+                // TODO: Send preset data to DMX output (via Max3485Sender).)
+            }
+<span style = "background-color:#fdd">            break;</span>
+
+            case Messages::EventType::SEND_PRESET_DATA_RESPONSE:
+            {
+                // Forward preset index to SevenSegmentDisplay
+<span style = "background-color:#fdd">                Messages::Event displayEvent = Messages::Event();
+                displayEvent.type = Messages::EventType::SHOW_PRESET_INDEX;
+                displayEvent.data.presetData.presetNumber = event.data.presetData.presetNumber;
+                if (xQueueSend(display_-&gt;getEventQueue(), &amp;displayEvent, 0) != pdPASS)</span>
+                {
+<span style = "background-color:#fdd">                    ESP_LOGE(log_tag_, "Failed to forward preset index to SevenSegmentDisplay");</span>
+                }
+            }
+            break;
+
+            default:
+                // Ignore other events
+                break;
+            }
+
+<span style = "background-color:#fdd">            vTaskDelay(pdMS_TO_TICKS(100));</span>
+        }
+<span style = "background-color:#fdd">    }
+}</span>
+
+<span style = "background-color:#fdd">void DmxController::taskEntry(void *param) { static_cast&lt;DmxController *&gt;(param)-&gt;taskLoop(); }</span></pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>
