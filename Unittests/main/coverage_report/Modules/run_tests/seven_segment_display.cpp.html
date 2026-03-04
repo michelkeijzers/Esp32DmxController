@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+        <meta charset="utf-8"/>
+	    <title>seven_segment_display.cpp</title>
+	    <link href="../../third-party/google-code-prettify/prettify-CppCoverage.css" type="text/css" rel="stylesheet" />
+	    <script type="text/javascript" src="../../third-party/google-code-prettify/prettify.js"></script>
+	</head>
+    <body onload="prettyPrint()">
+        <h4></h4>
+        <pre class="prettyprint lang-cpp linenums">
+#include "seven_segment_display.hpp"
+#include "driver/gpio.h"
+#include &lt;esp_check.h&gt;
+#include &lt;esp_log.h&gt;
+#include &lt;freertos/FreeRTOS.h&gt;
+#include &lt;freertos/task.h&gt;
+
+// Digit patterns for common cathode 7-segment display
+// Each bit represents a segment: bit 0 = A, 1 = B, 2 = C, 3 = D, 4 = E, 5 = F, 6 = G
+// DP is handled separately
+/* static */ const uint8_t SevenSegmentDisplay::digitPatterns_[] = {
+    0b00111111, // 0: ABCDEF
+    0b00000110, // 1: BC
+    0b01011011, // 2: ABDEG
+    0b01001111, // 3: ABCDG
+    0b01100110, // 4: BCFG
+    0b01101101, // 5: ACDFG
+    0b01111101, // 6: ACDEFG
+    0b00000111, // 7: ABC
+    0b01111111, // 8: ABCDEFG
+    0b01101111, // 9: ABCDFG
+    0b01110111, // A: ABCEFG
+    0b01111100, // b: CDEFG
+    0b00111001, // C: ADEF
+    0b01011110, // d: BCDEG
+    0b01111001, // E: ADEFG
+    0b01110001, // F: AEFG
+    0b01101111, // g: ABCDFG
+    0b01110110, // H: BCEFG
+    0b00000110, // i: BC
+    0b00001110, // j: BCD
+    0b00111000, // l: DEF
+    0b00011100, // L: DEF
+    0b01110110, // n: CEFG
+    0b01111110, // o: CDEFG
+    0b01110011, // p: ABEFG
+    0b01100111, // q: ABCFG
+    0b01010100, // r: EG
+    0b01101101, // s: ACDFG
+    0b01111000, // t: DEF + G
+    0b00111110, // u: CDEF
+    0b00111110, // U: BCDEF
+    0b01111110, // y: BCDEFG
+    0b01111110, // Y: BCDEFG
+    0b00000001, // - (dash): G
+    0b01000000, // _ (underscore): D
+    0b00001000, // = (equals): G + D
+    0b10000000, // . (decimal point): DP (if available)
+    0b00000000, // (space): none
+    0b11111111  // All segments on
+};
+
+<span style = "background-color:#dfd">SevenSegmentDisplay::SevenSegmentDisplay() : RtosTask(), currentPattern_(0), decimalPointOn_(false) {}</span>
+
+<span style = "background-color:#dfd">SevenSegmentDisplay::~SevenSegmentDisplay() {}</span>
+
+void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8])
+<span style = "background-color:#dfd">{
+    RtosTask::init(taskProperties);</span>
+    assertNotNull(pins, "pins");
+<span style = "background-color:#fdd">
+    currentPattern_ = 0;</span>
+    decimalPointOn_ = false;
+
+<span style = "background-color:#dfd">    // Configure GPIO pins</span>
+    for (int i = 0; i &lt; 8; i++)
+<span style = "background-color:#dfd">    {
+        segmentPins_[i] = pins[i];</span>
+
+        gpio_config_t io_conf = {};
+<span style = "background-color:#dfd">        io_conf.pin_bit_mask = (1ULL &lt;&lt; pins[i]);
+        io_conf.mode = GPIO_MODE_OUTPUT;</span>
+        io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+        io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
+<span style = "background-color:#dfd">        io_conf.intr_type = GPIO_INTR_DISABLE;</span>
+
+<span style = "background-color:#dfd">        ESP_ERROR_CHECK(gpio_config(&amp;io_conf));</span>
+        segmentPins_[i] = pins[i];
+<span style = "background-color:#dfd">    }
+
+    ESP_LOGI(log_tag_, "SevenSegmentDisplay task started");
+}
+
+void SevenSegmentDisplay::taskEntry(void *param) { static_cast&lt;SevenSegmentDisplay *&gt;(param)-&gt;taskLoop(); }</span>
+
+<span style = "background-color:#dfd">void SevenSegmentDisplay::taskLoop()</span>
+{
+<span style = "background-color:#fdd">    Event event;
+    while (true)</span>
+    {
+<span style = "background-color:#dfd">        if (xQueueReceive(getEventQueue(), &amp;event, portMAX_DELAY) == pdTRUE)
+        {</span>
+            displayDigit(event.character, event.dot);
+<span style = "background-color:#dfd">        }
+    }
+}</span>
+
+<span style = "background-color:#fdd">void SevenSegmentDisplay::displayDigit(char character, bool dot)</span>
+{
+    uint8_t pattern = 0;
+<span style = "background-color:#fdd">    decimalPointOn_ = dot;</span>
+
+<span style = "background-color:#fdd">    // Map character to pattern</span>
+    if (character &gt;= '0' &amp;&amp; character &lt;= '9')
+<span style = "background-color:#fdd">    {</span>
+        pattern = digitPatterns_[character - '0'];
+<span style = "background-color:#fdd">    }</span>
+    else if (character &gt;= 'A' &amp;&amp; character &lt;= 'F')
+<span style = "background-color:#fdd">    {
+        pattern = digitPatterns_[10 + (character - 'A')];</span>
+    }
+    else if (character &gt;= 'a' &amp;&amp; character &lt;= 'f')
+<span style = "background-color:#dfd">    {
+        pattern = digitPatterns_[10 + (character - 'a')];
+    }
+    else if (character == '-')</span>
+    {
+        pattern = digitPatterns_[32];
+<span style = "background-color:#dfd">    }</span>
+    else if (character == '_')
+<span style = "background-color:#dfd">    {
+        pattern = digitPatterns_[33];
+    }</span>
+    else if (character == '=')
+<span style = "background-color:#fdd">    {
+        pattern = digitPatterns_[34];</span>
+<span style = "background-color:#dfd">    }</span>
+    else if (character == '.')
+<span style = "background-color:#fdd">    {
+        pattern = digitPatterns_[35];</span>
+<span style = "background-color:#dfd">    }</span>
+    else if (character == ' ')
+<span style = "background-color:#fdd">    {
+        pattern = digitPatterns_[36];</span>
+<span style = "background-color:#dfd">    }</span>
+    else
+<span style = "background-color:#fdd">    {
+        pattern = digitPatterns_[37]; // All segments on for unknown</span>
+<span style = "background-color:#dfd">        char msg[40];</span>
+        snprintf(msg, sizeof(msg), "Unsupported character: %d", static_cast&lt;int&gt;(character));
+<span style = "background-color:#fdd">        softwareError(msg);
+    }</span>
+<span style = "background-color:#dfd"></span>
+    currentPattern_ = pattern;
+<span style = "background-color:#fdd">    updateDisplay();
+}</span>
+<span style = "background-color:#dfd"></span>
+void SevenSegmentDisplay::updateDisplay()
+<span style = "background-color:#fdd">{
+    assertTrue(initialized_, "initialized_");</span>
+
+    // Set each segment based on the current pattern and display type
+<span style = "background-color:#dfd">    for (int i = 0; i &lt; 7; i++)
+    { // Segments A-G</span>
+        bool segmentOn = (currentPattern_ &amp; (1 &lt;&lt; i)) != 0;
+        bool gpioLevel;
+<span style = "background-color:#dfd"></span>
+        gpioLevel = !segmentOn; // LOW = on for common anode
+<span style = "background-color:#dfd">
+        gpio_set_level(segmentPins_[i], gpioLevel ? 1 : 0);</span>
+    }
+<span style = "background-color:#dfd">
+    // Set decimal point</span>
+    bool dpGpioLevel = !decimalPointOn_;
+    gpio_set_level(segmentPins_[SEG_DP], dpGpioLevel);
+<span style = "background-color:#dfd">}</span></pre>
+        <hr />
+        <table width="100%">
+            <thead>
+                <tr>
+                    <th align="center">
+                        <small>Generated by</small>
+                        <a href="https://github.com/OpenCppCoverage/OpenCppCoverage/releases">
+                            <strong>OpenCppCoverage (Version: 0.9.9.0)</strong>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+        </table>
+    </body>
+</html>

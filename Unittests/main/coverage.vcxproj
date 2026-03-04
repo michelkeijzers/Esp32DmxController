@@ -106,13 +106,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\9349c9fb1d93f47f2ae5e7d436fb6eec\coverage.rule">
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Running OpenCppCoverage for dmx_controller.cpp</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
 cd C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/build/Debug/run_tests.exe
+OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.exe
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -124,13 +124,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\coverage</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</VerifyInputsAndOutputsExist>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Running OpenCppCoverage for dmx_controller.cpp</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
 cd C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/build/Debug/run_tests.exe
+OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.exe
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -142,13 +142,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\coverage</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</VerifyInputsAndOutputsExist>
-      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Running OpenCppCoverage for dmx_controller.cpp</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
 cd C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/build/Debug/run_tests.exe
+OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.exe
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -160,13 +160,13 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\coverage</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
       <VerifyInputsAndOutputsExist Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</VerifyInputsAndOutputsExist>
-      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Running OpenCppCoverage for dmx_controller.cpp</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
 cd C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main
 if %errorlevel% neq 0 goto :cmEnd
 C:
 if %errorlevel% neq 0 goto :cmEnd
-OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/build/Debug/run_tests.exe
+OpenCppCoverage.exe --export_type=html:coverage_report --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp --sources C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp -- C:/Users/i4studio/Esp32Test/Esp32DmxController/Unittests/main/Debug/run_tests.exe
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone

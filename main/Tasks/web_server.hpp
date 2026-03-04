@@ -12,7 +12,7 @@ extern "C"
 #include <freertos/task.h>
 }
 
-class WebServer
+class WebServer : public RtosTask
 {
   public:
     enum EventType
@@ -29,7 +29,7 @@ class WebServer
     WebServer();
     virtual ~WebServer();
 
-    virtual esp_err_t init();
+    virtual void init(RtosTask::TaskProperties taskProperties);
 
   public:
     std::string presets_to_json();
@@ -38,12 +38,6 @@ class WebServer
     DmxPresets *dmxPresets_ = nullptr;
 
   private:
-    const char *logTag_;
-    int taskPriority_;
-    int queueCapacity_;
-    esp_err_t start();
-    esp_err_t stop();
-
     // Post an event to the web server task
     void postEvent(const WebServerEvent &event);
 
@@ -55,7 +49,7 @@ class WebServer
     QueueHandle_t eventQueue_;
 
     void init_spiffs();
-    static void taskEntry(void *param);
+    void taskEntry(void *param) override { static_cast<WebServer *>(param)->taskLoop(); }
     void taskLoop();
 
     static esp_err_t root_handler(httpd_req_t *req);

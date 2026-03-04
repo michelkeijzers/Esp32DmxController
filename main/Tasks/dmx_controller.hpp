@@ -23,14 +23,12 @@ class DmxController : public RtosTask
     DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *dmx3485Sender,
         WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
-    virtual esp_err_t init();
+    virtual void init();
     void taskLoop();
 
   private:
-    esp_err_t init_sub_tasks();
-    esp_err_t init_messages();
-    esp_err_t performOtaUpdate(const char *url);
-    void printFirmwareInfo();
+    void initSubTasks();
+    void initMessages();
 
   protected:
     static constexpr gpio_num_t FOOT_SWITCH_PIN = GPIO_NUM_4;
@@ -48,4 +46,6 @@ class DmxController : public RtosTask
     TickType_t bootTime = 0;
 
     void taskEntry(void *param) override;
+    esp_err_t performOtaUpdate(const char *url);
+    void logFirmwareInfo();
 };

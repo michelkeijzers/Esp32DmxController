@@ -12,15 +12,13 @@ class DmxPresets
   public:
     DmxPresets();
 
-    esp_err_t init();
-
     uint8_t getNumberOfFilledPresets() const { return numberOfFilledPresets_; }
-    esp_err_t setNumberOfFilledPresets(uint8_t numberOfFilledPresets);
+    void setNumberOfFilledPresets(uint8_t numberOfFilledPresets);
 
     DmxPreset &getCurrentPreset() { return presets_[currentPresetIndex_]; }
     DmxPreset &getPreset(uint8_t index);
-    esp_err_t setPreset(uint8_t index, const DmxPreset &preset);
-    esp_err_t addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues);
+    void setPreset(uint8_t index, const DmxPreset &preset);
+    void addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues);
     void clearAll();
 
     uint8_t getCurrentPresetIndex() const { return currentPresetIndex_; }

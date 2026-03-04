@@ -9,6 +9,7 @@ typedef struct
     int intr_type;
 } gpio_config_t;
 typedef int gpio_num_t;
+#define GPIO_NUM_0 0
 #define GPIO_NUM_1 1
 #define GPIO_NUM_2 2
 #define GPIO_NUM_3 3

@@ -22,9 +22,8 @@ class FootSwitch : public RtosTask
     FootSwitch();
     ~FootSwitch();
 
-    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum);
+    virtual void init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum);
 
-  private:
     const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
@@ -34,6 +33,7 @@ class FootSwitch : public RtosTask
 
     void taskEntry(void *param) override;
 
+  public:
     gpio_num_t getPin() const { return pin_; }
 
   private:

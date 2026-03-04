@@ -11,19 +11,16 @@ DmxPresets::DmxPresets() : numberOfFilledPresets_(20) // Default to 20 presets
     presets_.resize(MAX_PRESETS);
 }
 
-esp_err_t DmxPresets::init()
-{
-    ESP_LOGI(LOG_TAG, "DmxPresets initialized with %d filled presets", numberOfFilledPresets_);
-    return ESP_OK;
-}
-
-esp_err_t DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
+void DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 {
     if (numberOfFilledPresets < MIN_PRESETS || numberOfFilledPresets > MAX_PRESETS)
     {
         ESP_LOGE(LOG_TAG, "Invalid number of filled presets: %d (must be %d-%d)", numberOfFilledPresets, MIN_PRESETS,
             MAX_PRESETS);
-        return ESP_ERR_INVALID_ARG;
+        // TODO: call software error. Put in a better place (cannot call rtostask).
+        // char msg[80];
+        // snprintf(msg, sizeof(msg), "Preset '%s' error: numberOfFilledPresets = %d", presetName,
+        // numberOfFilledPresets); softwareError(msg);
     }
 
     numberOfFilledPresets_ = numberOfFilledPresets;
@@ -33,22 +30,23 @@ esp_err_t DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
     {
         currentPresetIndex_ = 0;
     }
-
-    return ESP_OK; // TODO
 }
 
-esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
+void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
     if (presetNumber >= numberOfFilledPresets_)
     {
         ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", presetNumber, numberOfFilledPresets_ - 1);
-        return ESP_ERR_INVALID_ARG;
+        // TODO: call software error. Put in a better place (cannot call rtostask).
+        // char msg[80];
+        // snprintf(msg, sizeof(msg), "Preset '%s' error: numberOfFilledPresets = %d", presetName,
+        // numberOfFilledPresets); softwareError(msg);
     }
 
+    // TODO: Call assertNotNull
     if (!name || !dmxValues)
     {
         ESP_LOGE(LOG_TAG, "Invalid pointer arguments");
-        return ESP_ERR_INVALID_ARG;
     }
 
     presets_[presetNumber].setIndex(presetNumber);
@@ -56,7 +54,6 @@ esp_err_t DmxPresets::addPreset(uint8_t presetNumber, const char *name, const ui
     presets_[presetNumber].setDmxValues(dmxValues);
 
     ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", presetNumber, name);
-    return ESP_OK;
 }
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)
@@ -70,16 +67,15 @@ DmxPreset &DmxPresets::getPreset(uint8_t index)
     return presets_[index];
 }
 
-esp_err_t DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
+void DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
 {
     if (index >= numberOfFilledPresets_)
     {
         ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
-        return ESP_ERR_INVALID_ARG;
+        // TODO: call software error. Put in a better place (cannot call rtostask).
     }
 
     presets_[index].copyFrom(preset);
-    return ESP_OK;
 }
 
 void DmxPresets::clearAll()

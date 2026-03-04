@@ -17,7 +17,7 @@ class RtosTask <<abstract>> #lightYellow
     +RtosTask();
     +virtual ~RtosTask();
 
-    +esp_err_t init(TaskProperties taskProperties);
+    +void init(TaskProperties taskProperties);
     +virtual void taskEntry(void *param) = 0;
     +TaskHandle_t getTaskHandle() const
     +virtual QueueHandle_t getEventQueue() const
@@ -37,13 +37,13 @@ class DmxController <<Task>> #LightYellow
 {
     +DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, \n Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage)
     +~DmxController()
-    +virtual esp_err_t init()
+    +virtual void init()
     +void taskLoop()
 
-    -esp_err_t init_sub_tasks()
-    -esp_err_t init_messages()
-    -esp_err_t performOtaUpdate(const char *url)
-    -void printFirmwareInfo()
+    -void initSubTasks()
+    -void initMessages()
+    -void performOtaUpdate(const char *url)
+    -void logFirmwareInfo()
 
     -SevenSegmentDisplay *display_
     -FootSwitch *footSwitch_
@@ -118,15 +118,15 @@ title Data Classes
 class DmxPresets <<Data>>
 { 
     +DmxPresets()
-    +esp_err_t init()
+    +void init()
 
     +uint8_t getNumberOfFilledPresets() const
-    +esp_err_t setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
+    +void setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 
     +DmxPreset &getCurrentPreset()
     +DmxPreset &getPreset(uint8_t index)
-    +esp_err_t setPreset(uint8_t index, const DmxPreset &preset)
-    +esp_err_t addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
+    +void setPreset(uint8_t index, const DmxPreset &preset)
+    +void addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
     +void clearAll()
 
     +uint8_t getCurrentPresetIndex()
@@ -235,7 +235,7 @@ class RtosTask <<abstract>> #lightYellow
     +RtosTask();
     +virtual ~RtosTask();
 
-    +esp_err_t init(TaskProperties taskProperties);
+    +void init(TaskProperties taskProperties);
     +virtual void taskEntry(void *param) = 0;
     +TaskHandle_t getTaskHandle() const
     +virtual QueueHandle_t getEventQueue() const
@@ -256,7 +256,7 @@ class NvStorage
     +NvStorage()
     +~NvStorage()
 
-    +virtual esp_err_t init(RtosTask::TaskProperties taskProperties)
+    +virtual void init(RtosTask::TaskProperties taskProperties)
 
     -const char *log_tag_
     -int task_priority_
@@ -307,20 +307,26 @@ participant NvStorage
 Main -> DmxController : DmxController()
 Main -> DmxController : init()
 activate DmxController
-    DmxController -> WebServer : WebServer()
-    DmxController -> WebServer : init() 
-    DmxController -> SevenSegmentDisplay: SevenSegmentDisplay()
-    DmxController -> SevenSegmentDisplay : init()
-    DmxController -> FootSwitch : FootSwitch()
-    DmxController -> FootSwitch : init()
-    DmxController -> NvStorage : NvStorage()
-    DmxController -> NvStorage : init()
-    DmxController --> NvStorage : LOAD_CONFIGURATION
-deactivate DmxController
+    DmxController -> DmxController : initSubTasks()
+    activate DmxController
+        DmxController -> SevenSegmentDisplay: SevenSegmentDisplay()
+        DmxController -> SevenSegmentDisplay : init()
+        DmxController -> FootSwitch : FootSwitch()
+        DmxController -> FootSwitch : init()
+        DmxController -> NvStorage : NvStorage()
+        DmxController -> NvStorage : init()
+        DmxController -> WebServer : WebServer()
+        DmxController -> WebServer : init() 
+        note over DmxController
+            constructor and init for other sub tasks
+        end note
+    DmxController -> DmxController : initMessages()
+    activate DmxController
+        DmxController --> NvStorage : LOAD_CONFIGURATION
+    deactivate DmxController
 
-DmxController -> DmxController : taskLoop() 
+    DmxController -> DmxController : taskLoop() 
 
-activate DmxController
     NvStorage -> NvStorage : Load configuration \n from NVRAM and \n store in internal instance
     group Load Configuration
         alt Configuration loaded successfully from NVRAM

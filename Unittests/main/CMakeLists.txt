@@ -6,9 +6,12 @@ add_custom_target(coverage
   COMMAND ${OPENCOVERAGE_EXE}
     --export_type=html:coverage_report
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\dmx_controller.cpp"
-    -- "${CMAKE_CURRENT_BINARY_DIR}/build/Debug/run_tests.exe"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\seven_segment_display.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\max3485_sender.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.cpp"
+    -- "${CMAKE_CURRENT_BINARY_DIR}/Debug/run_tests.exe"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Running OpenCppCoverage for dmx_controller.cpp"
+  COMMENT "Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp"
   VERBATIM
 )
 
@@ -48,6 +51,9 @@ add_executable(
   custom_main.cpp
   dmx_controller_tests.cpp
   web_server_api_tests.cpp
+  foot_switch_tests.cpp
+  seven_segment_display_tests.cpp
+  max3485_sender_tests.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/dmx_controller.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/seven_segment_display.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/foot_switch.cpp

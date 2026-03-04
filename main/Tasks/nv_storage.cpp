@@ -21,27 +21,11 @@ NvStorage::~NvStorage()
     }
 }
 
-esp_err_t NvStorage::init(RtosTask::TaskProperties taskProperties)
+void NvStorage::init(RtosTask::TaskProperties taskProperties)
 {
-    if (RtosTask::init(taskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize NvStorageTask");
-        return ESP_FAIL;
-    }
-
-    esp_err_t err = nvs_open(configuration_namespace_name, NVS_READWRITE, &configuration_nvs_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to open configuration NVS namespace: %s", esp_err_to_name(err));
-    }
-
-    err = nvs_open(presets_namespace_name, NVS_READWRITE, &presets_nvs_handle);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to open presets NVS namespace: %s", esp_err_to_name(err));
-    }
-
-    return err;
+    RtosTask::init(taskProperties);
+    ESP_ERROR_CHECK(nvs_open(configuration_namespace_name, NVS_READWRITE, &configuration_nvs_handle));
+    ESP_ERROR_CHECK(nvs_open(presets_namespace_name, NVS_READWRITE, &presets_nvs_handle));
 }
 
 void NvStorage::taskEntry(void *param) { static_cast<NvStorage *>(param)->taskLoop(); }
@@ -80,51 +64,26 @@ void NvStorage::taskLoop()
     }
 }
 
-esp_err_t NvStorage::setConfiguration(const Messages::ConfigurationEventData &configurationData)
+void NvStorage::setConfiguration(const Messages::ConfigurationEventData &configurationData)
 {
-    if (!configuration_nvs_handle)
-        return ESP_ERR_INVALID_STATE;
-
-    if (nvs_set_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen",
-            configurationData.switchPolarityNormallyOpen) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to set switch polarity normally open");
-        return ESP_FAIL;
-    }
-
-    if (nvs_set_u16(configuration_nvs_handle, "LongPressThreshold", configurationData.longPressThresholdMs) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to set long press threshold");
-        return ESP_FAIL;
-    }
-
-    if (nvs_commit(configuration_nvs_handle) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to commit configuration data");
-        return ESP_FAIL;
-    }
-    return ESP_OK;
+    assertNot0(configuration_nvs_handle, "configuration_nvs_handle");
+    ESP_ERROR_CHECK(nvs_set_u8(
+        configuration_nvs_handle, "SwitchPolarityNormallyOpen", configurationData.switchPolarityNormallyOpen));
+    ESP_ERROR_CHECK(
+        nvs_set_u16(configuration_nvs_handle, "LongPressThreshold", configurationData.longPressThresholdMs));
+    ESP_ERROR_CHECK(nvs_commit(configuration_nvs_handle));
 }
 
-esp_err_t NvStorage::requestConfiguration(Messages::ConfigurationEventData &configurationData)
+void NvStorage::requestConfiguration(Messages::ConfigurationEventData &configurationData)
 {
-    if (!configuration_nvs_handle)
-        return ESP_ERR_INVALID_STATE;
+    assertNot0(configuration_nvs_handle, "configuration_nvs_handle");
 
     uint8_t switch_polarity_normally_open;
-    if (nvs_get_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen", &switch_polarity_normally_open) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to get switch polarity normally open");
-        return ESP_FAIL;
-    }
+    ESP_ERROR_CHECK(nvs_get_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen", &switch_polarity_normally_open));
     configurationData.switchPolarityNormallyOpen = switch_polarity_normally_open;
 
     uint16_t long_press_threshold_ms;
-    if (nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to get long press threshold");
-        return ESP_FAIL;
-    }
+    ESP_ERROR_CHECK(nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms));
     configurationData.longPressThresholdMs = long_press_threshold_ms;
 
     // Send configuration response message
@@ -132,53 +91,31 @@ esp_err_t NvStorage::requestConfiguration(Messages::ConfigurationEventData &conf
     responseEvent.type = Messages::CONFIGURATION_RESPONSE;
     responseEvent.data.configurationData = configurationData;
     xQueueSend(getDmxControllerEventQueue(), &responseEvent, portMAX_DELAY);
-
-    return ESP_OK;
 }
 
-esp_err_t NvStorage::setPresets(const Messages::PresetsEventData &presetsData)
+void NvStorage::setPresets(const Messages::PresetsEventData &presetsData)
 {
-    if (!presets_nvs_handle)
-        return ESP_ERR_INVALID_STATE;
+    assertNot0(presets_nvs_handle, "presets_nvs_handle");
 
-    if (nvs_set_u8(presets_nvs_handle, "NumberOfPresets", presetsData.numberOfPresets) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to set number of presets");
-        return ESP_FAIL;
-    }
+    ESP_ERROR_CHECK(nvs_set_u8(presets_nvs_handle, "NumberOfPresets", presetsData.numberOfPresets));
 
     for (uint8_t i = 0; i < presetsData.numberOfPresets; ++i)
     {
         const Messages::PresetEventData &preset = presetsData.presets[i];
         char key[16];
         snprintf(key, sizeof(key), "Preset%d", i);
-        if (nvs_set_blob(presets_nvs_handle, key, &preset, sizeof(Messages::PresetEventData)) != ESP_OK)
-        {
-            ESP_LOGE(log_tag_, "Failed to set preset %d", i);
-            return ESP_FAIL;
-        }
+        ESP_ERROR_CHECK(nvs_set_blob(presets_nvs_handle, key, &preset, sizeof(Messages::PresetEventData)));
     }
 
-    if (nvs_commit(presets_nvs_handle) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to commit presets data");
-        return ESP_FAIL;
-    }
-    return ESP_OK;
+    ESP_ERROR_CHECK(nvs_commit(presets_nvs_handle));
 }
 
-esp_err_t NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
+void NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
 {
-    if (!presets_nvs_handle)
-        return ESP_ERR_INVALID_STATE;
+    assertNot0(presets_nvs_handle, "presets_nvs_handle");
 
     uint8_t number_of_presets;
-    if (nvs_get_u8(presets_nvs_handle, "NumberOfPresets", &number_of_presets) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to get number of presets");
-        return ESP_FAIL;
-    }
-
+    ESP_ERROR_CHECK(nvs_get_u8(presets_nvs_handle, "NumberOfPresets", &number_of_presets));
     presetsData.numberOfPresets = number_of_presets;
 
     for (uint8_t i = 0; i < number_of_presets; ++i)
@@ -188,12 +125,7 @@ esp_err_t NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
         Messages::PresetEventData &preset = presetsData.presets[i];
         size_t length = sizeof(Messages::PresetEventData); // Length is not used in this case since
                                                            // we expect a fixed size blob
-        esp_err_t err = nvs_get_blob(presets_nvs_handle, key, &preset, &length);
-        if (err != ESP_OK)
-        {
-            ESP_LOGE(log_tag_, "Failed to get preset %d", i);
-            return err;
-        }
+        ESP_ERROR_CHECK(nvs_get_blob(presets_nvs_handle, key, &preset, &length));
         presetsData.presets[i] = preset;
     }
 
@@ -202,6 +134,4 @@ esp_err_t NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
     responseEvent.type = Messages::PRESETS_RESPONSE;
     responseEvent.data.presetsData = presetsData;
     xQueueSend(getDmxControllerEventQueue(), &responseEvent, portMAX_DELAY);
-
-    return ESP_OK;
 }

@@ -14,12 +14,9 @@
 #include <stdio.h>
 
 static const int QUEUE_CAPACITY = 10;
-
 static QueueHandle_t interrupt_event_queue = nullptr;
 static QueueHandle_t config_event_queue = nullptr;
-#ifndef _MSC_VER
-static QueueSetHandle_t footswitch_queue_set = nullptr;
-#endif
+
 static gpio_num_t isr_pin = GPIO_NUM_NC;
 
 // ISR handler: minimal, just post event to queue
@@ -46,13 +43,9 @@ FootSwitch::FootSwitch()
 
 FootSwitch::~FootSwitch() {}
 
-esp_err_t FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum)
+void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum)
 {
-    if (RtosTask::init(taskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize FootSwitchTask");
-        return ESP_FAIL;
-    }
+    RtosTask::init(taskProperties);
 
     // Classic C++ initialization for unit test build
     gpio_config_t io_conf = {};
@@ -62,49 +55,20 @@ esp_err_t FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t p
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.intr_type = GPIO_INTR_ANYEDGE; // Enable interrupt on both edges
 
-    if (gpio_config(&io_conf) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to configure GPIO pin %d", pinNum);
-        return ESP_FAIL;
-    }
-    // Read initial state of the pin and set lastPinState accordingly
+    ESP_ERROR_CHECK(gpio_config(&io_conf));
     int initialLevel = gpio_get_level(pinNum);
     lastPinState_ = (initialLevel == 0);
 
     pin_ = pinNum;
     isr_pin = pinNum;
     interrupt_event_queue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
-    if (interrupt_event_queue == nullptr)
-    {
-        ESP_LOGE(log_tag_, "Failed to create foot switch interrupt event queue");
-        return ESP_FAIL;
-    }
+    assertNotNull(interrupt_event_queue, "interrupt_event_queue");
     config_event_queue = getEventQueue();
-#ifndef _MSC_VER
-    footswitch_queue_set = xQueueCreateSet(QUEUE_CAPACITY * 2);
-    if (footswitch_queue_set == nullptr)
-    {
-        ESP_LOGE(log_tag_, "Failed to create queue set");
-        return ESP_FAIL;
-    }
-    xQueueAddToSet(interrupt_event_queue, footswitch_queue_set);
-    xQueueAddToSet(config_event_queue, footswitch_queue_set);
-#endif
 
-    if (gpio_install_isr_service(0) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to install GPIO ISR service");
-        return ESP_FAIL;
-    }
-
-    if (gpio_isr_handler_add(pin_, isr_handler, this) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to add GPIO ISR handler");
-        return ESP_FAIL;
-    }
+    ESP_ERROR_CHECK(gpio_install_isr_service(0));
+    ESP_ERROR_CHECK(gpio_isr_handler_add(pin_, isr_handler, this));
 
     ESP_LOGI(log_tag_, "FootSwitchTask task started (interrupt mode)");
-    return ESP_OK;
 }
 
 void FootSwitch::taskEntry(void *param) { static_cast<FootSwitch *>(param)->taskLoop(); }
@@ -117,78 +81,12 @@ void FootSwitch::taskLoop()
     bool debouncedState = false;
     bool lastStableState = false;
     TickType_t lastDebounceTime = 0;
-#ifndef _MSC_VER
+
     while (true)
     {
-        QueueHandle_t activatedQueue = xQueueSelectFromSet(footswitch_queue_set, portMAX_DELAY);
-        if (activatedQueue == interrupt_event_queue)
+        if (xQueueReceive(interrupt_event_queue, &interruptEvent, 0) == pdTRUE)
         {
-            if (xQueueReceive(interrupt_event_queue, &interruptEvent, 0) == pdTRUE)
-            {
-                TickType_t now = xTaskGetTickCount();
-                bool currentState = (interruptEvent.type == InterruptEventType::PRESS);
-                if (currentState != lastStableState)
-                {
-                    lastDebounceTime = now;
-                }
-                if ((now - lastDebounceTime) * portTICK_PERIOD_MS >= debounceDelayMs)
-                {
-                    if (currentState != debouncedState)
-                    {
-                        debouncedState = currentState;
-                        lastStableState = currentState;
-                        if (debouncedState)
-                        {
-                            // Debouncing finished: switch pressed
-                            pressStartTime_ = xTaskGetTickCount();
-                        }
-                        else
-                        {
-                            // Debouncing finished: switch released
-                            TickType_t now = xTaskGetTickCount();
-                            TickType_t elapsedMs = (now - pressStartTime_) * portTICK_PERIOD_MS;
-                            if (elapsedMs >= longPressThresholdMs_)
-                            {
-                                ESP_LOGI(log_tag_, "Long press detected: %lu ms", elapsedMs);
-                                bool legal = HandleLongPress();
-                                if (!legal)
-                                {
-                                    ESP_LOGW(log_tag_, "Long press not legal in current state");
-                                }
-                            }
-                            if (HandleShortPress() != ESP_OK)
-                            {
-                                ESP_LOGW(log_tag_, "Short press not legal in current state");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if (activatedQueue == config_event_queue)
-        {
-            if (xQueueReceive(config_event_queue, &configEvent, 0) == pdTRUE)
-            {
-                if (configEvent.type == Messages::EventType::SET_CONFIGURATION)
-                {
-                    polarityNormallyOpen_ = configEvent.data.configurationData.switchPolarityNormallyOpen;
-                    longPressThresholdMs_ = configEvent.data.configurationData.longPressThresholdMs;
-                    ESP_LOGI(log_tag_, "Configuration updated: polarityNormallyOpen=%d, longPressThresholdMs=%d",
-                        polarityNormallyOpen_, longPressThresholdMs_);
-                }
-                else
-                {
-                    ESP_LOGW(log_tag_, "Unknown event type received in FootSwitch: %d", configEvent.type);
-                }
-            }
-        }
-    }
-#else
-    // For unit tests (MSVC), just block on interrupt_event_queue and poll config_event_queue
-    while (true)
-    {
-        if (xQueueReceive(interrupt_event_queue, &interruptEvent, portMAX_DELAY) == pdTRUE)
-        {
+
             TickType_t now = xTaskGetTickCount();
             bool currentState = (interruptEvent.type == InterruptEventType::PRESS);
             if (currentState != lastStableState)
@@ -203,10 +101,12 @@ void FootSwitch::taskLoop()
                     lastStableState = currentState;
                     if (debouncedState)
                     {
+                        // Debouncing finished: switch pressed
                         pressStartTime_ = xTaskGetTickCount();
                     }
                     else
                     {
+                        // Debouncing finished: switch released
                         TickType_t now = xTaskGetTickCount();
                         TickType_t elapsedMs = (now - pressStartTime_) * portTICK_PERIOD_MS;
                         if (elapsedMs >= longPressThresholdMs_)
@@ -226,7 +126,7 @@ void FootSwitch::taskLoop()
                 }
             }
         }
-        if (xQueueReceive(config_event_queue, &configEvent, 0) == pdTRUE)
+        else if (xQueueReceive(config_event_queue, &configEvent, 0) == pdTRUE)
         {
             if (configEvent.type == Messages::EventType::SET_CONFIGURATION)
             {
@@ -240,8 +140,11 @@ void FootSwitch::taskLoop()
                 ESP_LOGW(log_tag_, "Unknown event type received in FootSwitch: %d", configEvent.type);
             }
         }
+        else
+        {
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
     }
-#endif
 }
 
 esp_err_t FootSwitch::HandleShortPress()

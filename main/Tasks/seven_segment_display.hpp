@@ -15,6 +15,8 @@
 
 class SevenSegmentDisplay : public RtosTask
 {
+    friend class SevenSegmentDisplayTest_Friend;
+
   public:
     struct Event
     {
@@ -25,14 +27,13 @@ class SevenSegmentDisplay : public RtosTask
     SevenSegmentDisplay();
     ~SevenSegmentDisplay();
 
-    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8]);
+    virtual void init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8]);
 
-  private:
+  protected:
     const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
 
-  private:
     enum Segment
     {
         SEG_A = 0,
@@ -48,11 +49,11 @@ class SevenSegmentDisplay : public RtosTask
     uint8_t currentPattern_;
     bool decimalPointOn_;
 
-    esp_err_t updateDisplay();
+    void updateDisplay();
 
-    esp_err_t displayDigit(char character, bool dot);
-    esp_err_t setSegment(Segment segment, bool on);
-    esp_err_t setDecimalPoint(bool on);
+    void displayDigit(char character, bool dot);
+    void setSegment(Segment segment, bool on);
+    void setDecimalPoint(bool on);
 
     ///  --- a ---
     ///  |       |

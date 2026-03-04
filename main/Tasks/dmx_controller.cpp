@@ -20,164 +20,67 @@ DmxController::DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitc
 
 DmxController::~DmxController() {}
 
-void DmxController::printFirmwareInfo()
-{
-    const esp_app_desc_t *app_desc = esp_app_get_description();
-    ESP_LOGW(log_tag_, "Current firmware version: %s", app_desc->version);
-    ESP_LOGW(log_tag_, "Project name: %s", app_desc->project_name);
-    ESP_LOGW(log_tag_, "Compile time: %s %s", app_desc->date, app_desc->time);
-}
-
-esp_err_t DmxController::performOtaUpdate(const char *url)
-{
-    printf("Starting OTA update from: %s\n", url);
-    esp_https_ota_config_t ota_config = {};
-    // ota_config.http_config = NULL;
-    // ota_config.http_client_init_cb = NULL;
-    esp_err_t ret = esp_https_ota(&ota_config);
-    if (ret == ESP_OK)
-    {
-        ESP_LOGW(log_tag_, "OTA update successful, restarting...");
-        esp_restart();
-    }
-    else
-    {
-        ESP_LOGE(log_tag_, "OTA update failed: %s\n", esp_err_to_name(ret));
-    }
-    return ret;
-}
-
-esp_err_t DmxController::init()
+void DmxController::init()
 {
     printf("Initializing DmxController...\n");
     QueueHandle_t queue = getEventQueue(); // Unused
     printf("DmxController init: queue handle = %p\n", (void *)queue);
-    TaskProperties dmxControllerTaskProperties = {.taskName_ = "DmxControllerTask",
-        .logTag = "DmxController",
-        .taskPriority = 4,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = queue};
+    setMainEventQueue(queue);
+    TaskProperties dmxControllerTaskProperties =
+        CreateTaskProperties("DmxControllerTask", "DmxController", 4, 4096, 20, sizeof(Messages::Event));
 
-    if (RtosTask::init(dmxControllerTaskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize DmxControllerTask");
-        return ESP_FAIL;
-    }
-
-    printf("DmxController initialized successfully, bootTime=%lu\n", bootTime);
+    RtosTask::init(dmxControllerTaskProperties);
 
     bootTime = xTaskGetTickCount();
-    printFirmwareInfo();
+    logFirmwareInfo();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    printf("Initializing sub-tasks...\n");
-    if (init_sub_tasks() != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize sub-tasks");
-        return ESP_FAIL;
-    }
-
-    if (init_messages() != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize message handling");
-        return ESP_FAIL;
-    }
-
-    return ESP_OK;
+    ESP_LOGI(log_tag_, "Initializing sub-tasks...\n");
+    initSubTasks();
+    initMessages();
 }
 
-esp_err_t DmxController::init_sub_tasks()
+void DmxController::initSubTasks()
 {
     if (!display_)
     {
         ESP_LOGE(log_tag_, "display_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
+        return;
     }
-    TaskProperties taskProperties = {.taskName_ = "SevenSegmentDisplayTask",
-        .logTag = "SevenSegmentDisplay",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (display_->init(taskProperties, DISPLAY_PINS) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize SevenSegmentDisplay");
-        return ESP_FAIL;
-    }
+    TaskProperties taskProperties =
+        CreateTaskProperties("SevenSegmentDisplayTask", "SevenSegmentDisplay", 5, 4096, 20, sizeof(Messages::Event));
+    display_->init(taskProperties, DISPLAY_PINS);
 
     if (!footSwitch_)
     {
         ESP_LOGE(log_tag_, "footSwitch_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
+        return;
     }
-    TaskProperties footSwitchTaskProperties = {.taskName_ = "FootSwitchTask",
-        .logTag = "FootSwitch",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (footSwitch_->init(footSwitchTaskProperties, FOOT_SWITCH_PIN) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize FootSwitch");
-        return ESP_FAIL;
-    }
-
-    if (!max3485Sender_)
-    {
-        ESP_LOGE(log_tag_, "max3485Sender_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
-    }
-    TaskProperties max3485SenderTaskProperties = {.taskName_ = "Max3485SenderTask",
-        .logTag = "Max3485Sender",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (max3485Sender_->init(max3485SenderTaskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize Max3485Sender");
-        return ESP_FAIL;
-    }
+    TaskProperties footSwitchTaskProperties =
+        CreateTaskProperties("FootSwitchTask", "FootSwitch", 5, 4096, 20, sizeof(Messages::Event));
+    footSwitch_->init(footSwitchTaskProperties, FOOT_SWITCH_PIN);
 
     if (!webServer_)
     {
         ESP_LOGE(log_tag_, "webServer_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
+        return;
     }
-    if (webServer_->init() != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize WebServer");
-        return ESP_FAIL;
-    }
+    TaskProperties webServerTaskProperties =
+        CreateTaskProperties("WebServerTask", "WebServer", 5, 4096, 20, sizeof(Messages::Event));
+    webServer_->init(webServerTaskProperties);
 
-    TaskProperties nvStorageTaskProperties = {.taskName_ = "NvStorageTask",
-        .logTag = "NvStorage",
-        .taskPriority = 5,
-        .stackSize = 4096,
-        .queueCapacity = 20,
-        .queueItemSize = sizeof(Messages::Event),
-        .mainEventQueue = getEventQueue()};
-    if (!nvStorage_)
+    if (!max3485Sender_)
     {
-        ESP_LOGE(log_tag_, "nvStorage_ is nullptr");
-        return ESP_ERR_INVALID_ARG;
+        ESP_LOGE(log_tag_, "max3485Sender_ is nullptr");
+        return;
     }
-    if (nvStorage_->init(nvStorageTaskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize NvStorage");
-        return ESP_FAIL;
-    }
-
-    return ESP_OK;
+    TaskProperties max3485SenderTaskProperties =
+        CreateTaskProperties("Max3485SenderTask", "Max3485Sender", 5, 4096, 20, sizeof(Messages::Event));
+    max3485Sender_->init(max3485SenderTaskProperties);
 }
 
-esp_err_t DmxController::init_messages()
+void DmxController::initMessages()
 {
     // Send a message to NvStorage to request config
     Messages::Event event = Messages::Event();
@@ -185,19 +88,19 @@ esp_err_t DmxController::init_messages()
     if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
         ESP_LOGE(log_tag_, "Failed to send configuration request to NvStorage");
-        return ESP_FAIL;
+        return;
     }
 
     // Receive config response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
         ESP_LOGE(log_tag_, "Failed to receive configuration response from NvStorage");
-        return ESP_FAIL;
+        return;
     }
     if (event.type != Messages::EventType::CONFIGURATION_RESPONSE)
     {
         ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvStorage: %d", event.type);
-        return ESP_FAIL;
+        return;
     }
 
     // Send config response to FootSwitch (no response needed)
@@ -207,7 +110,7 @@ esp_err_t DmxController::init_messages()
     if (xQueueSend(footSwitch_->getEventQueue(), &footSwitchEvent, 0) != pdPASS)
     {
         ESP_LOGE(log_tag_, "Failed to send configuration to FootSwitch");
-        return ESP_FAIL;
+        return;
     }
 
     // Send a message to NvStorage to request presets
@@ -215,22 +118,20 @@ esp_err_t DmxController::init_messages()
     if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
     {
         ESP_LOGE(log_tag_, "Failed to send presets request to NvStorage");
-        return ESP_FAIL;
+        return;
     }
 
     // Receive presets response (blocking)
     if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
     {
         ESP_LOGE(log_tag_, "Failed to receive presets response from NvStorage");
-        return ESP_FAIL;
+        return;
     }
     if (event.type != Messages::EventType::PRESETS_RESPONSE)
     {
         ESP_LOGE(log_tag_, "Received unexpected event type from NvStorage: %d", event.type);
-        return ESP_FAIL;
+        return;
     }
-
-    return ESP_OK;
 }
 
 void DmxController::taskLoop()
@@ -285,3 +186,30 @@ void DmxController::taskLoop()
 }
 
 void DmxController::taskEntry(void *param) { static_cast<DmxController *>(param)->taskLoop(); }
+
+void DmxController::logFirmwareInfo()
+{
+    const esp_app_desc_t *app_desc = esp_app_get_description();
+    ESP_LOGW(log_tag_, "Current firmware version: %s", app_desc->version);
+    ESP_LOGW(log_tag_, "Project name: %s", app_desc->project_name);
+    ESP_LOGW(log_tag_, "Compile time: %s %s", app_desc->date, app_desc->time);
+}
+
+esp_err_t DmxController::performOtaUpdate(const char *url)
+{
+    printf("Starting OTA update from: %s\n", url);
+    esp_https_ota_config_t ota_config = {};
+    // ota_config.http_config = NULL;
+    // ota_config.http_client_init_cb = NULL;
+    esp_err_t ret = esp_https_ota(&ota_config);
+    if (ret == ESP_OK)
+    {
+        ESP_LOGW(log_tag_, "OTA update successful, restarting...");
+        esp_restart();
+    }
+    else
+    {
+        ESP_LOGE(log_tag_, "OTA update failed: %s\n", esp_err_to_name(ret));
+    }
+    return ret;
+}

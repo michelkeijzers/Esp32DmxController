@@ -22,7 +22,7 @@ class NvStorage : public RtosTask
     NvStorage();
     ~NvStorage();
 
-    virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
+    virtual void init(RtosTask::TaskProperties taskProperties);
 
   private:
     const char *log_tag_;
@@ -30,10 +30,10 @@ class NvStorage : public RtosTask
     int queue_capacity_;
 
     // Synchronous wrappers (for compatibility)
-    esp_err_t setConfiguration(const Messages::ConfigurationEventData &config);
-    esp_err_t requestConfiguration(Messages::ConfigurationEventData &config);
-    esp_err_t setPresets(const Messages::PresetsEventData &presets);
-    esp_err_t requestPresets(Messages::PresetsEventData &presets);
+    void setConfiguration(const Messages::ConfigurationEventData &config);
+    void requestConfiguration(Messages::ConfigurationEventData &config);
+    void setPresets(const Messages::PresetsEventData &presets);
+    void requestPresets(Messages::PresetsEventData &presets);
 
   private:
     nvs_handle_t configuration_nvs_handle;

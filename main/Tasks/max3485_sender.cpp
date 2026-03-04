@@ -24,11 +24,8 @@ Max3485Sender::~Max3485Sender() { close(); }
 
 esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
 {
-    if (RtosTask::init(taskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize Max3485SenderTask");
-        return ESP_FAIL;
-    }
+    RtosTask::init(taskProperties);
+
     uart_config_t uart_config;
     uart_config.baud_rate = DMX_BAUD_RATE;
     uart_config.data_bits = UART_DATA_8_BITS;

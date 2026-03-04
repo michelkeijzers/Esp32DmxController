@@ -203,19 +203,9 @@ class DMXController {
 const app = new DMXController();
 )js";
 
-WebServer::WebServer() : server_(nullptr)
+WebServer::WebServer() : RtosTask(), server_(nullptr), initialized_(false), taskHandle_(nullptr), eventQueue_(nullptr)
 {
     instance_ = this;
-    eventQueue_ = xQueueCreate(4, sizeof(WebServerEvent));
-    if (eventQueue_)
-    {
-        xTaskCreate(taskEntry, "WebServerTask", 4096, this, 5, &taskHandle_);
-        ESP_LOGI(TAG, "WebServer task started");
-    }
-    else
-    {
-        ESP_LOGE(TAG, "Failed to create WebServer event queue");
-    }
 }
 
 WebServer::~WebServer()
@@ -238,8 +228,6 @@ void WebServer::postEvent(const WebServerEvent &event)
     }
 }
 
-void WebServer::taskEntry(void *param) { static_cast<WebServer *>(param)->taskLoop(); }
-
 void WebServer::taskLoop()
 {
     WebServerEvent event;
@@ -247,19 +235,7 @@ void WebServer::taskLoop()
     {
         if (xQueueReceive(eventQueue_, &event, portMAX_DELAY) == pdTRUE)
         {
-            switch (event.type)
-            {
-            case START_SERVER:
-                start();
-                break;
-            case STOP_SERVER:
-                stop();
-                break;
-            case RESTART_SERVER:
-                stop();
-                start();
-                break;
-            }
+            // TODO Future message handling can be added here
         }
     }
 }
@@ -282,12 +258,14 @@ void WebServer::init_spiffs()
     }
 }
 
-esp_err_t WebServer::init()
+void WebServer::init(RtosTask::TaskProperties taskProperties)
 {
     if (initialized_)
     {
-        return ESP_OK;
+        return;
     }
+
+    RtosTask::init(taskProperties);
 
     // Mount SPIFFS
     init_spiffs();
@@ -296,12 +274,7 @@ esp_err_t WebServer::init()
     config.server_port = 80;
     config.max_uri_handlers = 8;
 
-    esp_err_t ret = httpd_start(&server_, &config);
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to start HTTP server");
-        return ret;
-    }
+    httpd_start(&server_, &config);
 
     // Register URI handlers
     httpd_uri_t root_uri;
@@ -360,7 +333,7 @@ esp_err_t WebServer::init()
     static_file_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &static_file_uri);
 
-    return ESP_OK;
+    initialized_ = true;
 }
 
 // /all_data handler: GET returns { configuration, presets }, POST updates both
@@ -420,26 +393,6 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
     }
 
     return instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
-}
-
-esp_err_t WebServer::start()
-{
-    if (!initialized_)
-    {
-        return init();
-    }
-    return ESP_OK;
-}
-
-esp_err_t WebServer::stop()
-{
-    if (server_)
-    {
-        httpd_stop(server_);
-        server_ = nullptr;
-        initialized_ = false;
-    }
-    return ESP_OK;
 }
 
 esp_err_t WebServer::root_handler(httpd_req_t *req)
@@ -695,9 +648,7 @@ esp_err_t WebServer::json_to_presets(const char *json_str)
     }
 
     // Set number of presets
-    esp_err_t ret = dmxPresets_->setNumberOfFilledPresets(static_cast<int>(num_presets));
-    if (ret != ESP_OK)
-        return ret;
+    dmxPresets_->setNumberOfFilledPresets(static_cast<int>(num_presets));
 
     // Load each preset
     for (size_t i = 0; i < num_presets; i++)

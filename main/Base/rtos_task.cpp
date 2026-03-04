@@ -22,9 +22,23 @@ RtosTask::~RtosTask()
     }
 }
 
-esp_err_t RtosTask::init(TaskProperties taskProperties)
+RtosTask::TaskProperties RtosTask::CreateTaskProperties(const char *taskName, const char *logTag,
+    UBaseType_t taskPriority, size_t stackSize, size_t queueCapacity, size_t queueItemSize)
 {
-    task_name = taskProperties.taskName_;
+    TaskProperties taskProperties;
+    taskProperties.taskName_ = taskName;
+    taskProperties.logTag = logTag;
+    taskProperties.taskPriority = taskPriority;
+    taskProperties.stackSize = stackSize;
+    taskProperties.queueCapacity = queueCapacity;
+    taskProperties.queueItemSize = queueItemSize;
+    taskProperties.mainEventQueue = main_event_queue_;
+    return taskProperties;
+}
+
+void RtosTask::init(TaskProperties taskProperties)
+{
+    task_name_ = taskProperties.taskName_;
     log_tag_ = taskProperties.logTag;
     main_event_queue_ = taskProperties.mainEventQueue;
 
@@ -37,7 +51,7 @@ esp_err_t RtosTask::init(TaskProperties taskProperties)
     else
     {
         ESP_LOGE(log_tag_, "Failed to create event queue");
-        return ESP_FAIL;
+        return;
     }
 
     // Static entry wrapper
@@ -53,8 +67,51 @@ esp_err_t RtosTask::init(TaskProperties taskProperties)
         ESP_LOGE(log_tag_, "Failed to create task");
         vQueueDelete(event_queue_);
         event_queue_ = nullptr;
-        return ESP_FAIL;
     }
     initialized_ = true;
-    return ESP_OK;
+}
+
+void RtosTask::assertNotNull(const void *ptr, const char *variableName)
+{
+    if (ptr == nullptr)
+    {
+        ESP_LOGE(log_tag_, "%s: %s is null", task_name_, variableName);
+        while (true)
+        {
+            vTaskDelay(portMAX_DELAY);
+        }
+    }
+}
+
+void RtosTask::assertNot0(nvs_handle_t handle, const char *variableName)
+{
+    if (handle == 0)
+    {
+        ESP_LOGE(log_tag_, "%s: %s is 0", task_name_, variableName);
+        while (true)
+        {
+            vTaskDelay(portMAX_DELAY);
+        }
+    }
+}
+
+void RtosTask::assertTrue(bool variable, const char *variableName)
+{
+    if (!variable)
+    {
+        ESP_LOGE(log_tag_, "%s: %s is false", task_name_, variableName);
+        while (true)
+        {
+            vTaskDelay(portMAX_DELAY);
+        }
+    }
+}
+
+void RtosTask::softwareError(const char *message)
+{
+    ESP_LOGE(log_tag_, "%s: Software error: %s", task_name_, message);
+    while (true)
+    {
+        vTaskDelay(portMAX_DELAY);
+    }
 }
