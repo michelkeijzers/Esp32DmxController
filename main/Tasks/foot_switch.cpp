@@ -57,7 +57,7 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.intr_type = GPIO_INTR_ANYEDGE; // Enable interrupt on both edges
 
-    ESP_ERROR_CHECK(gpio_config(&io_conf));
+    Assert::assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
     int initialLevel = gpio_get_level(pinNum);
     lastPinState_ = (initialLevel == 0);
 
@@ -67,8 +67,8 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
     Assert::assertQueueHandle(interruptEventQueue, "interruptEventQueue");
     configEventQueue = getEventQueue();
 
-    ESP_ERROR_CHECK(gpio_install_isr_service(0));
-    ESP_ERROR_CHECK(gpio_isr_handler_add(pin_, isr_handler, this));
+    Assert::assertNotEspError(gpio_install_isr_service(0), "Failed to install ISR service");
+    Assert::assertNotEspError(gpio_isr_handler_add(pin_, isr_handler, this), "Failed to add ISR handler");
 
     ESP_LOGI(logTag_, "FootSwitchTask task started (interrupt mode)");
 }

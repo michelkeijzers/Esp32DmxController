@@ -14,6 +14,7 @@ class Messages
         UPDATE_CONFIGURATION, // DMX Controller -> Foot Switch, Web Server
 
         LOAD_DMX_PRESETS,   // DMX Controller -> NVS Storage
+        DMX_PRESETS_LOADED, // NVS Storage -> DMX Controller
         UPDATE_DMX_PRESETS, // NVS Storage -> DMX Controller
 
         // OLD:

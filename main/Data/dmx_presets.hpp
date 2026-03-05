@@ -8,7 +8,7 @@
 #define MAX_PRESETS 20
 #define MIN_PRESETS 2
 
-class DmxPresets : Lockable
+class DmxPresets : public Lockable
 {
   public:
     DmxPresets();

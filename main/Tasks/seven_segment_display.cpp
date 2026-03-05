@@ -76,7 +76,7 @@ void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gp
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.intr_type = GPIO_INTR_DISABLE;
 
-        ESP_ERROR_CHECK(gpio_config(&io_conf));
+        Assert::assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
         segmentPins_[i] = pins[i];
     }
 
@@ -159,7 +159,7 @@ void SevenSegmentDisplay::updateDisplay()
 
         gpioLevel = !segmentOn; // LOW = on for common anode
 
-        gpio_set_level(segmentPins_[i], gpioLevel ? 1 : 0);
+        Assert::assertNotEspError(gpio_set_level(segmentPins_[i], gpioLevel ? 1 : 0), "Failed to set GPIO level");
     }
 
     // Set decimal point

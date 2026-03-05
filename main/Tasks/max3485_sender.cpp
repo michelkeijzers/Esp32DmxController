@@ -9,6 +9,7 @@
 #include "esp_log.h"
 #include "esp_rom_sys.h"
 #endif
+#include "../Base/assert.hpp"
 #include "../Data/dmx_preset.hpp"
 #include <messages.hpp>
 
@@ -32,10 +33,11 @@ esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
     uart_config.parity = UART_PARITY_DISABLE;
     uart_config.stop_bits = UART_STOP_BITS_2;
     uart_config.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
-    ESP_ERROR_CHECK(uart_param_config(DMX_UART_PORT, &uart_config));
-    ESP_ERROR_CHECK(
-        uart_set_pin(DMX_UART_PORT, DMX_TX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE));
-    ESP_ERROR_CHECK(uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0));
+    Assert::assertNotEspError(uart_param_config(DMX_UART_PORT, &uart_config), "Failed to configure UART");
+    Assert::assertNotEspError(
+        uart_set_pin(DMX_UART_PORT, DMX_TX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE),
+        "Failed to set UART pins");
+    Assert::assertNotEspError(uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0), "Failed to install UART driver");
     initialized_ = true;
     ESP_LOGI(logTag_, "MAX3485 sender initialized");
     return ESP_OK;

@@ -32,8 +32,8 @@ void DmxController::init()
     RtosTask::init(dmxControllerTaskProperties);
 
     logFirmwareInfo();
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    Assert::assertNotEspError(esp_netif_init(), "Failed to initialize network interface");
+    Assert::assertNotEspError(esp_event_loop_create_default(), "Failed to create default event loop");
 
     initSubTasks();
     initMessages();

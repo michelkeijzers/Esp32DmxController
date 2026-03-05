@@ -371,6 +371,9 @@ activate DmxController
             deactivate WebServer
 
         else error loading configuration from NVRAM 
+            note over DmxController #red
+                NOT IMPLEMENTED YET
+            end note
             NvStorage -> DmxController : <back:lightblue> ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
             DmxController -> SevenSegmentDisplay : <back:lightblue> DISPLAY_ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
         end

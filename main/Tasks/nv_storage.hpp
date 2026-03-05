@@ -31,9 +31,10 @@ class NvStorage : public RtosTask
     int queueCapacity_;
 
     void loadConfiguration();
+    void loadDmxPresets();
 
-    Configuration& getConfiguration() { return configuration_; }
-    DmxPresets& getDmxPresets() { return dmxPresets_; }
+    Configuration &getConfiguration() { return configuration_; }
+    DmxPresets &getDmxPresets() { return dmxPresets_; }
 
   private:
     nvs_handle_t configurationNvsHandle_;
