@@ -22,6 +22,7 @@ extern "C" void __force_link_DmxControllerQueueFailTest() {}
 #include "Mocks/nv_storage_mock.hpp"
 #include "Mocks/seven_segment_display_mock.hpp"
 #include "Mocks/web_server_mock.hpp"
+#include "Mocks/mock_assert.hpp"
 
 // Patch xQueueReceive to simulate correct event sequence for init_messages
 #include "messages.hpp"
@@ -151,6 +152,7 @@ extern "C"
 class DmxControllerTest : public ::testing::Test
 {
   protected:
+    MockAssert *mockAssert;
     MockSevenSegmentDisplay *mockDisplay;
     MockFootSwitch *mockFootSwitch;
     MockMax3485Sender *mockMax3485Sender;
@@ -158,10 +160,14 @@ class DmxControllerTest : public ::testing::Test
     MockNvStorage *mockNvStorage;
 
     DmxControllerTest()
-        : mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
-          mockMax3485Sender(new MockMax3485Sender()), mockWebServer(new MockWebServer()),
-          mockNvStorage(new MockNvStorage())
+        : mockAssert(new MockAssert()),
+          mockDisplay(new MockSevenSegmentDisplay(mockAssert)),
+          mockFootSwitch(new MockFootSwitch(mockAssert)),
+          mockMax3485Sender(new MockMax3485Sender(mockAssert)),
+          mockWebServer(new MockWebServer()),
+          mockNvStorage(new MockNvStorage(mockAssert))
     {
+        testing::Mock::AllowLeak(mockAssert);
         testing::Mock::AllowLeak(mockDisplay);
         testing::Mock::AllowLeak(mockFootSwitch);
         testing::Mock::AllowLeak(mockMax3485Sender);
@@ -173,7 +179,7 @@ class DmxControllerTest : public ::testing::Test
     void TearDown() override
     {
         std::cout << "TEST_F TearDown()\n";
-        // Prevent double deletion by nulling out pointers after controller destruction
+        mockAssert = nullptr;
         mockDisplay = nullptr;
         mockFootSwitch = nullptr;
         mockMax3485Sender = nullptr;
@@ -197,9 +203,9 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
-        ControllerTestDouble(
-            SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws, NvStorage *ns, QueueHandle_t q)
-            : DmxController(_unit_test_dummy_configuration, _unit_test_dummy_dmx_presets, sd, fs, ms, ws, ns),
+        ControllerTestDouble(IAssert* assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
+            NvStorage *ns, QueueHandle_t q)
+            : DmxController(assert, _unit_test_dummy_configuration, _unit_test_dummy_dmx_presets, sd, fs, ms, ws, ns),
               testQueue(q)
         {
         }
@@ -213,7 +219,7 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     ASSERT_NE(mockNvStorage, nullptr);
 
     ControllerTestDouble controllerWithQueue(
-        mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
+        mockAssert, mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
 
     // Null checks before dereferencing mocks
     ASSERT_NE(mockDisplay, nullptr);
@@ -249,6 +255,7 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
 class DmxControllerQueueFailTest : public ::testing::Test
 {
   protected:
+    MockAssert *mockAssert;
     MockSevenSegmentDisplay *mockDisplay;
     MockFootSwitch *mockFootSwitch;
     MockMax3485Sender *mockMax3485Sender;
@@ -256,10 +263,12 @@ class DmxControllerQueueFailTest : public ::testing::Test
     MockNvStorage *mockNvStorage;
 
     DmxControllerQueueFailTest()
-        : mockDisplay(new MockSevenSegmentDisplay()), mockFootSwitch(new MockFootSwitch()),
-          mockMax3485Sender(new MockMax3485Sender()), mockWebServer(new MockWebServer()),
-          mockNvStorage(new MockNvStorage())
+        : mockAssert(new MockAssert()),
+          mockDisplay(new MockSevenSegmentDisplay(mockAssert)), mockFootSwitch(new MockFootSwitch(mockAssert)),
+          mockMax3485Sender(new MockMax3485Sender(mockAssert)), mockWebServer(new MockWebServer()),
+          mockNvStorage(new MockNvStorage(mockAssert))
     {
+        testing::Mock::AllowLeak(mockAssert);
         testing::Mock::AllowLeak(mockDisplay);
         testing::Mock::AllowLeak(mockFootSwitch);
         testing::Mock::AllowLeak(mockMax3485Sender);
@@ -285,9 +294,9 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
-        ControllerTestDouble(SevenSegmentDisplay *sd, FootSwitch *fs, MockMax3485Sender *ms, WebServer *ws,
+        ControllerTestDouble(IAssert* assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
             NvStorage *ns, QueueHandle_t q)
-            : DmxController(_unit_test_dummy_configuration_fail, _unit_test_dummy_dmx_presets_fail, sd, fs, ms, ws, ns),
+            : DmxController(assert, _unit_test_dummy_configuration_fail, _unit_test_dummy_dmx_presets_fail, sd, fs, ms, ws, ns),
               testQueue(q)
         {
         }
@@ -296,7 +305,7 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
 
     QueueHandle_t dummyQueue = reinterpret_cast<QueueHandle_t>(0x1);
     ControllerTestDouble controllerWithQueue(
-        mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
+        mockAssert, mockDisplay, mockFootSwitch, mockMax3485Sender, mockWebServer, mockNvStorage, dummyQueue);
 
     // Null checks before dereferencing mocks
     ASSERT_NE(mockDisplay, nullptr);

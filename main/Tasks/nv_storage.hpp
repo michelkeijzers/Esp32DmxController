@@ -12,6 +12,7 @@ extern "C"
 #include <freertos/queue.h>
 #include <freertos/task.h>
 }
+#include "../Base/assert.hpp"
 #include "../Base/rtos_task.hpp"
 #include "../Data/configuration.hpp"
 #include "../Data/dmx_presets.hpp"
@@ -20,13 +21,12 @@ extern "C"
 class NvStorage : public RtosTask
 {
   public:
-    NvStorage(Configuration &configuration, DmxPresets &dmxPresets);
+    NvStorage(IAssert *assert, Configuration &configuration, DmxPresets &dmxPresets);
     ~NvStorage();
 
     virtual void init(RtosTask::TaskProperties taskProperties);
 
   private:
-    const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
 
@@ -47,6 +47,7 @@ class NvStorage : public RtosTask
 
     Configuration &configuration_;
     DmxPresets &dmxPresets_;
+    IAssert *assert_;
 };
 
 #endif // NV_STORAGE_HPP

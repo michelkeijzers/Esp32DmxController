@@ -8,7 +8,8 @@ static DmxPresets _unit_test_dummy_dmx_presets_nv_storage;
 class MockNvStorage : public NvStorage
 {
   public:
-    MockNvStorage() : NvStorage(_unit_test_dummy_configuration_nv_storage, _unit_test_dummy_dmx_presets_nv_storage) {}
+    MockNvStorage(IAssert* assert, Configuration& config = _unit_test_dummy_configuration_nv_storage, DmxPresets& presets = _unit_test_dummy_dmx_presets_nv_storage)
+        : NvStorage(assert, config, presets) {}
     MOCK_METHOD(esp_err_t, init, (QueueHandle_t));
     MOCK_METHOD(QueueHandle_t, getEventQueue, ());
 };

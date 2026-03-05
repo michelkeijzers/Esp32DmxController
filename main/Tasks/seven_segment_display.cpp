@@ -52,14 +52,17 @@
     0b11111111  // All segments on
 };
 
-SevenSegmentDisplay::SevenSegmentDisplay() : RtosTask(), currentPattern_(0), decimalPointOn_(false) {}
+SevenSegmentDisplay::SevenSegmentDisplay(IAssert *assert)
+    : RtosTask(), assert_(assert), currentPattern_(0), decimalPointOn_(false)
+{
+}
 
 SevenSegmentDisplay::~SevenSegmentDisplay() {}
 
 void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8])
 {
     RtosTask::init(taskProperties);
-    Assert::assertNotNull(pins, "pins");
+    assert_->assertNotNull(pins, "pins");
 
     currentPattern_ = 0;
     decimalPointOn_ = false;
@@ -76,7 +79,7 @@ void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gp
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.intr_type = GPIO_INTR_DISABLE;
 
-        Assert::assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
+        assert_->assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
         segmentPins_[i] = pins[i];
     }
 
@@ -140,7 +143,7 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
         pattern = digitPatterns_[37]; // All segments on for unknown
         char msg[40];
         snprintf(msg, sizeof(msg), "Unsupported character: %d", static_cast<int>(character));
-        Assert::assertSoftwareError(msg);
+        assert_->assertSoftwareError(msg);
     }
 
     currentPattern_ = pattern;
@@ -149,7 +152,7 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
 
 void SevenSegmentDisplay::updateDisplay()
 {
-    Assert::assertTrue(initialized_, "initialized_");
+    assert_->assertTrue(initialized_, "initialized_");
 
     // Set each segment based on the current pattern and display type
     for (int i = 0; i < 7; i++)
@@ -159,7 +162,7 @@ void SevenSegmentDisplay::updateDisplay()
 
         gpioLevel = !segmentOn; // LOW = on for common anode
 
-        Assert::assertNotEspError(gpio_set_level(segmentPins_[i], gpioLevel ? 1 : 0), "Failed to set GPIO level");
+        assert_->assertNotEspError(gpio_set_level(segmentPins_[i], gpioLevel ? 1 : 0), "Failed to set GPIO level");
     }
 
     // Set decimal point

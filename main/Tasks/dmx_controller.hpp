@@ -1,4 +1,5 @@
 #pragma once
+#include "../Base/assert.hpp"
 #include "../Base/rtos_task.hpp"
 #include "../Data/dmx_presets.hpp"
 #include "driver/gpio.h"
@@ -18,10 +19,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
+class SevenSegmentDisplay;
+
 class DmxController : public RtosTask
 {
   public:
-    DmxController(Configuration &configuration, DmxPresets &dmxPresets, SevenSegmentDisplay *display,
+    DmxController(IAssert *assert, Configuration &configuration, DmxPresets &dmxPresets, SevenSegmentDisplay *display,
         FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
     virtual void init();
@@ -47,6 +50,7 @@ class DmxController : public RtosTask
     Configuration configuration_;
     DmxPresets dmxPresets_;
 
+    IAssert *assert_;
     TickType_t bootTime = 0;
     void taskEntry(void *param) override;
     esp_err_t performOtaUpdate(const char *url);

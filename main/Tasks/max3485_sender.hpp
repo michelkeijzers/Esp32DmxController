@@ -10,22 +10,25 @@ extern "C"
 }
 #include "Base/rtos_task.hpp"
 
+class IAssert;
 // Class to send DMX data to MAX3485 board
+
 class Max3485Sender : public RtosTask
 {
   public:
-    Max3485Sender();
+    Max3485Sender(IAssert *assert);
     ~Max3485Sender();
 
     virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
 
   private:
-    const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
     void close();
 
     esp_err_t sendDmx(const uint8_t *data, uint16_t length);
+
+    IAssert *assert_;
 
   private:
     void taskEntry(void *param) override;

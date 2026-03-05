@@ -2,6 +2,7 @@
 
 #include "../Data/configuration.hpp"
 #include "Base/rtos_task.hpp"
+#include <../Base/assert.hpp>
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/timers.h>
@@ -20,12 +21,11 @@ class FootSwitch : public RtosTask
         InterruptEventType type;
     };
 
-    FootSwitch(Configuration &configuration);
+    FootSwitch(IAssert *assert, Configuration &configuration);
     ~FootSwitch();
 
     virtual void init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum);
 
-    const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
 
@@ -39,6 +39,7 @@ class FootSwitch : public RtosTask
 
   private:
     Configuration &configuration_;
+    IAssert *assert_;
 
     gpio_num_t pin_;
 

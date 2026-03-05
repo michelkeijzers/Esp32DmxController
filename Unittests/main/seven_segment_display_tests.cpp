@@ -1,13 +1,18 @@
+
 #include "../../main/Tasks/seven_segment_display.hpp"
+#include "Mocks/mock_assert.hpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-class SevenSegmentDisplayTest : public ::testing::Test
-{
-  protected:
+
+class SevenSegmentDisplayTest : public ::testing::Test {
+protected:
+    MockAssert mockAssert;
     SevenSegmentDisplay display;
     gpio_num_t pins[8] = {
         GPIO_NUM_0, GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_4, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7};
+
+    SevenSegmentDisplayTest() : display(&mockAssert) {}
 };
 
 TEST_F(SevenSegmentDisplayTest, InitWithValidPins_ReturnsEspOk)
@@ -36,19 +41,21 @@ TEST_F(SevenSegmentDisplayTest, InitWithNullPins_ReturnsInvalidArg)
     // Optionally, check state after init
 }
 
+
 // Friend test class for private access
-class SevenSegmentDisplayTest_Friend : public SevenSegmentDisplay
-{
-  public:
-    void callDisplayDigit(char c, bool dot) { displayDigit(c, dot); }
-    void callUpdateDisplay() { updateDisplay(); }
-    uint8_t getCurrentPattern() const { return currentPattern_; }
-    bool getDecimalPointOn() const { return decimalPointOn_; }
+class SevenSegmentDisplayTest_Friend : public SevenSegmentDisplay {
+public:
+        SevenSegmentDisplayTest_Friend(IAssert* assert) : SevenSegmentDisplay(assert) {}
+        void callDisplayDigit(char c, bool dot) { displayDigit(c, dot); }
+        void callUpdateDisplay() { updateDisplay(); }
+        uint8_t getCurrentPattern() const { return currentPattern_; }
+        bool getDecimalPointOn() const { return decimalPointOn_; }
 };
 
 TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_ValidChar_UpdatesPatternAndReturnsOk)
 {
-    SevenSegmentDisplayTest_Friend testDisplay;
+    MockAssert mockAssert;
+    SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     RtosTask::TaskProperties props = {};
     props.taskName_ = "SevenSeg";
     props.taskPriority = 1;
@@ -65,7 +72,8 @@ TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_ValidChar_UpdatesPatternAndRet
 
 TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_InvalidChar_ReturnsInvalidArg)
 {
-    SevenSegmentDisplayTest_Friend testDisplay;
+    MockAssert mockAssert;
+    SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     RtosTask::TaskProperties props = {};
     props.taskName_ = "SevenSeg";
     props.taskPriority = 1;
@@ -82,7 +90,8 @@ TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_InvalidChar_ReturnsInvalidArg)
 
 TEST(SevenSegmentDisplayTest_Friend, UpdateDisplay_NotInitialized_ReturnsInvalidState)
 {
-    SevenSegmentDisplayTest_Friend testDisplay;
+    MockAssert mockAssert;
+    SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     // callUpdateDisplay() would trigger an assert or error; skip EXPECT_EQ
     // testDisplay.callUpdateDisplay();
 }

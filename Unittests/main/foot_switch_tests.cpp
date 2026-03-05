@@ -1,4 +1,6 @@
+
 #include "../../main/Tasks/foot_switch.hpp"
+#include "Mocks/mock_assert.hpp"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -7,11 +9,15 @@ using ::testing::Return;
 
 // No need to stub gpio_get_level here; already stubbed in esp_idf_stubs/driver/gpio.h
 
+
 static Configuration _unit_test_dummy_configuration_foot_switch_test;
-class FootSwitchTest : public ::testing::Test
-{
-  protected:
-    FootSwitch footSwitch{_unit_test_dummy_configuration_foot_switch_test};
+class FootSwitchTest : public ::testing::Test {
+protected:
+    MockAssert mockAssert;
+    FootSwitch footSwitch;
+
+    FootSwitchTest() : footSwitch(&mockAssert, _unit_test_dummy_configuration_foot_switch_test) {}
+
     void SetUp() override {}
     void TearDown() override {}
 };

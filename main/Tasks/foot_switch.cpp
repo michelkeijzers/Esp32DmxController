@@ -36,10 +36,11 @@ static void IRAM_ATTR isr_handler(void *arg)
     }
 }
 
-FootSwitch::FootSwitch(Configuration &configuration)
-    : RtosTask(), configuration_(configuration), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
-      longPressTimeMs_(1000), // Default long press time
-      polarityNormallyOpen_(true), longPressThresholdMs_(1000)
+
+FootSwitch::FootSwitch(IAssert* assert, Configuration &configuration)
+        : RtosTask(), configuration_(configuration), assert_(assert), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
+            longPressTimeMs_(1000), // Default long press time
+            polarityNormallyOpen_(true), longPressThresholdMs_(1000)
 {
 }
 
@@ -57,7 +58,7 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
     io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
     io_conf.intr_type = GPIO_INTR_ANYEDGE; // Enable interrupt on both edges
 
-    Assert::assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
+    assert_->assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
     int initialLevel = gpio_get_level(pinNum);
     lastPinState_ = (initialLevel == 0);
 
@@ -67,13 +68,13 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
     interruptEventQueue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
     ESP_LOGI("1", "2");
     printf("%p\n", interruptEventQueue);
-    Assert::assertQueueHandle(interruptEventQueue, "interruptEventQueue");
+    assert_->assertQueueHandle(interruptEventQueue, "interruptEventQueue");
     ESP_LOGI("1", "3");
     configEventQueue = getEventQueue();
     ESP_LOGI("1", "4");
 
-    Assert::assertNotEspError(gpio_install_isr_service(0), "Failed to install ISR service");
-    Assert::assertNotEspError(gpio_isr_handler_add(pin_, isr_handler, this), "Failed to add ISR handler");
+    assert_->assertNotEspError(gpio_install_isr_service(0), "Failed to install ISR service");
+    assert_->assertNotEspError(gpio_isr_handler_add(pin_, isr_handler, this), "Failed to add ISR handler");
 
     ESP_LOGI("1", "5");
     ESP_LOGI(pcTaskGetName(nullptr), "FootSwitchTask task started (interrupt mode)");

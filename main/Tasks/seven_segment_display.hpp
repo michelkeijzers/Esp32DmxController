@@ -13,6 +13,8 @@
 #include <freertos/queue.h>
 #include <freertos/task.h>
 
+class IAssert;
+
 class SevenSegmentDisplay : public RtosTask
 {
     friend class SevenSegmentDisplayTest_Friend;
@@ -24,13 +26,15 @@ class SevenSegmentDisplay : public RtosTask
         bool dot;
     };
 
-    SevenSegmentDisplay();
+    SevenSegmentDisplay(IAssert *assert);
     ~SevenSegmentDisplay();
 
     virtual void init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8]);
 
+  private:
+    IAssert *assert_;
+
   protected:
-    const char *logTag_;
     int taskPriority_;
     int queueCapacity_;
 

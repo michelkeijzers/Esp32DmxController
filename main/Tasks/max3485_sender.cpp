@@ -19,7 +19,7 @@ static const int DMX_BAUD_RATE = 250000;
 static const int DMX_BREAK_US = 100;
 static const int DMX_MAB_US = 12;
 
-Max3485Sender::Max3485Sender() : RtosTask() {}
+Max3485Sender::Max3485Sender(IAssert *assert) : RtosTask(), assert_(assert) {}
 
 Max3485Sender::~Max3485Sender() { close(); }
 
@@ -33,11 +33,12 @@ esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
     uart_config.parity = UART_PARITY_DISABLE;
     uart_config.stop_bits = UART_STOP_BITS_2;
     uart_config.flow_ctrl = UART_HW_FLOWCTRL_DISABLE;
-    Assert::assertNotEspError(uart_param_config(DMX_UART_PORT, &uart_config), "Failed to configure UART");
-    Assert::assertNotEspError(
+    assert_->assertNotEspError(uart_param_config(DMX_UART_PORT, &uart_config), "Failed to configure UART");
+    assert_->assertNotEspError(
         uart_set_pin(DMX_UART_PORT, DMX_TX_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE),
         "Failed to set UART pins");
-    Assert::assertNotEspError(uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0), "Failed to install UART driver");
+    assert_->assertNotEspError(
+        uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0), "Failed to install UART driver");
     initialized_ = true;
     ESP_LOGI(pcTaskGetName(nullptr), "MAX3485 sender initialized");
     return ESP_OK;

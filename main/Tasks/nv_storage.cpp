@@ -4,9 +4,9 @@
 #include <cstring>
 #include <esp_log.h>
 
-NvStorage::NvStorage(Configuration &configuration, DmxPresets &dmxPresets)
+NvStorage::NvStorage(IAssert *assert, Configuration &configuration, DmxPresets &dmxPresets)
     : RtosTask(), configurationNvsHandle_(0), presetsNvsHandle_(0), configurationNamespaceName_("configuration"),
-      presetsNamespaceName_("presets"), configuration_(configuration), dmxPresets_(dmxPresets)
+      presetsNamespaceName_("presets"), configuration_(configuration), dmxPresets_(dmxPresets), assert_(assert)
 {
 }
 
@@ -26,9 +26,9 @@ NvStorage::~NvStorage()
 void NvStorage::init(RtosTask::TaskProperties taskProperties)
 {
     RtosTask::init(taskProperties);
-    Assert::assertNotEspError(nvs_open(configurationNamespaceName_, NVS_READWRITE, &configurationNvsHandle_),
+    assert_->assertNotEspError(nvs_open(configurationNamespaceName_, NVS_READWRITE, &configurationNvsHandle_),
         "Failed to open configuration NVS");
-    Assert::assertNotEspError(
+    assert_->assertNotEspError(
         nvs_open(presetsNamespaceName_, NVS_READWRITE, &presetsNvsHandle_), "Failed to open presets NVS");
 }
 
@@ -41,7 +41,7 @@ void NvStorage::taskLoop()
     {
         if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(logTag_, "NvStorage event received: %d", event.type);
+            ESP_LOGI(pcTaskGetName(nullptr), "NvStorage event received: %d", event.type);
             switch (event.type)
             {
             case Messages::EventType::LOAD_CONFIGURATION:
@@ -52,7 +52,7 @@ void NvStorage::taskLoop()
                 loadDmxPresets();
                 break;
             default:
-                Assert::assertSoftwareError("Unknown NvStorage event type");
+                assert_->assertSoftwareError("Unknown NvStorage event type");
                 break;
             }
         }
@@ -73,29 +73,29 @@ void NvStorage::taskLoop()
 
 void NvStorage::loadConfiguration()
 {
-    Assert::assertNot0(configurationNvsHandle_, "configurationNvsHandle_");
+    assert_->assertNot0(configurationNvsHandle_, "configurationNvsHandle_");
 
     configuration_.lock();
 
     uint8_t footSwitchPolarityNormallyOpen;
-    Assert::assertNotEspError(
+    assert_->assertNotEspError(
         nvs_get_u8(configurationNvsHandle_, "FootSwitchPolarityNormallyOpen", &footSwitchPolarityNormallyOpen),
         "Failed to get FootSwitchPolarityNormallyOpen");
     configuration_.setFootSwitchPolarityNormallyOpen(footSwitchPolarityNormallyOpen);
 
     uint16_t footSwitchLongPressTime_;
-    Assert::assertNotEspError(
+    assert_->assertNotEspError(
         nvs_get_u16(configurationNvsHandle_, "FootSwitchLongPressThreshold", &footSwitchLongPressTime_),
         "Failed to get FootSwitchLongPressThreshold");
     configuration_.setFootSwitchLongPressTime(footSwitchLongPressTime_);
 
     uint8_t numberOfFilledPresets = 0;
-    Assert::assertNotEspError(nvs_get_u8(configurationNvsHandle_, "NumberOfFilledPresets", &numberOfFilledPresets),
+    assert_->assertNotEspError(nvs_get_u8(configurationNvsHandle_, "NumberOfFilledPresets", &numberOfFilledPresets),
         "Failed to get NumberOfFilledPresets");
     configuration_.setNumberOfFilledPresets(numberOfFilledPresets);
 
     uint8_t circularPresetNavigation;
-    Assert::assertNotEspError(
+    assert_->assertNotEspError(
         nvs_get_u8(configurationNvsHandle_, "CircularPresetNavigation", &circularPresetNavigation),
         "Failed to get CircularPresetNavigation");
     configuration_.setCircularPresetNavigation(circularPresetNavigation);
@@ -128,12 +128,12 @@ void NvStorage::loadConfiguration()
 
 void NvStorage::loadDmxPresets()
 {
-    Assert::assertNvsHandle(presetsNvsHandle_, "presetsNvsHandle_");
+    assert_->assertNvsHandle(presetsNvsHandle_, "presetsNvsHandle_");
 
     dmxPresets_.lock();
 
     uint8_t numberOfFilledPresets = 0;
-    Assert::assertNotEspError(nvs_get_u8(presetsNvsHandle_, "NumberOfFilledPresets", &numberOfFilledPresets),
+    assert_->assertNotEspError(nvs_get_u8(presetsNvsHandle_, "NumberOfFilledPresets", &numberOfFilledPresets),
         "Failed to get NumberOfFilledPresets");
     dmxPresets_.setNumberOfFilledPresets(numberOfFilledPresets);
 
@@ -146,13 +146,13 @@ void NvStorage::loadDmxPresets()
         snprintf(key, sizeof(key), "P%d.Name", presetIndex);
         size_t length = 32; // TODO: Use max length of name
         char name[32];
-        Assert::assertNotEspError(nvs_get_str(presetsNvsHandle_, key, name, &length), "Failed to get Preset name");
+        assert_->assertNotEspError(nvs_get_str(presetsNvsHandle_, key, name, &length), "Failed to get Preset name");
         dmxPreset.setName(name);
 
         snprintf(key, sizeof(key), "P%d.Values", presetIndex);
         length = 512; // TODO: Use actual size of DMX values
         uint8_t dmxValues[512];
-        Assert::assertNotEspError(
+        assert_->assertNotEspError(
             nvs_get_blob(presetsNvsHandle_, key, dmxValues, &length), "Failed to get Preset DMX values");
         dmxPreset.setDmxValues(dmxValues);
     }

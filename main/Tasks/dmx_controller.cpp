@@ -1,4 +1,5 @@
 #include "dmx_controller.hpp"
+#include "../Base/assert.hpp"
 #include "esp_app_desc.h"
 #include "esp_event.h"
 #include "esp_http_client.h"
@@ -11,12 +12,11 @@
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
-#include "../Base/assert.hpp"
-
-DmxController::DmxController(Configuration &configuration, DmxPresets &dmxPresets, SevenSegmentDisplay *display,
-    FootSwitch *footSwitch, Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
+DmxController::DmxController(IAssert *assert, Configuration &configuration, DmxPresets &dmxPresets,
+    SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *max3485Sender, WebServer *webServer,
+    NvStorage *nvStorage)
     : RtosTask(), display_(display), footSwitch_(footSwitch), max3485Sender_(max3485Sender), webServer_(webServer),
-      nvStorage_(nvStorage), configuration_(configuration), dmxPresets_(dmxPresets)
+      nvStorage_(nvStorage), configuration_(configuration), dmxPresets_(dmxPresets), assert_(assert)
 {
 }
 
@@ -32,8 +32,9 @@ void DmxController::init()
     RtosTask::init(dmxControllerTaskProperties);
 
     logFirmwareInfo();
-    Assert::assertNotEspError(esp_netif_init(), "Failed to initialize network interface");
-    Assert::assertNotEspError(esp_event_loop_create_default(), "Failed to create default event loop");
+
+    assert_->assertNotEspError(esp_netif_init(), "Failed to initialize network interface");
+    assert_->assertNotEspError(esp_event_loop_create_default(), "Failed to create default event loop");
 
     initSubTasks();
     initMessages();
@@ -44,22 +45,22 @@ void DmxController::initSubTasks()
 {
     ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController subtasks...\n");
 
-    Assert::assertNotNull(display_, "SevenSegmentDisplay");
+    assert_->assertNotNull(display_, "SevenSegmentDisplay");
     TaskProperties taskProperties =
         CreateTaskProperties("SevenSegmentDisplayTask", 5, 4096, 20, sizeof(Messages::Event));
     display_->init(taskProperties, DISPLAY_PINS);
 
-    Assert::assertNotNull(footSwitch_, "FootSwitch");
+    assert_->assertNotNull(footSwitch_, "FootSwitch");
     TaskProperties footSwitchTaskProperties =
         CreateTaskProperties("FootSwitchTask", 5, 4096, 20, sizeof(Messages::Event));
     footSwitch_->init(footSwitchTaskProperties, FOOT_SWITCH_PIN);
 
-    Assert::assertNotNull(webServer_, "WebServer");
+    assert_->assertNotNull(webServer_, "WebServer");
     TaskProperties webServerTaskProperties =
         CreateTaskProperties("WebServerTask", 5, 4096, 20, sizeof(Messages::Event));
     webServer_->init(webServerTaskProperties);
 
-    Assert::assertNotNull(max3485Sender_, "Max3485Sender");
+    assert_->assertNotNull(max3485Sender_, "Max3485Sender");
     TaskProperties max3485SenderTaskProperties =
         CreateTaskProperties("Max3485SenderTask", 5, 4096, 20, sizeof(Messages::Event));
     max3485Sender_->init(max3485SenderTaskProperties);
@@ -74,22 +75,13 @@ void DmxController::initMessages()
     Messages::Event event = Messages::Event();
     event.type = Messages::LOAD_CONFIGURATION;
 
-    QueueHandle_t nvQueue = nvStorage_ ? nvStorage_->getEventQueue() : nullptr;
-    if (nvQueue == nullptr) {
-        ESP_LOGE(pcTaskGetName(nullptr), "NvStorage event queue is nullptr");
-    } else {
-        Assert::assertPdPass(
-            xQueueSend(nvQueue, &event, 0), "Failed to send LOAD_CONFIGURATION message to NvStorage");
-    }
+    assert_->assertPdPass(
+        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_CONFIGURATION message to NvStorage");
 
     event.type = Messages::LOAD_DMX_PRESETS;
 
-    if (nvQueue == nullptr) {
-        ESP_LOGE(pcTaskGetName(nullptr), "NvStorage event queue is nullptr");
-    } else {
-        Assert::assertPdPass(
-            xQueueSend(nvQueue, &event, 0), "Failed to send LOAD_DMX_PRESETS message to NvStorage");
-    }
+    assert_->assertPdPass(
+        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_DMX_PRESETS message to NvStorage");
 
     ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController messages completed.\n");
 }
@@ -99,8 +91,7 @@ void DmxController::taskLoop()
     while (true)
     {
         Messages::Event event;
-        QueueHandle_t queue = getEventQueue();
-        if (queue != nullptr && xQueueReceive(queue, &event, 0) == pdTRUE)
+        if (xQueueReceive(getEventQueue(), &event, 0) == pdTRUE)
         {
             switch (event.type)
             {
@@ -109,24 +100,14 @@ void DmxController::taskLoop()
                 Messages::Event updateConfigurationEvent = Messages::Event();
                 updateConfigurationEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
 
-                QueueHandle_t footSwitchQueue = footSwitch_ ? footSwitch_->getEventQueue() : nullptr;
-                if (footSwitchQueue == nullptr) {
-                    ESP_LOGE(pcTaskGetName(nullptr), "FootSwitch event queue is nullptr");
-                } else {
-                    Assert::assertPdPass(xQueueSend(footSwitchQueue, &updateConfigurationEvent, 0),
-                        "Failed to forward configuration loaded to FootSwitch");
-                }
+                assert_->assertPdPass(xQueueSend(footSwitch_->getEventQueue(), &updateConfigurationEvent, 0),
+                    "Failed to forward configuration loaded to FootSwitch");
 
                 Messages::Event updateConfigurationWebEvent = Messages::Event();
                 updateConfigurationWebEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
 
-                QueueHandle_t webServerQueue = webServer_ ? webServer_->getEventQueue() : nullptr;
-                if (webServerQueue == nullptr) {
-                    ESP_LOGE(pcTaskGetName(nullptr), "WebServer event queue is nullptr");
-                } else {
-                    Assert::assertPdPass(xQueueSend(webServerQueue, &updateConfigurationWebEvent, 0),
-                        "Failed to forward configuration loaded to WebServer");
-                }
+                assert_->assertPdPass(xQueueSend(webServer_->getEventQueue(), &updateConfigurationWebEvent, 0),
+                    "Failed to forward configuration loaded to WebServer");
             }
             break;
 
