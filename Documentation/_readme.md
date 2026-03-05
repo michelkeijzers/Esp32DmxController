@@ -75,7 +75,7 @@ Build unit tests:
 In VS Code terminal (rename to Unittests):
 
 ```
-cd <....\Esp32Test\Esp32DmxController\Unittests\main\Debug>
+cd <....\Esp32Test\Esp32DmxController\Unittests\main>
 cmake --build . --config Debug
 ```
 
@@ -101,7 +101,7 @@ Run with code coverage:
 
 ```
 cmake --build . --config Debug --target coverage
-C:\OpenCppCoverage\OpenCppCoverage.exe --export_type html:coverage_report --sources "C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" -- Debug\Debug\run_tests.exe
+C:\OpenCppCoverage\OpenCppCoverage.exe --export_type html:coverage_report --sources "C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" -- Debug\run_tests.exe
 ```
 
 Run Reactor tests:

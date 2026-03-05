@@ -7,18 +7,13 @@ using ::testing::Return;
 
 // No need to stub gpio_get_level here; already stubbed in esp_idf_stubs/driver/gpio.h
 
+static Configuration _unit_test_dummy_configuration_foot_switch_test;
 class FootSwitchTest : public ::testing::Test
 {
   protected:
-    FootSwitch footSwitch;
-    void SetUp() override
-    {
-        // Setup code if needed
-    }
-    void TearDown() override
-    {
-        // Cleanup code if needed
-    }
+    FootSwitch footSwitch{_unit_test_dummy_configuration_foot_switch_test};
+    void SetUp() override {}
+    void TearDown() override {}
 };
 
 TEST_F(FootSwitchTest, DefaultConstructor_InitializesMembers)

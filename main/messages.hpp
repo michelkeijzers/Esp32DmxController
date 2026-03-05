@@ -17,17 +17,7 @@ class Messages
         DMX_PRESETS_LOADED, // NVS Storage -> DMX Controller
         UPDATE_DMX_PRESETS, // NVS Storage -> DMX Controller
 
-        // OLD:
-
-        // Initialization
-        REQUEST_CONFIGURATION,      // DMX Controller -> NVS Storage
-        CONFIGURATION_RESPONSE,     // NVS Storage -> DMX Controller
-        SET_CONFIGURATION,          // DMX Controller -> Foot Switch
-        SET_CONFIGURATION_RESPONSE, // Foot Switch -> DMX Controller
-        REQUEST_PRESETS,            // DMX Controller -> Preset Changer
-        PRESETS_RESPONSE,           // Preset Changer -> DMX Controller
-        SET_PRESETS,
-        SET_PRESETS_RESPONSE,
+        // OLD/TODO
 
         // Story: Foot switch for next/previous preset
         USER_NEXT_PRESET,          // Foot Switch -> DMX Controller
@@ -37,8 +27,11 @@ class Messages
         USE_PRESET_DATA,           // Preset Changer -> DMX Controller
         SEND_PRESET_DATA,          // DMX Controller -> Max3485 Sender
         SEND_PRESET_DATA_RESPONSE, // Max3485 Sender -> DMX Controller
-        SHOW_PRESET_INDEX          // DMX Controller -> Seven Segment Display
+        SHOW_PRESET_INDEX,         // DMX Controller -> Seven Segment Display
 
+        // Added for unit test compatibility
+        CONFIGURATION_RESPONSE,
+        PRESETS_RESPONSE
     };
 
     struct ConfigurationEventData

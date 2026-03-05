@@ -6,7 +6,7 @@ class Max3485SenderTest : public ::testing::Test
 {
   protected:
     Max3485Sender sender;
-    RtosTask::TaskProperties props = {"Max3485Sender", "Max3485Sender", 1, 1024, 4, sizeof(int), nullptr};
+    RtosTask::TaskProperties props = {"Max3485Sender", 1, 1024, 4, sizeof(int), nullptr};
 };
 
 TEST_F(Max3485SenderTest, Init_ReturnsEspOk) { EXPECT_EQ(sender.init(props), ESP_OK); }

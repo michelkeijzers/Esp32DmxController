@@ -80,7 +80,7 @@ void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gp
         segmentPins_[i] = pins[i];
     }
 
-    ESP_LOGI(logTag_, "SevenSegmentDisplay task started");
+    ESP_LOGI(pcTaskGetName(nullptr), "SevenSegmentDisplay task started");
 }
 
 void SevenSegmentDisplay::taskEntry(void *param) { static_cast<SevenSegmentDisplay *>(param)->taskLoop(); }

@@ -63,7 +63,7 @@ TEST_F(WebServerApiTest, AllDataPostRequestValidation)
     ASSERT_TRUE(root.is_object());
     ASSERT_TRUE(root.contains("configuration") && root["configuration"].is_object());
     ASSERT_TRUE(root.contains("presets") && root["presets"].is_array());
-    int num_presets = root["presets"].size();
+    size_t num_presets = root["presets"].size();
     EXPECT_EQ(num_presets, 2);
     for (const auto &preset : root["presets"])
     {

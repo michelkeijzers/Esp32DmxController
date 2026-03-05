@@ -33,7 +33,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/esp_idf_stubs)
+include_directories(${CMAKE_CURRENT_LIST_DIR}/esp_idf_stubs/freertos)
+# Add main and main/Data for includes
 include_directories(${CMAKE_SOURCE_DIR}/../../main)
+include_directories(${CMAKE_SOURCE_DIR}/../../main/Data)
 # Add ESP-IDF freertos include path for unit tests
 include_directories("C:/esp-idf/components/freertos/include")
 
@@ -68,6 +71,7 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/../../main/Data/dmx_preset.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/configuration.cpp
   ${STUB_SOURCES}
+  esp_idf_stubs/assert.cpp
 )
 
 set_target_properties(run_tests PROPERTIES

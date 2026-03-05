@@ -24,6 +24,7 @@ Thumbs.db
 *.iml
 # Test and coverage outputs
 coverage/
+coverage_report/
 *.lcov
 *.gcda
 *.gcno

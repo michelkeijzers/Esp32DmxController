@@ -145,13 +145,13 @@ void NvStorage::loadDmxPresets()
 
         snprintf(key, sizeof(key), "P%d.Name", presetIndex);
         size_t length = 32; // TODO: Use max length of name
-        char name[length];
+        char name[32];
         Assert::assertNotEspError(nvs_get_str(presetsNvsHandle_, key, name, &length), "Failed to get Preset name");
         dmxPreset.setName(name);
 
         snprintf(key, sizeof(key), "P%d.Values", presetIndex);
         length = 512; // TODO: Use actual size of DMX values
-        uint8_t dmxValues[length];
+        uint8_t dmxValues[512];
         Assert::assertNotEspError(
             nvs_get_blob(presetsNvsHandle_, key, dmxValues, &length), "Failed to get Preset DMX values");
         dmxPreset.setDmxValues(dmxValues);

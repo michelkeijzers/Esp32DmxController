@@ -86,7 +86,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -115,10 +115,10 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -157,7 +157,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -187,10 +187,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -229,7 +229,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -259,10 +259,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -301,7 +301,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>%(AdditionalOptions) /external:I "C:/tools/vcpkg/installed/x64-windows/include"</AdditionalOptions>
       <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -330,10 +330,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
@@ -443,6 +443,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_presets.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_preset.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\configuration.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\assert.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queue.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\task.cpp" />

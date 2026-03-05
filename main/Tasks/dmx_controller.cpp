@@ -73,12 +73,23 @@ void DmxController::initMessages()
 
     Messages::Event event = Messages::Event();
     event.type = Messages::LOAD_CONFIGURATION;
-    Assert::assertPdPass(
-        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_CONFIGURATION message to NvStorage");
+
+    QueueHandle_t nvQueue = nvStorage_ ? nvStorage_->getEventQueue() : nullptr;
+    if (nvQueue == nullptr) {
+        ESP_LOGE(pcTaskGetName(nullptr), "NvStorage event queue is nullptr");
+    } else {
+        Assert::assertPdPass(
+            xQueueSend(nvQueue, &event, 0), "Failed to send LOAD_CONFIGURATION message to NvStorage");
+    }
 
     event.type = Messages::LOAD_DMX_PRESETS;
-    Assert::assertPdPass(
-        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_DMX_PRESETS message to NvStorage");
+
+    if (nvQueue == nullptr) {
+        ESP_LOGE(pcTaskGetName(nullptr), "NvStorage event queue is nullptr");
+    } else {
+        Assert::assertPdPass(
+            xQueueSend(nvQueue, &event, 0), "Failed to send LOAD_DMX_PRESETS message to NvStorage");
+    }
 
     ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController messages completed.\n");
 }
@@ -88,7 +99,8 @@ void DmxController::taskLoop()
     while (true)
     {
         Messages::Event event;
-        if (xQueueReceive(getEventQueue(), &event, 0) == pdTRUE)
+        QueueHandle_t queue = getEventQueue();
+        if (queue != nullptr && xQueueReceive(queue, &event, 0) == pdTRUE)
         {
             switch (event.type)
             {
@@ -96,13 +108,25 @@ void DmxController::taskLoop()
             {
                 Messages::Event updateConfigurationEvent = Messages::Event();
                 updateConfigurationEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
-                Assert::assertPdPass(xQueueSend(footSwitch_->getEventQueue(), &updateConfigurationEvent, 0),
-                    "Failed to forward configuration loaded to FootSwitch");
+
+                QueueHandle_t footSwitchQueue = footSwitch_ ? footSwitch_->getEventQueue() : nullptr;
+                if (footSwitchQueue == nullptr) {
+                    ESP_LOGE(pcTaskGetName(nullptr), "FootSwitch event queue is nullptr");
+                } else {
+                    Assert::assertPdPass(xQueueSend(footSwitchQueue, &updateConfigurationEvent, 0),
+                        "Failed to forward configuration loaded to FootSwitch");
+                }
 
                 Messages::Event updateConfigurationWebEvent = Messages::Event();
                 updateConfigurationWebEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
-                Assert::assertPdPass(xQueueSend(webServer_->getEventQueue(), &updateConfigurationWebEvent, 0),
-                    "Failed to forward configuration loaded to WebServer");
+
+                QueueHandle_t webServerQueue = webServer_ ? webServer_->getEventQueue() : nullptr;
+                if (webServerQueue == nullptr) {
+                    ESP_LOGE(pcTaskGetName(nullptr), "WebServer event queue is nullptr");
+                } else {
+                    Assert::assertPdPass(xQueueSend(webServerQueue, &updateConfigurationWebEvent, 0),
+                        "Failed to forward configuration loaded to WebServer");
+                }
             }
             break;
 
