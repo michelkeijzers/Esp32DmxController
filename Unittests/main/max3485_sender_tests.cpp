@@ -7,7 +7,7 @@
 
 class Max3485SenderTest : public ::testing::Test {
 protected:
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     Max3485Sender sender;
     RtosTask::TaskProperties props = {"Max3485Sender", 1, 1024, 4, sizeof(int), nullptr};
 

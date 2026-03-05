@@ -13,4 +13,17 @@ public:
     MOCK_METHOD(void, assertTrue, (bool variable, const char *variableName), (override));
     MOCK_METHOD(void, assertSoftwareError, (const char *message), (override));
     MOCK_METHOD(void, Halt, (), (override));
+
+    MockAssert() {
+        using namespace ::testing;
+        ON_CALL(*this, assertNotEspError).WillByDefault(Return());
+        ON_CALL(*this, assertPdPass).WillByDefault(Return());
+        ON_CALL(*this, assertQueueHandle).WillByDefault(Return());
+        ON_CALL(*this, assertNvsHandle).WillByDefault(Return());
+        ON_CALL(*this, assertNotNull).WillByDefault(Return());
+        ON_CALL(*this, assertNot0).WillByDefault(Return());
+        ON_CALL(*this, assertTrue).WillByDefault(Return());
+        ON_CALL(*this, assertSoftwareError).WillByDefault(Return());
+        ON_CALL(*this, Halt).WillByDefault(Return());
+    }
 };

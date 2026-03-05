@@ -7,7 +7,7 @@
 
 class SevenSegmentDisplayTest : public ::testing::Test {
 protected:
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     SevenSegmentDisplay display;
     gpio_num_t pins[8] = {
         GPIO_NUM_0, GPIO_NUM_1, GPIO_NUM_2, GPIO_NUM_3, GPIO_NUM_4, GPIO_NUM_5, GPIO_NUM_6, GPIO_NUM_7};
@@ -28,7 +28,7 @@ TEST_F(SevenSegmentDisplayTest, InitWithValidPins_ReturnsEspOk)
     // Optionally, check state after init
 }
 
-TEST_F(SevenSegmentDisplayTest, InitWithNullPins_ReturnsInvalidArg)
+TEST_F(SevenSegmentDisplayTest, InitWithNullPins_TriggersAssertNotNull)
 {
     RtosTask::TaskProperties props = {};
     props.taskName_ = "SevenSeg";
@@ -37,8 +37,11 @@ TEST_F(SevenSegmentDisplayTest, InitWithNullPins_ReturnsInvalidArg)
     props.queueCapacity = 4;
     props.queueItemSize = sizeof(SevenSegmentDisplay::Event);
     props.mainEventQueue = nullptr;
-    display.init(props, nullptr);
-    // Optionally, check state after init
+
+    EXPECT_CALL(mockAssert, assertNotNull(nullptr, ::testing::StrEq("pins")))
+        .WillOnce(::testing::Throw(std::runtime_error("assertNotNull failed")));
+
+    EXPECT_THROW(display.init(props, nullptr), std::runtime_error);
 }
 
 
@@ -54,7 +57,7 @@ public:
 
 TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_ValidChar_UpdatesPatternAndReturnsOk)
 {
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     RtosTask::TaskProperties props = {};
     props.taskName_ = "SevenSeg";
@@ -72,7 +75,7 @@ TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_ValidChar_UpdatesPatternAndRet
 
 TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_InvalidChar_ReturnsInvalidArg)
 {
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     RtosTask::TaskProperties props = {};
     props.taskName_ = "SevenSeg";
@@ -90,7 +93,7 @@ TEST(SevenSegmentDisplayTest_Friend, DisplayDigit_InvalidChar_ReturnsInvalidArg)
 
 TEST(SevenSegmentDisplayTest_Friend, UpdateDisplay_NotInitialized_ReturnsInvalidState)
 {
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     SevenSegmentDisplayTest_Friend testDisplay(&mockAssert);
     // callUpdateDisplay() would trigger an assert or error; skip EXPECT_EQ
     // testDisplay.callUpdateDisplay();

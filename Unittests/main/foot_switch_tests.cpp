@@ -13,7 +13,7 @@ using ::testing::Return;
 static Configuration _unit_test_dummy_configuration_foot_switch_test;
 class FootSwitchTest : public ::testing::Test {
 protected:
-    MockAssert mockAssert;
+    ::testing::NiceMock<MockAssert> mockAssert;
     FootSwitch footSwitch;
 
     FootSwitchTest() : footSwitch(&mockAssert, _unit_test_dummy_configuration_foot_switch_test) {}

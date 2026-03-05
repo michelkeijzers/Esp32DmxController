@@ -5,14 +5,22 @@ set(OPENCOVERAGE_EXE "C:/OpenCppCoverage/OpenCppCoverage.exe" CACHE STRING "Path
 add_custom_target(coverage
   COMMAND ${OPENCOVERAGE_EXE}
     --export_type=html:coverage_report
-    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\dmx_controller.cpp"
-    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\seven_segment_display.cpp"
-    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\max3485_sender.cpp"
-    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\dmx_presets.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\dmx_preset.cpp"
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\configuration.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\web_server.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\seven_segment_display.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\nv_storage.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\max3485_sender.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\dmx_controller.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\foot_switch.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\lockable.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\assert.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\main.cpp"
     -- "${CMAKE_CURRENT_BINARY_DIR}/Debug/run_tests.exe"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp"
+  COMMENT "Running OpenCppCoverage for all Data, Tasks, Base, and main.cpp files"
   VERBATIM
 )
 

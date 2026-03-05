@@ -61,8 +61,12 @@ SevenSegmentDisplay::~SevenSegmentDisplay() {}
 
 void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8])
 {
-    RtosTask::init(taskProperties);
     assert_->assertNotNull(pins, "pins");
+    ESP_LOGI(pcTaskGetName(nullptr), "I0\n");
+    RtosTask::init(taskProperties);
+    ESP_LOGI(pcTaskGetName(nullptr), "I10\n");
+    assert_->assertNotNull(pins, "pins");
+    ESP_LOGI(pcTaskGetName(nullptr), "20\n");
 
     currentPattern_ = 0;
     decimalPointOn_ = false;
@@ -70,20 +74,26 @@ void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gp
     // Configure GPIO pins
     for (int i = 0; i < 8; i++)
     {
-        segmentPins_[i] = pins[i];
+        ESP_LOGI(pcTaskGetName(nullptr), "50\n");
 
+        ESP_LOGI(pcTaskGetName(nullptr), "Configuring GPIO pin %d for segment %d\n", pins[i], i);
+        segmentPins_[i] = pins[i];
+        ESP_LOGI(pcTaskGetName(nullptr), "I52\n");
         gpio_config_t io_conf = {};
         io_conf.pin_bit_mask = (1ULL << pins[i]);
+        ESP_LOGI(pcTaskGetName(nullptr), "I54\n");
         io_conf.mode = GPIO_MODE_OUTPUT;
         io_conf.pull_up_en = GPIO_PULLUP_DISABLE;
         io_conf.pull_down_en = GPIO_PULLDOWN_DISABLE;
         io_conf.intr_type = GPIO_INTR_DISABLE;
 
+        ESP_LOGI(pcTaskGetName(nullptr), "I60\n");
         assert_->assertNotEspError(gpio_config(&io_conf), "Failed to configure GPIO");
         segmentPins_[i] = pins[i];
     }
 
     ESP_LOGI(pcTaskGetName(nullptr), "SevenSegmentDisplay task started");
+    ESP_LOGI(pcTaskGetName(nullptr), "I99\n");
 }
 
 void SevenSegmentDisplay::taskEntry(void *param) { static_cast<SevenSegmentDisplay *>(param)->taskLoop(); }
@@ -104,7 +114,7 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
 {
     uint8_t pattern = 0;
     decimalPointOn_ = dot;
-
+    ESP_LOGI(pcTaskGetName(nullptr), "D0\n");
     // Map character to pattern
     if (character >= '0' && character <= '9')
     {
@@ -148,10 +158,12 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
 
     currentPattern_ = pattern;
     updateDisplay();
+    ESP_LOGI(pcTaskGetName(nullptr), "D99\n");
 }
 
 void SevenSegmentDisplay::updateDisplay()
 {
+    ESP_LOGI(pcTaskGetName(nullptr), "U0\n");
     assert_->assertTrue(initialized_, "initialized_");
 
     // Set each segment based on the current pattern and display type
@@ -168,4 +180,5 @@ void SevenSegmentDisplay::updateDisplay()
     // Set decimal point
     bool dpGpioLevel = !decimalPointOn_;
     gpio_set_level(segmentPins_[SEG_DP], dpGpioLevel);
+    ESP_LOGI(pcTaskGetName(nullptr), "U99\n");
 }
