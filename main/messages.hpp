@@ -9,6 +9,15 @@ class Messages
 
     enum EventType
     {
+        LOAD_CONFIGURATION,   // DMX Controller -> NVS Storage
+        CONFIGURATION_LOADED, // NVS Storage -> DMX Controller
+        UPDATE_CONFIGURATION, // DMX Controller -> Foot Switch, Web Server
+
+        LOAD_DMX_PRESETS,   // DMX Controller -> NVS Storage
+        UPDATE_DMX_PRESETS, // NVS Storage -> DMX Controller
+
+        // OLD:
+
         // Initialization
         REQUEST_CONFIGURATION,      // DMX Controller -> NVS Storage
         CONFIGURATION_RESPONSE,     // NVS Storage -> DMX Controller
@@ -55,9 +64,6 @@ class Messages
         EventType type;
         union
         {
-            ConfigurationEventData configurationData;
-            PresetsEventData presetsData;
-            PresetEventData presetData;
         } data;
     };
 };

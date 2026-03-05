@@ -13,7 +13,10 @@ idf_component_register(
         "Tasks/web_server.cpp"
         "Data/dmx_presets.cpp"
         "Data/dmx_preset.cpp"
+        "Data/configuration.cpp"
+        "Base/lockable.cpp"
+        "Base/assert.cpp"
     INCLUDE_DIRS "." "Tasks"
-    REQUIRES esp_https_ota app_update nvs_flash esp_wifi esp_event driver json esp_http_server spiffs
+    REQUIRES esp_https_ota app_update nvs_flash esp_wifi esp_event driver json esp_http_server spiffs freertos
 )
 

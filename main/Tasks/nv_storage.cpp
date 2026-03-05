@@ -1,31 +1,33 @@
 #include "nv_storage.hpp"
+
+#include "../Base/assert.hpp"
 #include <cstring>
 #include <esp_log.h>
 
-NvStorage::NvStorage()
-    : RtosTask(), configuration_nvs_handle(0), presets_nvs_handle(0), configuration_namespace_name("configuration"),
-      presets_namespace_name("presets")
+NvStorage::NvStorage(Configuration &configuration, DmxPresets &dmxPresets)
+    : RtosTask(), configurationNvsHandle_(0), presetsNvsHandle_(0), configurationNamespaceName_("configuration"),
+      presetsNamespaceName_("presets"), configuration_(configuration), dmxPresets_(dmxPresets)
 {
 }
 
 NvStorage::~NvStorage()
 {
-    if (configuration_nvs_handle != 0)
+    if (configurationNvsHandle_ != 0)
     {
-        nvs_close(configuration_nvs_handle);
+        nvs_close(configurationNvsHandle_);
     }
 
-    if (presets_nvs_handle != 0)
+    if (presetsNvsHandle_ != 0)
     {
-        nvs_close(presets_nvs_handle);
+        nvs_close(presetsNvsHandle_);
     }
 }
 
 void NvStorage::init(RtosTask::TaskProperties taskProperties)
 {
     RtosTask::init(taskProperties);
-    ESP_ERROR_CHECK(nvs_open(configuration_namespace_name, NVS_READWRITE, &configuration_nvs_handle));
-    ESP_ERROR_CHECK(nvs_open(presets_namespace_name, NVS_READWRITE, &presets_nvs_handle));
+    ESP_ERROR_CHECK(nvs_open(configurationNamespaceName_, NVS_READWRITE, &configurationNvsHandle_));
+    ESP_ERROR_CHECK(nvs_open(presetsNamespaceName_, NVS_READWRITE, &presetsNvsHandle_));
 }
 
 void NvStorage::taskEntry(void *param) { static_cast<NvStorage *>(param)->taskLoop(); }
@@ -37,101 +39,100 @@ void NvStorage::taskLoop()
     {
         if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(log_tag_, "NvStorage event received: %d", event.type);
+            ESP_LOGI(logTag_, "NvStorage event received: %d", event.type);
             switch (event.type)
             {
-            case Messages::SET_CONFIGURATION:
-                setConfiguration(event.data.configurationData);
-                break;
-
-            case Messages::REQUEST_CONFIGURATION:
-                requestConfiguration(event.data.configurationData);
-                break;
-
-            case Messages::SET_PRESETS:
-                setPresets(event.data.presetsData);
-                break;
-
-            case Messages::REQUEST_PRESETS:
-                requestPresets(event.data.presetsData);
+            case Messages::EventType::LOAD_CONFIGURATION:
+                loadConfiguration();
                 break;
 
             default:
-                ESP_LOGW(log_tag_, "Unknown NvStorage event type: %d", event.type);
+                ESP_LOGW(logTag_, "Unknown NvStorage event type: %d", event.type);
                 break;
             }
         }
     }
 }
 
-void NvStorage::setConfiguration(const Messages::ConfigurationEventData &configurationData)
+// void NvStorage::saveConfiguration(Configuration &configurationData)
+// {
+//     assertNot0(configurationNvsHandle_, "configurationNvsHandle_");
+//     ESP_ERROR_CHECK(nvs_set_u8(
+//         configurationNvsHandle_, "SwitchPolarityNormallyOpen", configurationData.switchPolarityNormallyOpen));
+//     ESP_ERROR_CHECK(
+//         nvs_set_u16(configurationNvsHandle_, "LongPressThreshold", configurationData.longPressThresholdMs));
+//     ESP_ERROR_CHECK(nvs_commit(configurationNvsHandle_));
+// }
+
+void NvStorage::loadConfiguration()
 {
-    assertNot0(configuration_nvs_handle, "configuration_nvs_handle");
-    ESP_ERROR_CHECK(nvs_set_u8(
-        configuration_nvs_handle, "SwitchPolarityNormallyOpen", configurationData.switchPolarityNormallyOpen));
+    Assert::assertNot0(configurationNvsHandle_, "configurationNvsHandle_");
+
+    configuration_.lock();
+
+    uint8_t footSwitchPolarityNormallyOpen;
     ESP_ERROR_CHECK(
-        nvs_set_u16(configuration_nvs_handle, "LongPressThreshold", configurationData.longPressThresholdMs));
-    ESP_ERROR_CHECK(nvs_commit(configuration_nvs_handle));
-}
+        nvs_get_u8(configurationNvsHandle_, "FootSwitchPolarityNormallyOpen", &footSwitchPolarityNormallyOpen));
+    configuration_.setFootSwitchPolarityNormallyOpen(footSwitchPolarityNormallyOpen);
 
-void NvStorage::requestConfiguration(Messages::ConfigurationEventData &configurationData)
-{
-    assertNot0(configuration_nvs_handle, "configuration_nvs_handle");
+    uint16_t footSwitchLongPressTime_;
+    ESP_ERROR_CHECK(nvs_get_u16(configurationNvsHandle_, "FootSwitchLongPressThreshold", &footSwitchLongPressTime_));
+    configuration_.setFootSwitchLongPressTime(footSwitchLongPressTime_);
 
-    uint8_t switch_polarity_normally_open;
-    ESP_ERROR_CHECK(nvs_get_u8(configuration_nvs_handle, "SwitchPolarityNormallyOpen", &switch_polarity_normally_open));
-    configurationData.switchPolarityNormallyOpen = switch_polarity_normally_open;
+    uint8_t numberOfFilledPresets = 0;
+    ESP_ERROR_CHECK(nvs_get_u8(configurationNvsHandle_, "NumberOfFilledPresets", &numberOfFilledPresets));
+    configuration_.setNumberOfFilledPresets(numberOfFilledPresets);
 
-    uint16_t long_press_threshold_ms;
-    ESP_ERROR_CHECK(nvs_get_u16(configuration_nvs_handle, "LongPressThreshold", &long_press_threshold_ms));
-    configurationData.longPressThresholdMs = long_press_threshold_ms;
+    uint8_t circularPresetNavigation;
+    ESP_ERROR_CHECK(nvs_get_u8(configurationNvsHandle_, "CircularPresetNavigation", &circularPresetNavigation));
+    configuration_.setCircularPresetNavigation(circularPresetNavigation);
 
-    // Send configuration response message
+    configuration_.unlock();
+
     Messages::Event responseEvent;
-    responseEvent.type = Messages::CONFIGURATION_RESPONSE;
-    responseEvent.data.configurationData = configurationData;
+    responseEvent.type = Messages::CONFIGURATION_LOADED;
     xQueueSend(getDmxControllerEventQueue(), &responseEvent, portMAX_DELAY);
 }
 
-void NvStorage::setPresets(const Messages::PresetsEventData &presetsData)
-{
-    assertNot0(presets_nvs_handle, "presets_nvs_handle");
+// void NvStorage::setPresets(const Messages::PresetsEventData &presetsData)
+// {
+//     assertNot0(presetsNvsHandle_, "presetsNvsHandle_");
 
-    ESP_ERROR_CHECK(nvs_set_u8(presets_nvs_handle, "NumberOfPresets", presetsData.numberOfPresets));
+//     ESP_ERROR_CHECK(nvs_set_u8(presetsNvsHandle_, "NumberOfPresets", presetsData.numberOfPresets));
 
-    for (uint8_t i = 0; i < presetsData.numberOfPresets; ++i)
-    {
-        const Messages::PresetEventData &preset = presetsData.presets[i];
-        char key[16];
-        snprintf(key, sizeof(key), "Preset%d", i);
-        ESP_ERROR_CHECK(nvs_set_blob(presets_nvs_handle, key, &preset, sizeof(Messages::PresetEventData)));
-    }
+//     for (uint8_t i = 0; i < presetsData.numberOfPresets; ++i)
+//     {
+//         const Messages::PresetEventData &preset = presetsData.presets[i];
+//         char key[16];
+//         snprintf(key, sizeof(key), "Preset%d", i);
+//         ESP_ERROR_CHECK(nvs_set_blob(presetsNvsHandle_, key, &preset, sizeof(Messages::PresetEventData)));
+//     }
 
-    ESP_ERROR_CHECK(nvs_commit(presets_nvs_handle));
-}
+//     ESP_ERROR_CHECK(nvs_commit(presetsNvsHandle_));
+// }
 
-void NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
-{
-    assertNot0(presets_nvs_handle, "presets_nvs_handle");
+// void NvStorage::requestPresets(Messages::PresetsEventData &presetsData)
+// {
+//     assertNot0(presetsNvsHandle_, "presetsNvsHandle_");
 
-    uint8_t number_of_presets;
-    ESP_ERROR_CHECK(nvs_get_u8(presets_nvs_handle, "NumberOfPresets", &number_of_presets));
-    presetsData.numberOfPresets = number_of_presets;
+//     uint8_t number_of_presets;
+//     ESP_ERROR_CHECK(nvs_get_u8(presetsNvsHandle_, "NumberOfPresets", &number_of_presets));
+//     presetsData.numberOfPresets = number_of_presets;
 
-    for (uint8_t i = 0; i < number_of_presets; ++i)
-    {
-        char key[16];
-        snprintf(key, sizeof(key), "Preset%d", i);
-        Messages::PresetEventData &preset = presetsData.presets[i];
-        size_t length = sizeof(Messages::PresetEventData); // Length is not used in this case since
-                                                           // we expect a fixed size blob
-        ESP_ERROR_CHECK(nvs_get_blob(presets_nvs_handle, key, &preset, &length));
-        presetsData.presets[i] = preset;
-    }
+//     for (uint8_t i = 0; i < number_of_presets; ++i)
+//     {
+//         char key[16];
+//         snprintf(key, sizeof(key), "Preset%d", i);
+//         Messages::PresetEventData &preset = presetsData.presets[i];
+//         size_t length = sizeof(Messages::PresetEventData); // Length is not used in this case since
+//                                                            // we expect a fixed size blob
+//         ESP_ERROR_CHECK(nvs_get_blob(presetsNvsHandle_, key, &preset, &length));
+//         presetsData.presets[i] = preset;
+//     }
 
-    // Send configuration response message
-    Messages::Event responseEvent;
-    responseEvent.type = Messages::PRESETS_RESPONSE;
-    responseEvent.data.presetsData = presetsData;
-    xQueueSend(getDmxControllerEventQueue(), &responseEvent, portMAX_DELAY);
-}
+//     // Send configuration response message
+//     Messages::Event responseEvent;
+//     responseEvent.type = Messages::PRESETS_RESPONSE;
+//     responseEvent.data.presetsData = presetsData;
+//     xQueueSend(getDmxControllerEventQueue(), &responseEvent, portMAX_DELAY);
+// }

@@ -11,10 +11,12 @@
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
 
-DmxController::DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *max3485Sender,
-    WebServer *webServer, NvStorage *nvStorage)
+#include "../Base/assert.hpp"
+
+DmxController::DmxController(Configuration &configuration, DmxPresets &dmxPresets, SevenSegmentDisplay *display,
+    FootSwitch *footSwitch, Max3485Sender *max3485Sender, WebServer *webServer, NvStorage *nvStorage)
     : RtosTask(), display_(display), footSwitch_(footSwitch), max3485Sender_(max3485Sender), webServer_(webServer),
-      nvStorage_(nvStorage)
+      nvStorage_(nvStorage), configuration_(configuration), dmxPresets_(dmxPresets)
 {
 }
 
@@ -22,159 +24,89 @@ DmxController::~DmxController() {}
 
 void DmxController::init()
 {
-    printf("Initializing DmxController...\n");
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController...\n");
     QueueHandle_t queue = getEventQueue(); // Unused
-    printf("DmxController init: queue handle = %p\n", (void *)queue);
     setMainEventQueue(queue);
     TaskProperties dmxControllerTaskProperties =
-        CreateTaskProperties("DmxControllerTask", "DmxController", 4, 4096, 20, sizeof(Messages::Event));
-
+        CreateTaskProperties("DmxControllerTask", 4, 4096, 20, sizeof(Messages::Event));
     RtosTask::init(dmxControllerTaskProperties);
 
-    bootTime = xTaskGetTickCount();
     logFirmwareInfo();
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    ESP_LOGI(log_tag_, "Initializing sub-tasks...\n");
     initSubTasks();
     initMessages();
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController completed.\n");
 }
 
 void DmxController::initSubTasks()
 {
-    if (!display_)
-    {
-        ESP_LOGE(log_tag_, "display_ is nullptr");
-        return;
-    }
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController subtasks...\n");
+
+    Assert::assertNotNull(display_, "SevenSegmentDisplay");
     TaskProperties taskProperties =
-        CreateTaskProperties("SevenSegmentDisplayTask", "SevenSegmentDisplay", 5, 4096, 20, sizeof(Messages::Event));
+        CreateTaskProperties("SevenSegmentDisplayTask", 5, 4096, 20, sizeof(Messages::Event));
     display_->init(taskProperties, DISPLAY_PINS);
 
-    if (!footSwitch_)
-    {
-        ESP_LOGE(log_tag_, "footSwitch_ is nullptr");
-        return;
-    }
+    Assert::assertNotNull(footSwitch_, "FootSwitch");
     TaskProperties footSwitchTaskProperties =
-        CreateTaskProperties("FootSwitchTask", "FootSwitch", 5, 4096, 20, sizeof(Messages::Event));
+        CreateTaskProperties("FootSwitchTask", 5, 4096, 20, sizeof(Messages::Event));
     footSwitch_->init(footSwitchTaskProperties, FOOT_SWITCH_PIN);
 
-    if (!webServer_)
-    {
-        ESP_LOGE(log_tag_, "webServer_ is nullptr");
-        return;
-    }
+    Assert::assertNotNull(webServer_, "WebServer");
     TaskProperties webServerTaskProperties =
-        CreateTaskProperties("WebServerTask", "WebServer", 5, 4096, 20, sizeof(Messages::Event));
+        CreateTaskProperties("WebServerTask", 5, 4096, 20, sizeof(Messages::Event));
     webServer_->init(webServerTaskProperties);
 
-    if (!max3485Sender_)
-    {
-        ESP_LOGE(log_tag_, "max3485Sender_ is nullptr");
-        return;
-    }
+    Assert::assertNotNull(max3485Sender_, "Max3485Sender");
     TaskProperties max3485SenderTaskProperties =
-        CreateTaskProperties("Max3485SenderTask", "Max3485Sender", 5, 4096, 20, sizeof(Messages::Event));
+        CreateTaskProperties("Max3485SenderTask", 5, 4096, 20, sizeof(Messages::Event));
     max3485Sender_->init(max3485SenderTaskProperties);
+
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController subtasks completed.\n");
 }
 
 void DmxController::initMessages()
 {
-    // Send a message to NvStorage to request config
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController messages...\n");
+
     Messages::Event event = Messages::Event();
-    event.type = Messages::REQUEST_CONFIGURATION;
-    if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
-    {
-        ESP_LOGE(log_tag_, "Failed to send configuration request to NvStorage");
-        return;
-    }
+    event.type = Messages::LOAD_CONFIGURATION;
+    Assert::assertPdPass(
+        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_CONFIGURATION message to NvStorage");
 
-    // Receive config response (blocking)
-    if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
-    {
-        ESP_LOGE(log_tag_, "Failed to receive configuration response from NvStorage");
-        return;
-    }
-    if (event.type != Messages::EventType::CONFIGURATION_RESPONSE)
-    {
-        ESP_LOGE(log_tag_, "Received unexpected configuration event type from NvStorage: %d", event.type);
-        return;
-    }
+    event.type = Messages::LOAD_DMX_PRESETS;
+    Assert::assertPdPass(
+        xQueueSend(nvStorage_->getEventQueue(), &event, 0), "Failed to send LOAD_DMX_PRESETS message to NvStorage");
 
-    // Send config response to FootSwitch (no response needed)
-    Messages::Event footSwitchEvent = Messages::Event();
-    footSwitchEvent.type = Messages::SET_CONFIGURATION;
-    footSwitchEvent.data.configurationData = event.data.configurationData;
-    if (xQueueSend(footSwitch_->getEventQueue(), &footSwitchEvent, 0) != pdPASS)
-    {
-        ESP_LOGE(log_tag_, "Failed to send configuration to FootSwitch");
-        return;
-    }
-
-    // Send a message to NvStorage to request presets
-    event.type = Messages::REQUEST_PRESETS;
-    if (xQueueSend(nvStorage_->getEventQueue(), &event, 0) != pdPASS)
-    {
-        ESP_LOGE(log_tag_, "Failed to send presets request to NvStorage");
-        return;
-    }
-
-    // Receive presets response (blocking)
-    if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) != pdTRUE)
-    {
-        ESP_LOGE(log_tag_, "Failed to receive presets response from NvStorage");
-        return;
-    }
-    if (event.type != Messages::EventType::PRESETS_RESPONSE)
-    {
-        ESP_LOGE(log_tag_, "Received unexpected event type from NvStorage: %d", event.type);
-        return;
-    }
+    ESP_LOGI(pcTaskGetName(nullptr), "Initializing DmxController messages completed.\n");
 }
 
 void DmxController::taskLoop()
 {
     while (true)
     {
-        // TODO: call performOtaUpdate, etc.
-
-        // Handle next preset event from FootSwitch
         Messages::Event event;
         if (xQueueReceive(getEventQueue(), &event, 0) == pdTRUE)
         {
             switch (event.type)
             {
-            case Messages::EventType::USER_NEXT_PRESET:
+            case Messages::EventType::CONFIGURATION_LOADED:
             {
+                Messages::Event updateConfigurationEvent = Messages::Event();
+                updateConfigurationEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
+                Assert::assertPdPass(xQueueSend(footSwitch_->getEventQueue(), &updateConfigurationEvent, 0),
+                    "Failed to forward configuration loaded to FootSwitch");
+
+                Messages::Event updateConfigurationWebEvent = Messages::Event();
+                updateConfigurationWebEvent.type = Messages::EventType::UPDATE_CONFIGURATION;
+                Assert::assertPdPass(xQueueSend(webServer_->getEventQueue(), &updateConfigurationWebEvent, 0),
+                    "Failed to forward configuration loaded to WebServer");
             }
             break;
 
-            case Messages::EventType::USER_PREVIOUS_PRESET:
-            {
-            }
-            break;
-
-            case Messages::EventType::USE_PRESET_DATA:
-            {
-                // TODO: Send preset data to DMX output (via Max3485Sender).)
-            }
-            break;
-
-            case Messages::EventType::SEND_PRESET_DATA_RESPONSE:
-            {
-                // Forward preset index to SevenSegmentDisplay
-                Messages::Event displayEvent = Messages::Event();
-                displayEvent.type = Messages::EventType::SHOW_PRESET_INDEX;
-                displayEvent.data.presetData.presetNumber = event.data.presetData.presetNumber;
-                if (xQueueSend(display_->getEventQueue(), &displayEvent, 0) != pdPASS)
-                {
-                    ESP_LOGE(log_tag_, "Failed to forward preset index to SevenSegmentDisplay");
-                }
-            }
-            break;
-
+            // TODO: ERROR (from NVStorage)
             default:
                 // Ignore other events
                 break;
@@ -190,26 +122,26 @@ void DmxController::taskEntry(void *param) { static_cast<DmxController *>(param)
 void DmxController::logFirmwareInfo()
 {
     const esp_app_desc_t *app_desc = esp_app_get_description();
-    ESP_LOGW(log_tag_, "Current firmware version: %s", app_desc->version);
-    ESP_LOGW(log_tag_, "Project name: %s", app_desc->project_name);
-    ESP_LOGW(log_tag_, "Compile time: %s %s", app_desc->date, app_desc->time);
+    ESP_LOGW(pcTaskGetName(nullptr), "Current firmware version: %s", app_desc->version);
+    ESP_LOGW(pcTaskGetName(nullptr), "Project name: %s", app_desc->project_name);
+    ESP_LOGW(pcTaskGetName(nullptr), "Compile time: %s %s", app_desc->date, app_desc->time);
 }
 
 esp_err_t DmxController::performOtaUpdate(const char *url)
 {
-    printf("Starting OTA update from: %s\n", url);
+    ESP_LOGI(pcTaskGetName(nullptr), "Starting OTA update from: %s", url);
     esp_https_ota_config_t ota_config = {};
     // ota_config.http_config = NULL;
     // ota_config.http_client_init_cb = NULL;
     esp_err_t ret = esp_https_ota(&ota_config);
     if (ret == ESP_OK)
     {
-        ESP_LOGW(log_tag_, "OTA update successful, restarting...");
+        ESP_LOGW(pcTaskGetName(nullptr), "OTA update successful, restarting...");
         esp_restart();
     }
     else
     {
-        ESP_LOGE(log_tag_, "OTA update failed: %s\n", esp_err_to_name(ret));
+        ESP_LOGE(pcTaskGetName(nullptr), "OTA update failed: %s\n", esp_err_to_name(ret));
     }
     return ret;
 }

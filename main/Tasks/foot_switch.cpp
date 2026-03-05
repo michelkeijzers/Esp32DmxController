@@ -4,6 +4,8 @@
 #endif
 #endif
 #include "foot_switch.hpp"
+
+#include "../Base/assert.hpp"
 #include "esp_attr.h"
 #include "messages.hpp"
 #include <driver/gpio.h>
@@ -14,8 +16,8 @@
 #include <stdio.h>
 
 static const int QUEUE_CAPACITY = 10;
-static QueueHandle_t interrupt_event_queue = nullptr;
-static QueueHandle_t config_event_queue = nullptr;
+static QueueHandle_t interruptEventQueue = nullptr;
+static QueueHandle_t configEventQueue = nullptr;
 
 static gpio_num_t isr_pin = GPIO_NUM_NC;
 
@@ -27,15 +29,15 @@ static void IRAM_ATTR isr_handler(void *arg)
     FootSwitch::InterruptEvent event;
     event.type = (level == 0) ? InterruptEventType::PRESS : InterruptEventType::RELEASE;
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    xQueueSendFromISR(interrupt_event_queue, &event, &xHigherPriorityTaskWoken);
+    xQueueSendFromISR(interruptEventQueue, &event, &xHigherPriorityTaskWoken);
     if (xHigherPriorityTaskWoken)
     {
         portYIELD_FROM_ISR();
     }
 }
 
-FootSwitch::FootSwitch()
-    : RtosTask(), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
+FootSwitch::FootSwitch(Configuration &configuration)
+    : RtosTask(), configuration_(configuration), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
       longPressTimeMs_(1000), // Default long press time
       polarityNormallyOpen_(true), longPressThresholdMs_(1000)
 {
@@ -61,14 +63,14 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
 
     pin_ = pinNum;
     isr_pin = pinNum;
-    interrupt_event_queue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
-    assertNotNull(interrupt_event_queue, "interrupt_event_queue");
-    config_event_queue = getEventQueue();
+    interruptEventQueue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
+    Assert::assertQueueHandle(interruptEventQueue, "interruptEventQueue");
+    configEventQueue = getEventQueue();
 
     ESP_ERROR_CHECK(gpio_install_isr_service(0));
     ESP_ERROR_CHECK(gpio_isr_handler_add(pin_, isr_handler, this));
 
-    ESP_LOGI(log_tag_, "FootSwitchTask task started (interrupt mode)");
+    ESP_LOGI(logTag_, "FootSwitchTask task started (interrupt mode)");
 }
 
 void FootSwitch::taskEntry(void *param) { static_cast<FootSwitch *>(param)->taskLoop(); }
@@ -84,7 +86,7 @@ void FootSwitch::taskLoop()
 
     while (true)
     {
-        if (xQueueReceive(interrupt_event_queue, &interruptEvent, 0) == pdTRUE)
+        if (xQueueReceive(interruptEventQueue, &interruptEvent, 0) == pdTRUE)
         {
 
             TickType_t now = xTaskGetTickCount();
@@ -111,33 +113,36 @@ void FootSwitch::taskLoop()
                         TickType_t elapsedMs = (now - pressStartTime_) * portTICK_PERIOD_MS;
                         if (elapsedMs >= longPressThresholdMs_)
                         {
-                            ESP_LOGI(log_tag_, "Long press detected: %lu ms", elapsedMs);
+                            ESP_LOGI(logTag_, "Long press detected: %lu ms", elapsedMs);
                             bool legal = HandleLongPress();
                             if (!legal)
                             {
-                                ESP_LOGW(log_tag_, "Long press not legal in current state");
+                                ESP_LOGW(logTag_, "Long press not legal in current state");
                             }
                         }
                         if (HandleShortPress() != ESP_OK)
                         {
-                            ESP_LOGW(log_tag_, "Short press not legal in current state");
+                            ESP_LOGW(logTag_, "Short press not legal in current state");
                         }
                     }
                 }
             }
         }
-        else if (xQueueReceive(config_event_queue, &configEvent, 0) == pdTRUE)
+        else if (xQueueReceive(configEventQueue, &configEvent, 0) == pdTRUE)
         {
-            if (configEvent.type == Messages::EventType::SET_CONFIGURATION)
+            if (configEvent.type == Messages::EventType::UPDATE_CONFIGURATION)
             {
-                polarityNormallyOpen_ = configEvent.data.configurationData.switchPolarityNormallyOpen;
-                longPressThresholdMs_ = configEvent.data.configurationData.longPressThresholdMs;
-                ESP_LOGI(log_tag_, "Configuration updated: polarityNormallyOpen=%d, longPressThresholdMs=%d",
+
+                configuration_.lock();
+                polarityNormallyOpen_ = configuration_.getFootSwitchPolarityNormallyOpen();
+                longPressThresholdMs_ = configuration_.getFootSwitchLongPressTime();
+                configuration_.unlock();
+                ESP_LOGI(logTag_, "Configuration updated: polarityNormallyOpen=%d, longPressThresholdMs=%d",
                     polarityNormallyOpen_, longPressThresholdMs_);
             }
             else
             {
-                ESP_LOGW(log_tag_, "Unknown event type received in FootSwitch: %d", configEvent.type);
+                ESP_LOGW(logTag_, "Unknown event type received in FootSwitch: %d", configEvent.type);
             }
         }
         else
@@ -149,7 +154,7 @@ void FootSwitch::taskLoop()
 
 esp_err_t FootSwitch::HandleShortPress()
 {
-    ESP_LOGI(log_tag_, "Short press detected");
+    ESP_LOGI(logTag_, "Short press detected");
 
     // send next preset event to DMX Controller
     Messages::Event event;
@@ -157,7 +162,7 @@ esp_err_t FootSwitch::HandleShortPress()
 
     if (xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY) != pdPASS)
     {
-        ESP_LOGE(log_tag_, "Failed to send USER_NEXT_PRESET event to DMX Controller");
+        ESP_LOGE(logTag_, "Failed to send USER_NEXT_PRESET event to DMX Controller");
         return ESP_FAIL;
     }
 
@@ -166,13 +171,13 @@ esp_err_t FootSwitch::HandleShortPress()
 
 esp_err_t FootSwitch::HandleLongPress()
 {
-    ESP_LOGI(log_tag_, "Long press detected");
+    ESP_LOGI(logTag_, "Long press detected");
     // send previous preset event to DMX Controller
     Messages::Event event;
     event.type = Messages::USER_PREVIOUS_PRESET;
     if (xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY) != pdPASS)
     {
-        ESP_LOGE(log_tag_, "Failed to send USER_PREVIOUS_PRESET event to DMX Controller");
+        ESP_LOGE(logTag_, "Failed to send USER_PREVIOUS_PRESET event to DMX Controller");
         return ESP_FAIL;
     }
     return ESP_OK;

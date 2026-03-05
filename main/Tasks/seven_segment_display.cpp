@@ -5,6 +5,8 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include "../Base/assert.hpp"
+
 // Digit patterns for common cathode 7-segment display
 // Each bit represents a segment: bit 0 = A, 1 = B, 2 = C, 3 = D, 4 = E, 5 = F, 6 = G
 // DP is handled separately
@@ -57,7 +59,7 @@ SevenSegmentDisplay::~SevenSegmentDisplay() {}
 void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gpio_num_t pins[8])
 {
     RtosTask::init(taskProperties);
-    assertNotNull(pins, "pins");
+    Assert::assertNotNull(pins, "pins");
 
     currentPattern_ = 0;
     decimalPointOn_ = false;
@@ -78,7 +80,7 @@ void SevenSegmentDisplay::init(RtosTask::TaskProperties taskProperties, const gp
         segmentPins_[i] = pins[i];
     }
 
-    ESP_LOGI(log_tag_, "SevenSegmentDisplay task started");
+    ESP_LOGI(logTag_, "SevenSegmentDisplay task started");
 }
 
 void SevenSegmentDisplay::taskEntry(void *param) { static_cast<SevenSegmentDisplay *>(param)->taskLoop(); }
@@ -138,7 +140,7 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
         pattern = digitPatterns_[37]; // All segments on for unknown
         char msg[40];
         snprintf(msg, sizeof(msg), "Unsupported character: %d", static_cast<int>(character));
-        softwareError(msg);
+        Assert::assertSoftwareError(msg);
     }
 
     currentPattern_ = pattern;
@@ -147,7 +149,7 @@ void SevenSegmentDisplay::displayDigit(char character, bool dot)
 
 void SevenSegmentDisplay::updateDisplay()
 {
-    assertTrue(initialized_, "initialized_");
+    Assert::assertTrue(initialized_, "initialized_");
 
     // Set each segment based on the current pattern and display type
     for (int i = 0; i < 7; i++)

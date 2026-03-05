@@ -97,8 +97,8 @@ DmxPresets *--"20" DmxPreset
 class Configuration <<Data>> #lightBlue {}
 DmxController *-- Configuration
 
-NvStorage --> DmxPresets : Write
-NvStorage --> Configuration : Write
+NvStorage *-- DmxPresets : Local\n copy
+NvStorage *-- Configuration : Local\n copy
 
 'class OscConfiguration <<Data>> #grey {}
 'Configuration *-- OscConfiguration
@@ -321,34 +321,66 @@ activate DmxController
             constructor and init for other sub tasks
         end note
     DmxController -> DmxController : initMessages()
-    activate DmxController
-        DmxController --> NvStorage : LOAD_CONFIGURATION
-    deactivate DmxController
 
-    DmxController -> DmxController : taskLoop() 
+    ref over DmxController : Load Configuration
 
-    NvStorage -> NvStorage : Load configuration \n from NVRAM and \n store in internal instance
-    group Load Configuration
+    ref over DmxController : Load Presets
+@enduml 
+
+@startuml 
+title Load Configuration 
+
+legend top
+    |= Color |= Meaning |
+    |<back:black>              | Method call or statements |
+    |<back:lightBlue>             | Message/Event |
+    |<back:orange>             | Mutex semaphore operation |
+endlegend
+
+participant Main
+participant DmxController
+participant NvStorage
+participant FootSwitch
+participant SevenSegmentDisplay
+participant WebServer
+
+Main -> DmxController : initMessages()
+activate DmxController
+    DmxController --> NvStorage : <back:lightblue> LOAD_CONFIGURATION()
+    activate NvStorage
+        NvStorage -> DmxController : <back:orange> Lock Configuration
+        NvStorage -> NvStorage : Read configuration from NVRAM
+        NvStorage -> DmxController : Write to configuration instance
+        NvStorage -> DmxController : <back:orange> Unlock Configuration
+
         alt Configuration loaded successfully from NVRAM
-            NvStorage --> DmxController : UPDATE_CONFIGURATION
-            DmxController -> NvStorage : Configuration get_configuration()
-            NvStorage -> NvStorage : Take mutex
-            NvStorage -> NvStorage : Copy configuration
-            NvStorage -> NvStorage : Give mutex
-            NvStorage --> DmxController : configuration instance
-            DmxController --> FootSwitch : UPDATE_CONFIGURATION
-            FootSwitch -> DmxController : GetConfiguration()
-            DmxController -> DmxController : Take mutex
-            DmxController -> DmxController : Copy configuration 
-            DmxController -> DmxController : Release mutex
-            DmxController --> FootSwitch : configuration instance
-            FootSwitch -> FootSwitch : Copy to internal variables
-            
+            NvStorage -> DmxController : <back:lightblue> CONFIGURATION_LOADED()
+
+            DmxController -> FootSwitch : <back:lightblue> UPDATE_CONFIGURATION()
+            activate FootSwitch
+                FootSwitch -> DmxController : <back:orange> Lock Configuration
+                FootSwitch -> FootSwitch : Copy foot switch configuration \n to internal variables
+                FootSwitch -> DmxController : <back:orange> Unlock Configuration
+            deactivate FootSwitch
+
+            DmxController -> WebServer : <back:lightblue> UPDATE_CONFIGURATION() 
+            activate WebServer
+                WebServer -> DmxController : <back:orange> Lock Configuration
+                WebServer -> WebServer : Copy web server configuration \n to internal variables
+                WebServer -> DmxController : <back:orange> Unlock Configuration
+            deactivate WebServer
+
         else error loading configuration from NVRAM 
-            NvStorage --> DmxController : ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
-            DmxController --> SevenSegmentDisplay : DISPLAY_ERROR(\n NV_STORAGE_LOAD_CONFIGURATION_FAILED)
+            NvStorage -> DmxController : <back:lightblue> ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
+            DmxController -> SevenSegmentDisplay : <back:lightblue> DISPLAY_ERROR(NV_STORAGE_LOAD_CONFIGURATION_FAILED)
         end
-    end
+    deactivate NvStorage
+deactivate DmxController
+
+@enduml 
+
+@startuml
+    title Load Presets
 
     DmxController --> NvStorage : LOAD_PRESETS
     loop each filled preset

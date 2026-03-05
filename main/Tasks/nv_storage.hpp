@@ -12,37 +12,40 @@ extern "C"
 #include <freertos/queue.h>
 #include <freertos/task.h>
 }
+#include "../Base/rtos_task.hpp"
+#include "../Data/configuration.hpp"
 #include "../Data/dmx_presets.hpp"
-#include "Base/rtos_task.hpp"
-#include "messages.hpp"
+#include "../messages.hpp"
 
 class NvStorage : public RtosTask
 {
   public:
-    NvStorage();
+    NvStorage(Configuration &configuration, DmxPresets &dmxPresets);
     ~NvStorage();
 
     virtual void init(RtosTask::TaskProperties taskProperties);
 
   private:
-    const char *log_tag_;
-    int task_priority_;
-    int queue_capacity_;
+    const char *logTag_;
+    int taskPriority_;
+    int queueCapacity_;
 
-    // Synchronous wrappers (for compatibility)
-    void setConfiguration(const Messages::ConfigurationEventData &config);
-    void requestConfiguration(Messages::ConfigurationEventData &config);
-    void setPresets(const Messages::PresetsEventData &presets);
-    void requestPresets(Messages::PresetsEventData &presets);
+    void loadConfiguration();
+
+    Configuration& getConfiguration() { return configuration_; }
+    DmxPresets& getDmxPresets() { return dmxPresets_; }
 
   private:
-    nvs_handle_t configuration_nvs_handle;
-    nvs_handle_t presets_nvs_handle;
-    const char *configuration_namespace_name;
-    const char *presets_namespace_name;
+    nvs_handle_t configurationNvsHandle_;
+    nvs_handle_t presetsNvsHandle_;
+    const char *configurationNamespaceName_;
+    const char *presetsNamespaceName_;
 
     void taskEntry(void *param) override;
     void taskLoop();
+
+    Configuration &configuration_;
+    DmxPresets &dmxPresets_;
 };
 
 #endif // NV_STORAGE_HPP

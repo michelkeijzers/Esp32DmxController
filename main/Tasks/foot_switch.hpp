@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../Data/configuration.hpp"
 #include "Base/rtos_task.hpp"
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
@@ -19,7 +20,7 @@ class FootSwitch : public RtosTask
         InterruptEventType type;
     };
 
-    FootSwitch();
+    FootSwitch(Configuration &configuration);
     ~FootSwitch();
 
     virtual void init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum);
@@ -37,6 +38,8 @@ class FootSwitch : public RtosTask
     gpio_num_t getPin() const { return pin_; }
 
   private:
+    Configuration &configuration_;
+
     gpio_num_t pin_;
 
     bool lastPinState_;

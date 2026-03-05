@@ -1,13 +1,14 @@
 #pragma once
 
+#include "../Base/lockable.hpp"
 #include "dmx_preset.hpp"
 #include <esp_err.h>
 #include <vector>
-// Maximum number of presets
+
 #define MAX_PRESETS 20
 #define MIN_PRESETS 2
 
-class DmxPresets
+class DmxPresets : Lockable
 {
   public:
     DmxPresets();

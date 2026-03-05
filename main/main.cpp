@@ -7,13 +7,16 @@
 
 extern "C" void app_main()
 {
+    Configuration configuration;
+    DmxPresets dmxPresets;
+
     auto *display = new SevenSegmentDisplay();
-    auto *footSwitch = new FootSwitch();
+    auto *footSwitch = new FootSwitch(configuration);
     auto *max3485Sender = new Max3485Sender();
     auto *webServer = new WebServer();
-    auto *nvStorage = new NvStorage();
+    auto *nvStorage = new NvStorage(configuration, dmxPresets);
 
-    DmxController controller(display, footSwitch, max3485Sender, webServer, nvStorage);
-    controller.init();
-    controller.taskLoop();
+    DmxController dmxController(configuration, dmxPresets, display, footSwitch, max3485Sender, webServer, nvStorage);
+    dmxController.init();
+    dmxController.taskLoop();
 }

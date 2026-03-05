@@ -9,6 +9,7 @@ add_custom_target(coverage
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\seven_segment_display.cpp"
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\max3485_sender.cpp"
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.cpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\configuration.cpp"
     -- "${CMAKE_CURRENT_BINARY_DIR}/Debug/run_tests.exe"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Running OpenCppCoverage for dmx_controller.cpp and seven_segment_display.cpp"
@@ -33,6 +34,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${CMAKE_CURRENT_LIST_DIR}/esp_idf_stubs)
 include_directories(${CMAKE_SOURCE_DIR}/../../main)
+# Add ESP-IDF freertos include path for unit tests
+include_directories("C:/esp-idf/components/freertos/include")
 
 # Add all stub .cpp files from esp_idf_stubs and subfolders
 #default_stub_glob_pattern = "${CMAKE_CURRENT_LIST_DIR}/esp_idf_stubs/*.cpp"
@@ -63,6 +66,7 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/../../main/Base/rtos_task.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/dmx_presets.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/dmx_preset.cpp
+  ${CMAKE_SOURCE_DIR}/../../main/Data/configuration.cpp
   ${STUB_SOURCES}
 )
 

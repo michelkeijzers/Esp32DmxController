@@ -1,12 +1,13 @@
 #pragma once
-#include "Base/rtos_task.hpp"
-#include "Data/dmx_presets.hpp"
+#include "../Base/rtos_task.hpp"
+#include "../Data/dmx_presets.hpp"
 #include "driver/gpio.h"
 #include "foot_switch.hpp"
 #include "max3485_sender.hpp"
 #include "nv_storage.hpp"
 #include "seven_segment_display.hpp"
 #include "web_server.hpp"
+#include <../Data/configuration.hpp>
 #include <esp_err.h>
 #include <esp_https_ota.h>
 #include <esp_log.h>
@@ -20,8 +21,8 @@
 class DmxController : public RtosTask
 {
   public:
-    DmxController(SevenSegmentDisplay *display, FootSwitch *footSwitch, Max3485Sender *dmx3485Sender,
-        WebServer *webServer, NvStorage *nvStorage);
+    DmxController(Configuration &configuration, DmxPresets &dmxPresets, SevenSegmentDisplay *display,
+        FootSwitch *footSwitch, Max3485Sender *dmx3485Sender, WebServer *webServer, NvStorage *nvStorage);
     ~DmxController();
     virtual void init();
     void taskLoop();
@@ -43,8 +44,10 @@ class DmxController : public RtosTask
     WebServer *webServer_;
     NvStorage *nvStorage_;
 
-    TickType_t bootTime = 0;
+    Configuration configuration_;
+    DmxPresets dmxPresets_;
 
+    TickType_t bootTime = 0;
     void taskEntry(void *param) override;
     esp_err_t performOtaUpdate(const char *url);
     void logFirmwareInfo();
