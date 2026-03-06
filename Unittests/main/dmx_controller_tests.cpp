@@ -198,8 +198,9 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     // Test double for DmxController that does NOT override destructor or set member pointers to nullptr
 
     // Provide TU-local dummy Configuration and DmxPresets for test double
-    static Configuration _unit_test_dummy_configuration;
-    static DmxPresets _unit_test_dummy_dmx_presets;
+    static MockAssert _unit_test_mock_assert;
+    static Configuration _unit_test_dummy_configuration(&_unit_test_mock_assert);
+    static DmxPresets _unit_test_dummy_dmx_presets(&_unit_test_mock_assert);
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
@@ -289,8 +290,9 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     xQueueSendFromISR_ptr = queuefail_xQueueSendFromISR;
 
     // Provide TU-local dummy Configuration and DmxPresets for test double
-    static Configuration _unit_test_dummy_configuration_fail;
-    static DmxPresets _unit_test_dummy_dmx_presets_fail;
+    static MockAssert _unit_test_mock_assert_fail;
+    static Configuration _unit_test_dummy_configuration_fail(&_unit_test_mock_assert_fail);
+    static DmxPresets _unit_test_dummy_dmx_presets_fail(&_unit_test_mock_assert_fail);
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;

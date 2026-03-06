@@ -434,6 +434,11 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\foot_switch_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\seven_segment_display_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\max3485_sender_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\system_init_test.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\nv_storage_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\configuration_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_preset_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_presets_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\foot_switch.cpp" />

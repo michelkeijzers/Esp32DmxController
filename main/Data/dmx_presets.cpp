@@ -1,14 +1,20 @@
 #include "dmx_presets.hpp"
+#include "../Base/assert.hpp"
 #include <cstring>
-
 #include <esp_log.h>
 #include <stdexcept>
 
 static const char *LOG_TAG = "DmxPresets";
 
-DmxPresets::DmxPresets() : numberOfFilledPresets_(20) // Default to 20 presets
+DmxPresets::DmxPresets(IAssert *assert) : assert_(assert)
 {
-    presets_.resize(MAX_PRESETS);
+    presets_.clear();
+    for (int i = 0; i < MAX_PRESETS; ++i)
+    {
+        presets_.push_back(DmxPreset(assert_));
+    }
+    numberOfFilledPresets_ = 0;
+    currentPresetIndex_ = 0;
 }
 
 void DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
@@ -34,6 +40,9 @@ void DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 
 void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
+    assert_->assertNotNull(name, "name");
+    assert_->assertNotNull(dmxValues, "dmxValues");
+
     if (presetNumber >= numberOfFilledPresets_)
     {
         ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", presetNumber, numberOfFilledPresets_ - 1);
@@ -54,6 +63,7 @@ void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t
     presets_[presetNumber].setDmxValues(dmxValues);
 
     ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", presetNumber, name);
+    numberOfFilledPresets_++;
 }
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)
@@ -76,16 +86,6 @@ void DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
     }
 
     presets_[index].copyFrom(preset);
-}
-
-void DmxPresets::clearAll()
-{
-    for (auto &preset : presets_)
-    {
-        preset.clear();
-    }
-    currentPresetIndex_ = 0;
-    // numberOfFilledPresets_ remains unchanged to preserve test setup consistency
 }
 
 void DmxPresets::setCurrentPresetIndex(uint8_t index)

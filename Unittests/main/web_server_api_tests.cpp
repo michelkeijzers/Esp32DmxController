@@ -14,14 +14,17 @@ namespace
 #include "../../main/Data/dmx_preset.hpp"
 #include "../../main/Data/dmx_presets.hpp"
 
+// Use MockAssert for DI
+#include "Mocks/mock_assert.hpp"
+
 class WebServerApiTest : public ::testing::Test
 {
   protected:
-    DmxPresets presets;
+    MockAssert mockAssert;
+    DmxPresets presets{&mockAssert};
     std::unique_ptr<MockWebServer> server;
     void SetUp() override
     {
-        presets.clearAll();
         server = std::make_unique<MockWebServer>(&presets);
         presets.setNumberOfFilledPresets(2);
         uint8_t vals0[NR_OF_DMX_CHANNELS] = {0, 1, 2};

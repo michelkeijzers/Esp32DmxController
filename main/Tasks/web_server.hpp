@@ -12,6 +12,7 @@ extern "C"
 #include <freertos/task.h>
 }
 
+class IAssert;
 class WebServer : public RtosTask
 {
   public:
@@ -26,7 +27,7 @@ class WebServer : public RtosTask
         EventType type;
     };
 
-    WebServer();
+    WebServer(IAssert *assert);
     virtual ~WebServer();
 
     virtual void init(RtosTask::TaskProperties taskProperties);
@@ -71,4 +72,7 @@ class WebServer : public RtosTask
     void test_cjson_logic();
     void test_presets_to_json();
     void test_cjson_add_item();
+
+  private:
+    IAssert *assert_;
 };

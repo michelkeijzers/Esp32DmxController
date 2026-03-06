@@ -8,10 +8,12 @@
 #define MAX_PRESETS 20
 #define MIN_PRESETS 2
 
+class IAssert;
+
 class DmxPresets : public Lockable
 {
   public:
-    DmxPresets();
+    DmxPresets(IAssert *assert);
 
     uint8_t getNumberOfFilledPresets() const { return numberOfFilledPresets_; }
     void setNumberOfFilledPresets(uint8_t numberOfFilledPresets);
@@ -20,7 +22,6 @@ class DmxPresets : public Lockable
     DmxPreset &getPreset(uint8_t index);
     void setPreset(uint8_t index, const DmxPreset &preset);
     void addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues);
-    void clearAll();
 
     uint8_t getCurrentPresetIndex() const { return currentPresetIndex_; }
     void setCurrentPresetIndex(uint8_t index);
@@ -31,4 +32,5 @@ class DmxPresets : public Lockable
     uint8_t numberOfFilledPresets_;
     uint8_t currentPresetIndex_;
     std::vector<DmxPreset> presets_;
+    IAssert *assert_;
 };

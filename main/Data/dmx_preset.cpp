@@ -1,4 +1,4 @@
-
+#include "../Base/assert.hpp"
 
 #ifdef _MSC_VER
 #ifndef _CRT_SECURE_NO_WARNINGS
@@ -10,7 +10,7 @@
 
 static const char *TAG = "DmxPreset";
 
-DmxPreset::DmxPreset() { clear(); }
+DmxPreset::DmxPreset(IAssert *assert) : assert_(assert) { clear(); }
 
 void DmxPreset::setName(const char *name)
 {
@@ -67,6 +67,7 @@ void DmxPreset::setDmxValues(const uint8_t *values)
 
 void DmxPreset::clear()
 {
+    index_ = 0;
     memset(name_, 0, sizeof(name_));
     memset(dmxValues_, 0, NR_OF_DMX_CHANNELS);
 }

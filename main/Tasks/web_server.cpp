@@ -6,6 +6,7 @@
 #include "web_server.hpp"
 #include <esp_log.h>
 
+#include "../Base/assert.hpp"
 #include "../ThirdParty/nlohmann/json.hpp"
 #include "foot_switch.hpp"
 #include <cstring>
@@ -203,7 +204,8 @@ class DMXController {
 const app = new DMXController();
 )js";
 
-WebServer::WebServer() : RtosTask(), server_(nullptr), initialized_(false), taskHandle_(nullptr), eventQueue_(nullptr)
+WebServer::WebServer(IAssert *assert)
+    : RtosTask(), server_(nullptr), initialized_(false), taskHandle_(nullptr), eventQueue_(nullptr), assert_(assert)
 {
     instance_ = this;
 }
@@ -659,7 +661,7 @@ esp_err_t WebServer::json_to_presets(const char *json_str)
             continue;
         }
 
-        DmxPreset preset;
+        DmxPreset preset(assert_);
 
         // Index
         if (root[i].contains("index") && root[i]["index"].is_number())
@@ -724,59 +726,4 @@ esp_err_t WebServer::json_to_config(const char *json_str, FootSwitch *footSwitch
 
     ESP_LOGI(TAG, "Configuration updated from JSON");
     return ESP_OK;
-}
-
-void WebServer::test_cjson_logic()
-{
-    nlohmann::json root = nlohmann::json::array();
-    nlohmann::json test_obj;
-    test_obj["key"] = "value";
-    ESP_LOGI(TAG, "Test object JSON: %s", test_obj.dump(2).c_str());
-    root.push_back(test_obj);
-    ESP_LOGI(TAG, "Root JSON after adding test object: %s", root.dump(2).c_str());
-}
-
-void WebServer::test_presets_to_json()
-{
-    // Mock data for testing
-    DmxPreset mock_presets[2];
-    mock_presets[0].setIndex(0);
-    mock_presets[0].setName("Preset 1");
-    uint8_t values0[NR_OF_DMX_CHANNELS] = {0};
-    values0[0] = 1;
-    values0[1] = 2;
-    values0[2] = 3;
-    values0[3] = 4;
-    values0[4] = 5;
-    mock_presets[0].setDmxValues(values0);
-
-    mock_presets[1].setIndex(1);
-    mock_presets[1].setName("Preset 2");
-    uint8_t values1[NR_OF_DMX_CHANNELS] = {0};
-    values1[0] = 6;
-    values1[1] = 7;
-    values1[2] = 8;
-    values1[3] = 9;
-    values1[4] = 10;
-    mock_presets[1].setDmxValues(values1);
-
-    // Set mock presets in dmxPresets_
-    dmxPresets_->setNumberOfFilledPresets(2);
-    dmxPresets_->setPreset(0, mock_presets[0]);
-    dmxPresets_->setPreset(1, mock_presets[1]);
-
-    // Call presets_to_json
-    std::string json_output = presets_to_json();
-    ESP_LOGI(TAG, "Test presets_to_json output: %s", json_output.c_str());
-}
-
-void WebServer::test_cjson_add_item()
-{
-    nlohmann::json root = nlohmann::json::array();
-    nlohmann::json test_obj;
-    test_obj["key"] = "value";
-    ESP_LOGI(TAG, "Test object JSON: %s", test_obj.dump(2).c_str());
-    root.push_back(test_obj);
-    ESP_LOGI(TAG, "Added test object to root JSON array");
-    ESP_LOGI(TAG, "Root JSON after adding test object: %s", root.dump(2).c_str());
 }

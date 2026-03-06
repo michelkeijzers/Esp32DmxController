@@ -7,11 +7,12 @@
 
 const uint16_t NR_OF_DMX_CHANNELS = 512;
 
+class IAssert;
 class DmxPreset
 {
   public:
     // Constructor
-    DmxPreset();
+    DmxPreset(IAssert *assert);
 
     // Set preset name
     void setIndex(uint16_t index) { index_ = static_cast<uint8_t>(index); }
@@ -37,4 +38,5 @@ class DmxPreset
     uint16_t index_;
     char name_[32];
     uint8_t dmxValues_[NR_OF_DMX_CHANNELS];
+    IAssert *assert_;
 };

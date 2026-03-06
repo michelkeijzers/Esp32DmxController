@@ -2,10 +2,11 @@
 #include "../Base/lockable.hpp"
 #include <cstdint>
 
+class IAssert;
 class Configuration : public Lockable
 {
   public:
-    Configuration();
+    Configuration(IAssert *assert);
 
     bool getFootSwitchPolarityNormallyOpen() const;
     void setFootSwitchPolarityNormallyOpen(bool normallyOpen);
@@ -24,4 +25,5 @@ class Configuration : public Lockable
     uint16_t footSwitchLongPressTime_;
     bool circularPresetNavigation_;
     uint8_t numberOfFilledPresets_;
+    IAssert *assert_;
 };

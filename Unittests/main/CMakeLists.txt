@@ -68,6 +68,11 @@ add_executable(
   foot_switch_tests.cpp
   seven_segment_display_tests.cpp
   max3485_sender_tests.cpp
+  system_init_test.cpp
+  nv_storage_tests.cpp
+  configuration_tests.cpp
+  dmx_preset_tests.cpp
+  dmx_presets_tests.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/dmx_controller.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/seven_segment_display.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/foot_switch.cpp

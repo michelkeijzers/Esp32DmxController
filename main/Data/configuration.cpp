@@ -1,8 +1,9 @@
 #include "configuration.hpp"
+#include "../Base/assert.hpp"
 
-Configuration::Configuration()
+Configuration::Configuration(IAssert *assert)
     : footSwitchPolarityNormallyOpen_(false), footSwitchLongPressTime_(0), circularPresetNavigation_(false),
-      numberOfFilledPresets_(0)
+      numberOfFilledPresets_(0), assert_(assert)
 {
 }
 

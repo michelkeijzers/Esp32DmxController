@@ -10,7 +10,11 @@ using ::testing::Return;
 // No need to stub gpio_get_level here; already stubbed in esp_idf_stubs/driver/gpio.h
 
 
-static Configuration _unit_test_dummy_configuration_foot_switch_test;
+
+#include "Mocks/mock_assert.hpp"
+
+static MockAssert _unit_test_mock_assert_foot_switch_test;
+static Configuration _unit_test_dummy_configuration_foot_switch_test(&_unit_test_mock_assert_foot_switch_test);
 class FootSwitchTest : public ::testing::Test {
 protected:
     ::testing::NiceMock<MockAssert> mockAssert;

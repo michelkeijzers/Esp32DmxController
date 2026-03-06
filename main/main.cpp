@@ -7,15 +7,15 @@
 
 extern "C" void app_main()
 {
-    Configuration configuration;
-    DmxPresets dmxPresets;
-
-
     Assert assertObj;
+
+    Configuration configuration(&assertObj);
+    DmxPresets dmxPresets(&assertObj);
+
     auto *display = new SevenSegmentDisplay(&assertObj);
     auto *footSwitch = new FootSwitch(&assertObj, configuration);
     auto *max3485Sender = new Max3485Sender(&assertObj);
-    auto *webServer = new WebServer();
+    auto *webServer = new WebServer(&assertObj);
     auto *nvStorage = new NvStorage(&assertObj, configuration, dmxPresets);
 
     DmxController dmxController(

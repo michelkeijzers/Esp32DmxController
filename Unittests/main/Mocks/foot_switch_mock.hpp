@@ -2,7 +2,9 @@
 #include "../../main/Tasks/foot_switch.hpp"
 #include <gmock/gmock.h>
 // TU-local dummy Configuration used to satisfy FootSwitch base ctor
-static Configuration _unit_test_dummy_configuration_foot_switch;
+#include "mock_assert.hpp"
+static MockAssert _unit_test_mock_assert_foot_switch;
+static Configuration _unit_test_dummy_configuration_foot_switch(&_unit_test_mock_assert_foot_switch);
 
 class MockFootSwitch : public FootSwitch
 {
