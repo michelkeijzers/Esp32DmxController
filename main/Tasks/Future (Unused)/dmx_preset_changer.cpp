@@ -8,12 +8,7 @@ DmxPresetChanger::~DmxPresetChanger() {}
 
 esp_err_t DmxPresetChanger::init(TaskProperties taskProperties)
 {
-    if (RtosTask::init(taskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize DmxPresetChangerTask");
-        return ESP_FAIL;
-    }
-
+    RtosTask::init(taskProperties);
     ESP_LOGI(log_tag_, "DmxPresetChanger task started");
     return ESP_OK;
 }

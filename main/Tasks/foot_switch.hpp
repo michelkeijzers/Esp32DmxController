@@ -77,6 +77,6 @@ class FootSwitch : public RtosTask
 
     void taskLoop();
 
-    esp_err_t HandleShortPress();
-    esp_err_t HandleLongPress();
+    void HandleShortPress();
+    void HandleLongPress();
 };

@@ -94,7 +94,7 @@ void ArtNetSender::taskLoop()
     }
 }
 
-esp_err_t ArtNetSender::sendUniverse(uint16_t universe, const uint8_t *data, uint16_t length)
+void ArtNetSender::sendUniverse(uint16_t universe, const uint8_t *data, uint16_t length)
 {
     if (!initialized_)
     {
@@ -128,7 +128,6 @@ esp_err_t ArtNetSender::sendUniverse(uint16_t universe, const uint8_t *data, uin
     }
 
     ESP_LOGD(log_tag_, "Sent Art-Net universe %d (%d bytes)", universe, length);
-    return ESP_OK;
 }
 
 esp_err_t ArtNetSender::sendUniverses(
@@ -149,11 +148,7 @@ esp_err_t ArtNetSender::sendUniverses(
     // Send universe 2
     if (universe2_data && len2 > 0)
     {
-        ret = sendUniverse(1, universe2_data, len2);
-        if (ret != ESP_OK)
-        {
-            return ret;
-        }
+        sendUniverse(1, universe2_data, len2);
     }
 
     return ESP_OK;

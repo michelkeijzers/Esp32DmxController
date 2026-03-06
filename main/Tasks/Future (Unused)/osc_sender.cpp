@@ -10,21 +10,13 @@ OSCSender::OSCSender() : RtosTask(), sockfd(-1) {}
 
 OSCSender::~OSCSender() { close(); }
 
-esp_err_t OSCSender::init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port)
+void OSCSender::init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port)
 {
-    if (RtosTask::init(taskProperties) != ESP_OK)
-    {
-        ESP_LOGE(log_tag_, "Failed to initialize OSCSender task");
-        return ESP_FAIL;
-    }
+    assert_->assertEspOk(RtosTask::init(taskProperties), "Failed to initialize OSCSender task");
 
     // Create UDP socket
     sockfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sockfd < 0)
-    {
-        ESP_LOGE(log_tag_, "Failed to create socket");
-        return ESP_FAIL;
-    }
+    assert_->assertTrue(sockfd >= 0, "Failed to create socket");
 
     // Set up destination address
     memset(&dest_addr, 0, sizeof(dest_addr));
@@ -40,7 +32,6 @@ esp_err_t OSCSender::init(RtosTask::TaskProperties taskProperties, const char *d
 
     initialized = true;
     ESP_LOGI(log_tag_, "OSC sender initialized to %s:%d", dest_ip, dest_port);
-    return ESP_OK;
 }
 
 void OSCSender::writeInt32(std::vector<uint8_t> &buffer, int32_t value)

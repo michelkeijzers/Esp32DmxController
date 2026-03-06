@@ -19,10 +19,10 @@ extern "C" void __force_link_DmxControllerQueueFailTest() {}
 #include "../../main/Base/assert.hpp"
 #include "Mocks/foot_switch_mock.hpp"
 #include "Mocks/max3485_sender_mock.hpp"
+#include "Mocks/mock_assert.hpp"
 #include "Mocks/nv_storage_mock.hpp"
 #include "Mocks/seven_segment_display_mock.hpp"
 #include "Mocks/web_server_mock.hpp"
-#include "Mocks/mock_assert.hpp"
 
 // Patch xQueueReceive to simulate correct event sequence for init_messages
 #include "messages.hpp"
@@ -160,12 +160,9 @@ class DmxControllerTest : public ::testing::Test
     MockNvStorage *mockNvStorage;
 
     DmxControllerTest()
-        : mockAssert(new MockAssert()),
-          mockDisplay(new MockSevenSegmentDisplay(mockAssert)),
-          mockFootSwitch(new MockFootSwitch(mockAssert)),
-          mockMax3485Sender(new MockMax3485Sender(mockAssert)),
-          mockWebServer(new MockWebServer()),
-          mockNvStorage(new MockNvStorage(mockAssert))
+        : mockAssert(new MockAssert()), mockDisplay(new MockSevenSegmentDisplay(mockAssert)),
+          mockFootSwitch(new MockFootSwitch(mockAssert)), mockMax3485Sender(new MockMax3485Sender(mockAssert)),
+          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage(mockAssert))
     {
         testing::Mock::AllowLeak(mockAssert);
         testing::Mock::AllowLeak(mockDisplay);
@@ -204,7 +201,7 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
-        ControllerTestDouble(IAssert* assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
+        ControllerTestDouble(IAssert *assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
             NvStorage *ns, QueueHandle_t q)
             : DmxController(assert, _unit_test_dummy_configuration, _unit_test_dummy_dmx_presets, sd, fs, ms, ws, ns),
               testQueue(q)
@@ -234,12 +231,6 @@ TEST_F(DmxControllerTest, Init_AllSuccess_ReturnsEspOk)
     EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
 
-    EXPECT_CALL(*mockDisplay, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockFootSwitch, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
-
     // Patch xQueueReceive to simulate correct event sequence for init_messages
     xQueueReceive_ptr = &ConfigAndPresetsResponseStub::xQueueReceive;
 
@@ -264,10 +255,9 @@ class DmxControllerQueueFailTest : public ::testing::Test
     MockNvStorage *mockNvStorage;
 
     DmxControllerQueueFailTest()
-        : mockAssert(new MockAssert()),
-          mockDisplay(new MockSevenSegmentDisplay(mockAssert)), mockFootSwitch(new MockFootSwitch(mockAssert)),
-          mockMax3485Sender(new MockMax3485Sender(mockAssert)), mockWebServer(new MockWebServer()),
-          mockNvStorage(new MockNvStorage(mockAssert))
+        : mockAssert(new MockAssert()), mockDisplay(new MockSevenSegmentDisplay(mockAssert)),
+          mockFootSwitch(new MockFootSwitch(mockAssert)), mockMax3485Sender(new MockMax3485Sender(mockAssert)),
+          mockWebServer(new MockWebServer()), mockNvStorage(new MockNvStorage(mockAssert))
     {
         testing::Mock::AllowLeak(mockAssert);
         testing::Mock::AllowLeak(mockDisplay);
@@ -296,9 +286,10 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     struct ControllerTestDouble : DmxController
     {
         QueueHandle_t testQueue;
-        ControllerTestDouble(IAssert* assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
+        ControllerTestDouble(IAssert *assert, SevenSegmentDisplay *sd, FootSwitch *fs, Max3485Sender *ms, WebServer *ws,
             NvStorage *ns, QueueHandle_t q)
-            : DmxController(assert, _unit_test_dummy_configuration_fail, _unit_test_dummy_dmx_presets_fail, sd, fs, ms, ws, ns),
+            : DmxController(
+                  assert, _unit_test_dummy_configuration_fail, _unit_test_dummy_dmx_presets_fail, sd, fs, ms, ws, ns),
               testQueue(q)
         {
         }
@@ -320,12 +311,6 @@ TEST_F(DmxControllerQueueFailTest, Init_EventQueueCreateFails_ReturnsEspFail)
     EXPECT_CALL(*mockFootSwitch, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockMax3485Sender, getEventQueue()).WillRepeatedly(Return(dummyQueue));
     EXPECT_CALL(*mockNvStorage, getEventQueue()).WillRepeatedly(Return(dummyQueue));
-
-    EXPECT_CALL(*mockDisplay, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockFootSwitch, init(_, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockMax3485Sender, init(_, _, _)).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockWebServer, init()).WillRepeatedly(Return(ESP_OK));
-    EXPECT_CALL(*mockNvStorage, init(_)).WillRepeatedly(Return(ESP_OK));
 
     controllerWithQueue.init();
     // Optionally, add checks for side effects if needed

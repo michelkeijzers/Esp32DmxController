@@ -28,7 +28,7 @@ class OSCSender : public RtosTask
     virtual ~OSCSender();
 
     // Initialize OSC sender with destination IP and port
-    virtual esp_err_t init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port);
+    virtual void init(RtosTask::TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port);
 
   private:
     int sockfd;

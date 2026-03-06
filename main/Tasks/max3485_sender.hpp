@@ -1,6 +1,5 @@
 #pragma once
 
-#include <esp_err.h>
 #include <stdint.h>
 extern "C"
 {
@@ -19,14 +18,14 @@ class Max3485Sender : public RtosTask
     Max3485Sender(IAssert *assert);
     ~Max3485Sender();
 
-    virtual esp_err_t init(RtosTask::TaskProperties taskProperties);
+    virtual void init(RtosTask::TaskProperties taskProperties);
 
   private:
     int taskPriority_;
     int queueCapacity_;
     void close();
 
-    esp_err_t sendDmx(const uint8_t *data, uint16_t length);
+    void sendDmx(const uint8_t *data, uint16_t length);
 
     IAssert *assert_;
 

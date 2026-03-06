@@ -41,7 +41,7 @@ class ArtNetSender : public RtosTask
     ArtNetSender();
     ~ArtNetSender();
 
-    virtual esp_err_t init(TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port = ARTNET_PORT);
+    virtual void init(TaskProperties taskProperties, const char *dest_ip, uint16_t dest_port = ARTNET_PORT);
 
   private:
     void close();

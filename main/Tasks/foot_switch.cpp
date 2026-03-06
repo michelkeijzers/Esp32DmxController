@@ -208,19 +208,11 @@ void FootSwitch::handleTimeout()
             // Determine press type and handle
             if (pressDuration >= longPressThresholdMs_)
             {
-                ESP_LOGI(TAG, "Long press: %lu ms", pressDuration);
-                if (HandleLongPress() != ESP_OK)
-                {
-                    ESP_LOGW(TAG, "Long press rejected");
-                }
+                HandleLongPress();
             }
             else
             {
-                ESP_LOGI(TAG, "Short press: %lu ms", pressDuration);
-                if (HandleShortPress() != ESP_OK)
-                {
-                    ESP_LOGW(TAG, "Short press rejected");
-                }
+                HandleShortPress();
             }
 
             // Return to idle
@@ -326,36 +318,25 @@ void FootSwitch::taskLoop()
     }
 }
 
-esp_err_t FootSwitch::HandleShortPress()
+void FootSwitch::HandleShortPress()
 {
     ESP_LOGI(TAG, "Short press action");
 
     Messages::Event event;
     event.type = Messages::USER_NEXT_PRESET;
 
-    if (xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY) != pdPASS)
-    {
-        ESP_LOGE(TAG, "Failed to send USER_NEXT_PRESET event to DMX Controller");
-        return ESP_FAIL;
-    }
-
-    return ESP_OK;
+    assert_->assertPdPass(xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY),
+        "Failed to send USER_NEXT_PRESET event to DMX Controller");
 }
 
-esp_err_t FootSwitch::HandleLongPress()
+void FootSwitch::HandleLongPress()
 {
     ESP_LOGI(TAG, "Long press action");
 
     Messages::Event event;
     event.type = Messages::USER_PREVIOUS_PRESET;
-
-    if (xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY) != pdPASS)
-    {
-        ESP_LOGE(TAG, "Failed to send USER_PREVIOUS_PRESET event to DMX Controller");
-        return ESP_FAIL;
-    }
-
-    return ESP_OK;
+    assert_->assertPdPass(xQueueSend(getDmxControllerEventQueue(), &event, portMAX_DELAY),
+        "Failed to send USER_PREVIOUS_PRESET event to DMX Controller");
 }
 
 uint16_t FootSwitch::getLongPressThresholdMs() { return longPressThresholdMs_; }

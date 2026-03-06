@@ -23,7 +23,7 @@ Max3485Sender::Max3485Sender(IAssert *assert) : RtosTask(), assert_(assert) {}
 
 Max3485Sender::~Max3485Sender() { close(); }
 
-esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
+void Max3485Sender::init(RtosTask::TaskProperties taskProperties)
 {
     RtosTask::init(taskProperties);
 
@@ -41,7 +41,6 @@ esp_err_t Max3485Sender::init(RtosTask::TaskProperties taskProperties)
         uart_driver_install(DMX_UART_PORT, 1024, 0, 0, NULL, 0), "Failed to install UART driver");
     initialized_ = true;
     ESP_LOGI(pcTaskGetName(nullptr), "MAX3485 sender initialized");
-    return ESP_OK;
 }
 
 void Max3485Sender::close()
@@ -53,18 +52,12 @@ void Max3485Sender::close()
     }
 }
 
-esp_err_t Max3485Sender::sendDmx(const uint8_t *data, uint16_t length)
+void Max3485Sender::sendDmx(const uint8_t *data, uint16_t length)
 {
-    if (!initialized_)
-    {
-        ESP_LOGE(pcTaskGetName(nullptr), "MAX3485 sender not initialized");
-        return ESP_ERR_INVALID_STATE;
-    }
-    if (!data || length == 0 || length > 512)
-    {
-        ESP_LOGE(pcTaskGetName(nullptr), "Invalid DMX data or length");
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertTrue(initialized_, "MAX3485 sender not initialized");
+    assert_->assertNotNull(data, "DMX data pointer is null");
+    assert_->assertTrue(length <= 512, "DMX data length must be between 0 and 512");
+
     // DMX break
     uart_wait_tx_done(DMX_UART_PORT, portMAX_DELAY);
     esp_rom_delay_us(DMX_BREAK_US);
@@ -72,13 +65,8 @@ esp_err_t Max3485Sender::sendDmx(const uint8_t *data, uint16_t length)
     esp_rom_delay_us(DMX_MAB_US);
     // Send DMX data
     int written = uart_write_bytes(DMX_UART_PORT, (const char *)data, length);
-    if (written != length)
-    {
-        ESP_LOGE(pcTaskGetName(nullptr), "Failed to write all DMX bytes");
-        return ESP_FAIL;
-    }
+    assert_->assertTrue(written == length, "Failed to write all DMX bytes");
     ESP_LOGD(pcTaskGetName(nullptr), "Sent DMX frame (%d bytes)", length);
-    return ESP_OK;
 }
 
 void Max3485Sender::taskEntry(void *param) { static_cast<Max3485Sender *>(param)->taskLoop(); }

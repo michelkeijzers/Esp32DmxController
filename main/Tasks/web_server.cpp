@@ -249,15 +249,8 @@ void WebServer::init_spiffs()
     conf.partition_label = NULL;
     conf.max_files = 8;
     conf.format_if_mount_failed = true;
-    esp_err_t ret = esp_vfs_spiffs_register(&conf);
-    if (ret != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Failed to mount SPIFFS (%s)", esp_err_to_name(ret));
-    }
-    else
-    {
-        ESP_LOGI(TAG, "SPIFFS mounted successfully");
-    }
+    assert_->assertNotEspError(esp_vfs_spiffs_register(&conf), "Failed to initialize SPIFFS");
+    ESP_LOGI(TAG, "SPIFFS initialized");
 }
 
 void WebServer::init(RtosTask::TaskProperties taskProperties)
@@ -282,71 +275,68 @@ void WebServer::init(RtosTask::TaskProperties taskProperties)
     httpd_uri_t root_uri;
     root_uri.uri = "/";
     root_uri.method = HTTP_GET;
-    root_uri.handler = root_handler;
+    // TODO: root_uri.handler = root_handler;
     root_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &root_uri);
 
     httpd_uri_t api_presets_uri;
     api_presets_uri.uri = "/api/presets";
     api_presets_uri.method = HTTP_GET;
-    api_presets_uri.handler = api_presets_handler;
+    // TODO: api_presets_uri.handler = api_presets_handler;
     api_presets_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_presets_uri);
 
     httpd_uri_t api_presets_post_uri;
     api_presets_post_uri.uri = "/api/presets";
     api_presets_post_uri.method = HTTP_POST;
-    api_presets_post_uri.handler = api_presets_handler;
+    // TODO: api_presets_post_uri.handler = api_presets_handler;
     api_presets_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_presets_post_uri);
 
     httpd_uri_t api_config_uri;
     api_config_uri.uri = "/api/config";
     api_config_uri.method = HTTP_GET;
-    api_config_uri.handler = api_config_handler;
+    // TODO: api_config_uri.handler = api_config_handler;
     api_config_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_config_uri);
 
     httpd_uri_t api_config_post_uri;
     api_config_post_uri.uri = "/api/config";
     api_config_post_uri.method = HTTP_POST;
-    api_config_post_uri.handler = api_config_handler;
+    // TODO: api_config_post_uri.handler = api_config_handler;
     api_config_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_config_post_uri);
 
     httpd_uri_t api_all_data_get_uri;
     api_all_data_get_uri.uri = "/all_data";
     api_all_data_get_uri.method = HTTP_GET;
-    api_all_data_get_uri.handler = api_all_data_handler;
+    // TODO: api_all_data_get_uri.handler = api_all_data_handler;
     api_all_data_get_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_all_data_get_uri);
 
     httpd_uri_t api_all_data_post_uri;
     api_all_data_post_uri.uri = "/all_data";
     api_all_data_post_uri.method = HTTP_POST;
-    api_all_data_post_uri.handler = api_all_data_handler;
+    // TODO: api_all_data_post_uri.handler = api_all_data_handler;
     api_all_data_post_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &api_all_data_post_uri);
 
     httpd_uri_t static_file_uri;
     static_file_uri.uri = "/*";
     static_file_uri.method = HTTP_GET;
-    static_file_uri.handler = static_file_handler;
+    // TODO: //TODO: static_file_uri.handler = static_file_handler;
     static_file_uri.user_ctx = nullptr;
     httpd_register_uri_handler(server_, &static_file_uri);
 
     initialized_ = true;
 }
 
-// /all_data handler: GET returns { configuration, presets }, POST updates both
-// Move this function outside of init()
-
-esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
+void WebServer::api_all_data_handler(httpd_req_t *req)
 {
     if (!instance_)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
-        return ESP_FAIL;
+        return;
     }
 
     if (req->method == HTTP_GET)
@@ -359,8 +349,8 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
         root["configuration"] = nlohmann::json::parse(config_json);
         root["presets"] = nlohmann::json::parse(presets_json);
         std::string json_str = root.dump();
-        esp_err_t result = instance_->send_json_response(req, json_str.c_str());
-        return result;
+        instance_->send_json_response(req, json_str.c_str());
+        return;
     }
     else if (req->method == HTTP_POST)
     {
@@ -369,13 +359,17 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
         int ret = httpd_req_recv(req, content, sizeof(content) - 1);
         if (ret <= 0)
         {
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            return;
         }
         content[ret] = '\0';
 
         nlohmann::json root = nlohmann::json::parse(content);
         if (!root.is_object())
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        {
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+            return;
+        }
 
         // Update configuration
         if (root.contains("configuration"))
@@ -391,26 +385,25 @@ esp_err_t WebServer::api_all_data_handler(httpd_req_t *req)
             instance_->json_to_presets(presets_str.c_str());
         }
 
-        return instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        return;
     }
 
-    return instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
+    instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
 }
 
-esp_err_t WebServer::root_handler(httpd_req_t *req)
+void WebServer::root_handler(httpd_req_t *req)
 {
-    if (!instance_)
-    {
-        httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
-        return ESP_FAIL;
-    }
+    assert_->assertNotNull(instance_, "WebServer instance is null");
+    assert_->assertNotNull(req, "httpd_req_t is null");
+
     // Serve index.html from SPIFFS
     const char *filepath = "/spiffs/index.html";
     FILE *file = fopen(filepath, "r");
     if (!file)
     {
         httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "index.html not found");
-        return ESP_FAIL;
+        return;
     }
     httpd_resp_set_type(req, "text/html");
     char buffer[1024];
@@ -421,22 +414,24 @@ esp_err_t WebServer::root_handler(httpd_req_t *req)
     }
     fclose(file);
     httpd_resp_send_chunk(req, NULL, 0);
-    return ESP_OK;
 }
 
-esp_err_t WebServer::api_presets_handler(httpd_req_t *req)
+void WebServer::api_presets_handler(httpd_req_t *req)
 {
+    assert_->assertNotNull(req, "req instance is null");
+
     if (!instance_)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
-        return ESP_FAIL;
+        return;
     }
 
     if (req->method == HTTP_GET)
     {
         // Return presets as JSON
         std::string json = instance_->presets_to_json();
-        return instance_->send_json_response(req, json.c_str());
+        instance_->send_json_response(req, json.c_str());
+        return;
     }
     else if (req->method == HTTP_POST)
     {
@@ -445,13 +440,16 @@ esp_err_t WebServer::api_presets_handler(httpd_req_t *req)
         int ret = httpd_req_recv(req, content, sizeof(content));
         if (ret <= 0)
         {
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            return;
         }
         content[ret] = '\0';
 
         nlohmann::json root = nlohmann::json::parse(content);
-        if (!root.is_object())
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        if (!root.is_object()) {
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+            return;
+        }
 
         // Update configuration
         if (root.contains("configuration"))
@@ -467,26 +465,28 @@ esp_err_t WebServer::api_presets_handler(httpd_req_t *req)
             instance_->json_to_presets(presets_str.c_str());
         }
 
-        return instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        return;
     }
-
-    return instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
 }
 
-esp_err_t WebServer::api_config_handler(httpd_req_t *req)
+void WebServer::api_config_handler(httpd_req_t *req)
 {
+    assert_->assertNotNull(req, "req is NULL");
+
     ESP_LOGI(TAG, "Received config request: method=%d, uri=%s", req->method, req->uri);
     if (!instance_)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
-        return ESP_FAIL;
+        return;
     }
 
     if (req->method == HTTP_GET)
     {
         // Return config as JSON
         std::string json = instance_->config_to_json();
-        return instance_->send_json_response(req, json.c_str());
+        instance_->send_json_response(req, json.c_str());
+        return;
     }
     else if (req->method == HTTP_POST)
     {
@@ -495,7 +495,8 @@ esp_err_t WebServer::api_config_handler(httpd_req_t *req)
         int ret = httpd_req_recv(req, content, sizeof(content));
         if (ret <= 0)
         {
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "No data received");
+            return;
         }
         content[ret] = '\0';
 
@@ -503,7 +504,10 @@ esp_err_t WebServer::api_config_handler(httpd_req_t *req)
 
         nlohmann::json root = nlohmann::json::parse(content);
         if (!root.is_object())
-            return instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+        {
+            instance_->send_error_response(req, HTTPD_400_BAD_REQUEST, "Invalid JSON");
+            return;
+        }
 
         // Update configuration
         if (root.contains("footSwitchPolarity") && root["footSwitchPolarity"].is_string())
@@ -512,18 +516,21 @@ esp_err_t WebServer::api_config_handler(httpd_req_t *req)
         }
 
         ESP_LOGI(TAG, "Configuration updated from JSON");
-        return instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        instance_->send_json_response(req, "{\"status\":\"ok\"}");
+        return;
     }
 
-    return instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
+    instance_->send_error_response(req, HTTPD_405_METHOD_NOT_ALLOWED, "Method not allowed");
 }
 
-esp_err_t WebServer::static_file_handler(httpd_req_t *req)
+void WebServer::static_file_handler(httpd_req_t *req)
 {
+    assert_->assertNotNull(req, "req is NULL");
+
     if (!instance_)
     {
         httpd_resp_send_err(req, HTTPD_500_INTERNAL_SERVER_ERROR, "Server not initialized");
-        return ESP_FAIL;
+        return;
     }
 
     // Map URI to SPIFFS file path
@@ -545,7 +552,7 @@ esp_err_t WebServer::static_file_handler(httpd_req_t *req)
         if (!file)
         {
             httpd_resp_send_err(req, HTTPD_404_NOT_FOUND, "File not found");
-            return ESP_FAIL;
+            return;
         }
         httpd_resp_set_type(req, "text/html");
     }
@@ -578,20 +585,25 @@ esp_err_t WebServer::static_file_handler(httpd_req_t *req)
     }
     fclose(file);
     httpd_resp_send_chunk(req, NULL, 0);
-    return ESP_OK;
+    return;
 }
 
-esp_err_t WebServer::send_json_response(httpd_req_t *req, const char *json)
+void WebServer::send_json_response(httpd_req_t *req, const char *json)
 {
+
+    assert_->assertNotNull(req, "req is NULL");
+    assert_->assertNotNull(json, "json is NULL");
+
     httpd_resp_set_type(req, "application/json");
     httpd_resp_send(req, json, strlen(json));
-    return ESP_OK;
 }
 
-esp_err_t WebServer::send_error_response(httpd_req_t *req, int status, const char *message)
+void WebServer::send_error_response(httpd_req_t *req, int status, const char *message)
 {
+    assert_->assertNotNull(req, "req is NULL");
+    assert_->assertNotNull(message, "message is NULL");
+
     httpd_resp_send_err(req, (httpd_err_code_t)status, message);
-    return ESP_OK;
 }
 
 std::string WebServer::presets_to_json()
@@ -628,26 +640,18 @@ std::string WebServer::presets_to_json()
     return result;
 }
 
-esp_err_t WebServer::json_to_presets(const char *json_str)
+void WebServer::json_to_presets(const char *json_str)
 {
-    if (!dmxPresets_ || !json_str)
-    {
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertNotNull(json_str, "json_str is NULL");
+
+    assert_->assertNotNull(dmxPresets_, "dmxPresets_ is null");
+    assert_->assertNotNull(json_str, "json_str is null");
 
     nlohmann::json root = nlohmann::json::parse(json_str);
-    if (!root.is_array())
-    {
-        ESP_LOGE(TAG, "Invalid JSON: not an array");
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertTrue(root.is_array(), "Invalid JSON: not an array");
 
     size_t num_presets = root.size();
-    if (num_presets < 2 || num_presets > 20)
-    {
-        ESP_LOGE(TAG, "Invalid number of presets: %zu", num_presets);
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertTrue(num_presets >= 2 && num_presets <= 20, "Invalid number of presets");
 
     // Set number of presets
     dmxPresets_->setNumberOfFilledPresets(static_cast<int>(num_presets));
@@ -655,12 +659,7 @@ esp_err_t WebServer::json_to_presets(const char *json_str)
     // Load each preset
     for (size_t i = 0; i < num_presets; i++)
     {
-        if (!root[i].is_object())
-        {
-            ESP_LOGE(TAG, "Invalid preset object at index %zu", i);
-            continue;
-        }
-
+        assert_->assertTrue(i < root.size(), "Preset is missing in JSON");
         DmxPreset preset(assert_);
 
         // Index
@@ -692,7 +691,6 @@ esp_err_t WebServer::json_to_presets(const char *json_str)
     }
 
     ESP_LOGI(TAG, "Loaded %zu presets from JSON", num_presets);
-    return ESP_OK;
 }
 
 std::string WebServer::config_to_json()
@@ -704,19 +702,13 @@ std::string WebServer::config_to_json()
     return root.dump();
 }
 
-esp_err_t WebServer::json_to_config(const char *json_str, FootSwitch *footSwitch)
+void WebServer::json_to_config(const char *json_str, FootSwitch *footSwitch)
 {
-    if (!footSwitch || !json_str)
-    {
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertNotNull(json_str, "json_str is null");
+    assert_->assertNotNull(footSwitch, "footSwitch is null");
 
     nlohmann::json root = nlohmann::json::parse(json_str);
-    if (!root.is_object())
-    {
-        ESP_LOGE(TAG, "Invalid JSON: not an object");
-        return ESP_ERR_INVALID_ARG;
-    }
+    assert_->assertTrue(root.is_object(), "Invalid JSON: not an object");
 
     // Foot switch polarity
     if (root.contains("footSwitchPolarity") && root["footSwitchPolarity"].is_string())
@@ -725,5 +717,4 @@ esp_err_t WebServer::json_to_config(const char *json_str, FootSwitch *footSwitch
     }
 
     ESP_LOGI(TAG, "Configuration updated from JSON");
-    return ESP_OK;
 }

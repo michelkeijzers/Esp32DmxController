@@ -169,13 +169,14 @@ TEST_F(FootSwitchTest, TaskEntryDoesNotCrash)
 TEST_F(FootSwitchTest, HandleShortPressReturnsOK)
 {
     // Should return ESP_OK (stubbed queue always returns pdPASS)
-    EXPECT_EQ(footSwitch.HandleShortPress(), 0);
+
+    footSwitch.HandleShortPress();
 }
 
 TEST_F(FootSwitchTest, HandleLongPressReturnsOK)
 {
     // Should return ESP_OK (stubbed queue always returns pdPASS)
-    EXPECT_EQ(footSwitch.HandleLongPress(), 0);
+    footSwitch.HandleLongPress();
 }
 
 TEST_F(FootSwitchTest, GetLongPressThresholdMs)

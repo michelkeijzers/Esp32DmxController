@@ -132,21 +132,12 @@ void DmxController::logFirmwareInfo()
     ESP_LOGW(pcTaskGetName(nullptr), "Compile time: %s %s", app_desc->date, app_desc->time);
 }
 
-esp_err_t DmxController::performOtaUpdate(const char *url)
+void DmxController::performOtaUpdate(const char *url)
 {
     ESP_LOGI(pcTaskGetName(nullptr), "Starting OTA update from: %s", url);
     esp_https_ota_config_t ota_config = {};
     // ota_config.http_config = NULL;
     // ota_config.http_client_init_cb = NULL;
-    esp_err_t ret = esp_https_ota(&ota_config);
-    if (ret == ESP_OK)
-    {
-        ESP_LOGW(pcTaskGetName(nullptr), "OTA update successful, restarting...");
-        esp_restart();
-    }
-    else
-    {
-        ESP_LOGE(pcTaskGetName(nullptr), "OTA update failed: %s\n", esp_err_to_name(ret));
-    }
-    return ret;
+    esp_https_ota(&ota_config);
+    esp_restart();
 }

@@ -4,9 +4,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-
-class Max3485SenderTest : public ::testing::Test {
-protected:
+class Max3485SenderTest : public ::testing::Test
+{
+  protected:
     ::testing::NiceMock<MockAssert> mockAssert;
     Max3485Sender sender;
     RtosTask::TaskProperties props = {"Max3485Sender", 1, 1024, 4, sizeof(int), nullptr};
@@ -14,7 +14,7 @@ protected:
     Max3485SenderTest() : sender(&mockAssert) {}
 };
 
-TEST_F(Max3485SenderTest, Init_ReturnsEspOk) { EXPECT_EQ(sender.init(props), ESP_OK); }
+TEST_F(Max3485SenderTest, Init_Returns) { sender.init(props); }
 
 TEST_F(Max3485SenderTest, SendDmx_NotInitialized_ReturnsInvalidState)
 {

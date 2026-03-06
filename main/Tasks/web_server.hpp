@@ -53,18 +53,18 @@ class WebServer : public RtosTask
     void taskEntry(void *param) override { static_cast<WebServer *>(param)->taskLoop(); }
     void taskLoop();
 
-    static esp_err_t root_handler(httpd_req_t *req);
-    static esp_err_t api_presets_handler(httpd_req_t *req);
-    static esp_err_t api_config_handler(httpd_req_t *req);
-    static esp_err_t api_all_data_handler(httpd_req_t *req);
-    static esp_err_t static_file_handler(httpd_req_t *req);
+    void root_handler(httpd_req_t *req);
+    void api_presets_handler(httpd_req_t *req);
+    void api_config_handler(httpd_req_t *req);
+    void api_all_data_handler(httpd_req_t *req);
+    void static_file_handler(httpd_req_t *req);
 
-    esp_err_t send_json_response(httpd_req_t *req, const char *json);
-    esp_err_t send_error_response(httpd_req_t *req, int status, const char *message);
+    void send_json_response(httpd_req_t *req, const char *json);
+    void send_error_response(httpd_req_t *req, int status, const char *message);
     // removed duplicate declaration
-    esp_err_t json_to_presets(const char *json);
+    void json_to_presets(const char *json);
     std::string config_to_json();
-    esp_err_t json_to_config(const char *json, FootSwitch *footSwitch);
+    void json_to_config(const char *json, FootSwitch *footSwitch);
 
     static WebServer *instance_;
 

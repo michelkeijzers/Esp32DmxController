@@ -53,6 +53,6 @@ class DmxController : public RtosTask
     IAssert *assert_;
     TickType_t bootTime = 0;
     void taskEntry(void *param) override;
-    esp_err_t performOtaUpdate(const char *url);
+    void performOtaUpdate(const char *url);
     void logFirmwareInfo();
 };
