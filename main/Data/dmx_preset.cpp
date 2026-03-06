@@ -8,61 +8,33 @@
 #include "dmx_preset.hpp"
 #include <esp_log.h>
 
-static const char *TAG = "DmxPreset";
-
 DmxPreset::DmxPreset(IAssert *assert) : assert_(assert) { clear(); }
 
 void DmxPreset::setName(const char *name)
 {
-    if (name)
-    {
-        strncpy(name_, name, sizeof(name_) - 1);
-        name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
-    }
-    else
-    {
-        name_[0] = '\0';
-    }
+    assert_->assertNotNull(name, "Preset name is null");
+    strncpy(name_, name, sizeof(name_) - 1);
+    name_[sizeof(name_) - 1] = '\0'; // Ensure null termination
 }
 
 const char *DmxPreset::getName() const { return name_; }
 
 void DmxPreset::setDmxValue(uint16_t channel, uint8_t value)
 {
-    if (channel >= NR_OF_DMX_CHANNELS)
-    {
-        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, NR_OF_DMX_CHANNELS - 1);
-        return;
-    }
-
+    assert_->assertTrue(channel < NR_OF_DMX_CHANNELS, "Channel index out of range");
     dmxValues_[channel] = value;
 }
 
 uint8_t DmxPreset::getDmxValue(uint16_t channel) const
 {
-    if (channel >= NR_OF_DMX_CHANNELS)
-    {
-        ESP_LOGE(TAG, "Channel %d out of range (max %d)", channel, NR_OF_DMX_CHANNELS - 1);
-        return 0;
-    }
-
+    assert_->assertTrue(channel < NR_OF_DMX_CHANNELS, "Channel index out of range");
     return dmxValues_[channel];
 }
 
 void DmxPreset::setDmxValues(const uint8_t *values)
 {
-    if (!values)
-    {
-        ESP_LOGE(TAG, "Invalid data pointer");
-        return;
-    }
-
+    assert_->assertNotNull(values, "DMX values pointer is null");
     memcpy(dmxValues_, values, NR_OF_DMX_CHANNELS);
-    // Mark as initialized if DMX values are set
-    if (name_[0] == '\0')
-    {
-        strcpy(name_, "Preset");
-    }
 }
 
 void DmxPreset::clear()

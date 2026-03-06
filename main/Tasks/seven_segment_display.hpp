@@ -1,3 +1,4 @@
+
 #pragma once
 
 // 7-Segment Display Controller Class
@@ -20,6 +21,8 @@ class SevenSegmentDisplay : public RtosTask
     friend class SevenSegmentDisplayTest_Friend;
 
   public:
+    static const uint8_t *getDigitPatterns() { return digitPatterns_; }
+
     struct Event
     {
         char character;

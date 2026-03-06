@@ -19,44 +19,23 @@ DmxPresets::DmxPresets(IAssert *assert) : assert_(assert)
 
 void DmxPresets::setNumberOfFilledPresets(uint8_t numberOfFilledPresets)
 {
-    if (numberOfFilledPresets < MIN_PRESETS || numberOfFilledPresets > MAX_PRESETS)
-    {
-        ESP_LOGE(LOG_TAG, "Invalid number of filled presets: %d (must be %d-%d)", numberOfFilledPresets, MIN_PRESETS,
-            MAX_PRESETS);
-        // TODO: call software error. Put in a better place (cannot call rtostask).
-        // char msg[80];
-        // snprintf(msg, sizeof(msg), "Preset '%s' error: numberOfFilledPresets = %d", presetName,
-        // numberOfFilledPresets); softwareError(msg);
-    }
+    assert_->assertTrue(numberOfFilledPresets >= MIN_PRESETS && numberOfFilledPresets <= MAX_PRESETS,
+        "numberOfFilledPresets out of range");
 
     numberOfFilledPresets_ = numberOfFilledPresets;
 
     // Ensure current preset index is valid
     if (currentPresetIndex_ >= numberOfFilledPresets_)
     {
-        currentPresetIndex_ = 0;
+        currentPresetIndex_ = numberOfFilledPresets_ - 1;
     }
 }
 
 void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t *dmxValues)
 {
+    assert_->assertTrue(presetNumber < MAX_PRESETS, "Preset number out of range");
     assert_->assertNotNull(name, "name");
     assert_->assertNotNull(dmxValues, "dmxValues");
-
-    if (presetNumber >= numberOfFilledPresets_)
-    {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", presetNumber, numberOfFilledPresets_ - 1);
-        // TODO: call software error. Put in a better place (cannot call rtostask).
-        // char msg[80];
-        // snprintf(msg, sizeof(msg), "Preset '%s' error: numberOfFilledPresets = %d", presetName,
-        // numberOfFilledPresets); softwareError(msg);
-    }
-
-    // TODO: Call assertNotNull
-    if (!name || !dmxValues)
-    {
-        ESP_LOGE(LOG_TAG, "Invalid pointer arguments");
-    }
 
     presets_[presetNumber].setIndex(presetNumber);
     presets_[presetNumber].setName(name);
@@ -68,37 +47,26 @@ void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)
 {
-    if (index >= numberOfFilledPresets_ || !presets_[index].isInitialized())
-    {
-        ESP_LOGE(LOG_TAG, "Preset index %d is invalid or uninitialized (max %d)", index, numberOfFilledPresets_ - 1);
-        // Return first preset as fallback (or handle as needed)
-        return presets_[0];
-    }
+    assert_->assertTrue(index < numberOfFilledPresets_, "Preset index out of range");
+    assert_->assertTrue(presets_[index].isInitialized(), "Preset at index is not initialized");
+
     return presets_[index];
 }
 
 void DmxPresets::setPreset(uint8_t index, const DmxPreset &preset)
 {
-    if (index >= numberOfFilledPresets_)
-    {
-        ESP_LOGE(LOG_TAG, "Preset index %d out of range (max %d)", index, numberOfFilledPresets_ - 1);
-        // TODO: call software error. Put in a better place (cannot call rtostask).
-    }
+    assert_->assertTrue(index < numberOfFilledPresets_, "Preset index out of range");
+    assert_->assertTrue(presets_[index].isInitialized(), "Preset at index is not initialized");
 
     presets_[index].copyFrom(preset);
 }
 
 void DmxPresets::setCurrentPresetIndex(uint8_t index)
 {
-    if (index < numberOfFilledPresets_)
-    {
-        currentPresetIndex_ = index;
-        // Note: We don't save to NVRAM here for performance, it will be saved when presets change
-    }
-    else
-    {
-        ESP_LOGE(LOG_TAG, "Invalid preset index %d (max %d)", index, numberOfFilledPresets_ - 1);
-    }
+    assert_->assertTrue(index < numberOfFilledPresets_, "Preset index out of range");
+    assert_->assertTrue(presets_[index].isInitialized(), "Preset at index is not initialized");
+
+    currentPresetIndex_ = index;
 }
 
 uint8_t DmxPresets::selectNextPreset()

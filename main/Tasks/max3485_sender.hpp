@@ -20,7 +20,7 @@ class Max3485Sender : public RtosTask
 
     virtual void init(RtosTask::TaskProperties taskProperties);
 
-  private:
+  protected:
     int taskPriority_;
     int queueCapacity_;
     void close();
