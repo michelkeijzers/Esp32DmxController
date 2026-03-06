@@ -1,3 +1,0 @@
-C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\Debug\gtest.dll
-C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\Debug\gmock.dll
-C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\run_tests.dir\Debug\run_tests.vcxproj.Up2Date

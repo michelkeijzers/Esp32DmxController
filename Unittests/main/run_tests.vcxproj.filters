@@ -34,6 +34,12 @@
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_presets_tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\assert_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\lockable_tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,6 +59,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\assert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_presets.cpp">

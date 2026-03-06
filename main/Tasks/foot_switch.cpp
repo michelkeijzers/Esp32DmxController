@@ -36,11 +36,10 @@ static void IRAM_ATTR isr_handler(void *arg)
     }
 }
 
-
-FootSwitch::FootSwitch(IAssert* assert, Configuration &configuration)
-        : RtosTask(), configuration_(configuration), assert_(assert), pin_(GPIO_NUM_NC), lastPinState_(false), pressStartTime_(0),
-            longPressTimeMs_(1000), // Default long press time
-            polarityNormallyOpen_(true), longPressThresholdMs_(1000)
+FootSwitch::FootSwitch(IAssert *assert, Configuration &configuration)
+    : RtosTask(), configuration_(configuration), assert_(assert), pin_(GPIO_NUM_NC), lastPinState_(false),
+      pressStartTime_(0), longPressTimeMs_(1000), // Default long press time
+      polarityNormallyOpen_(true), longPressThresholdMs_(1000)
 {
 }
 
@@ -67,7 +66,6 @@ void FootSwitch::init(RtosTask::TaskProperties taskProperties, gpio_num_t pinNum
     ESP_LOGI("1", "1");
     interruptEventQueue = xQueueCreate(QUEUE_CAPACITY, sizeof(FootSwitch::InterruptEvent));
     ESP_LOGI("1", "2");
-    printf("%p\n", interruptEventQueue);
     assert_->assertQueueHandle(interruptEventQueue, "interruptEventQueue");
     ESP_LOGI("1", "3");
     configEventQueue = getEventQueue();

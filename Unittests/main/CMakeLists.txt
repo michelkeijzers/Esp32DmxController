@@ -1,3 +1,5 @@
+# Ensure UNIT_TEST macro is defined for test builds
+add_definitions(-DUNIT_TEST)
 # Optional: Set path to OpenCppCoverage.exe if not in PATH
 set(OPENCOVERAGE_EXE "C:/OpenCppCoverage/OpenCppCoverage.exe" CACHE STRING "Path to OpenCppCoverage.exe")
 
@@ -18,6 +20,20 @@ add_custom_target(coverage
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\assert.cpp"
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.cpp"
     --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\main.cpp"
+
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\dmx_presets.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\dmx_preset.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Data\\configuration.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\web_server.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\seven_segment_display.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\nv_storage.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\max3485_sender.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\dmx_controller.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Tasks\\foot_switch.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\lockable.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\assert.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\Base\\rtos_task.hpp"
+    --sources "C:\\Users\\i4studio\\Esp32Test\\Esp32DmxController\\main\\main.hpp"
     -- "${CMAKE_CURRENT_BINARY_DIR}/Debug/run_tests.exe"
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   COMMENT "Running OpenCppCoverage for all Data, Tasks, Base, and main.cpp files"
@@ -73,6 +89,8 @@ add_executable(
   configuration_tests.cpp
   dmx_preset_tests.cpp
   dmx_presets_tests.cpp
+  assert_tests.cpp
+  lockable_tests.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/dmx_controller.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/seven_segment_display.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/foot_switch.cpp
@@ -80,11 +98,12 @@ add_executable(
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/web_server.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Tasks/max3485_sender.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Base/rtos_task.cpp
+  ${CMAKE_SOURCE_DIR}/../../main/Base/assert.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/dmx_presets.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/dmx_preset.cpp
   ${CMAKE_SOURCE_DIR}/../../main/Data/configuration.cpp
   ${STUB_SOURCES}
-  esp_idf_stubs/assert.cpp
+  esp_idf_stubs/freertos/task.cpp
 )
 
 set_target_properties(run_tests PROPERTIES

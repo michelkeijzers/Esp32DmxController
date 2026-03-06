@@ -29,5 +29,6 @@ class Assert : public IAssert
     void assertNot0(int handle, const char *variableName) override;
     void assertTrue(bool variable, const char *variableName) override;
     void assertSoftwareError(const char *message) override;
-    void Halt() override;
+    virtual void Halt() override;
+    virtual ~Assert() = default;
 };

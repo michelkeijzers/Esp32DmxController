@@ -34,10 +34,11 @@ extern "C"
     }
 
     // Stubs for semaphore functions
-    SemaphoreHandle_t xSemaphoreCreateMutex(void) { return (SemaphoreHandle_t)0x2; }
-    void vSemaphoreDelete(SemaphoreHandle_t xSemaphore) {}
-    BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore, TickType_t ticks) { return pdTRUE; }
-    BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore) { return pdTRUE; }
+    // TODO: implemented in semphr.h
+    // SemaphoreHandle_t xSemaphoreCreateMutex(void) { return (SemaphoreHandle_t)0x2; }
+    // void vSemaphoreDelete(SemaphoreHandle_t xSemaphore) {}
+    // BaseType_t xSemaphoreTake(SemaphoreHandle_t xSemaphore, TickType_t ticks) { return pdTRUE; }
+    // BaseType_t xSemaphoreGive(SemaphoreHandle_t xSemaphore) { return pdTRUE; }
 
     // Stubs for task functions
     BaseType_t xTaskCreate(TaskFunction_t pxTaskCode, const char *const pcName, uint32_t usStackDepth,

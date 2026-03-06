@@ -109,12 +109,12 @@
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -179,14 +179,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -251,14 +251,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -324,12 +324,12 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <TreatWChar_tAsBuiltInType></TreatWChar_tAsBuiltInType>
       <UseFullPaths>false</UseFullPaths>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;UNIT_TEST;GTEST_LINKED_AS_SHARED_LIBRARY=1;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main;C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\..\..\main\Data;C:\esp-idf\components\freertos\include;C:\tools\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -439,6 +439,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\configuration_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_preset_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\dmx_presets_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\assert_tests.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\lockable_tests.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\dmx_controller.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\seven_segment_display.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\foot_switch.cpp" />
@@ -446,16 +448,28 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\web_server.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Tasks\max3485_sender.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\rtos_task.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Base\assert.cpp">
+      <ObjectFileName>$(IntDir)/C_/Users/i4studio/Esp32Test/Esp32DmxController/main/Base/assert.cpp.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_presets.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\dmx_preset.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\main\Data\configuration.cpp" />
-    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\assert.cpp" />
+    <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\assert.cpp">
+      <ObjectFileName>$(IntDir)/esp_idf_stubs/assert.cpp.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queue.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\queuefail_stub.cpp" />
     <ClCompile Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\esp_idf_stubs\freertos\task.cpp" />
   </ItemGroup>
   <ItemGroup />
-
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\ZERO_CHECK.vcxproj">
+      <Project>{A8F1B6C0-5FF7-3175-9942-185198A9B6B0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
