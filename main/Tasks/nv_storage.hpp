@@ -26,7 +26,7 @@ class NvStorage : public RtosTask
 
     virtual void init(RtosTask::TaskProperties taskProperties);
 
-  private:
+  protected:
     int taskPriority_;
     int queueCapacity_;
 
@@ -36,7 +36,6 @@ class NvStorage : public RtosTask
     Configuration &getConfiguration() { return configuration_; }
     DmxPresets &getDmxPresets() { return dmxPresets_; }
 
-  private:
     nvs_handle_t configurationNvsHandle_;
     nvs_handle_t presetsNvsHandle_;
     const char *configurationNamespaceName_;

@@ -18,14 +18,18 @@ extern "C"
     static inline esp_err_t nvs_set_u8(nvs_handle_t, const char *, unsigned char) { return ESP_OK; }
     static inline esp_err_t nvs_set_u16(nvs_handle_t, const char *, unsigned short) { return ESP_OK; }
     static inline esp_err_t nvs_commit(nvs_handle_t) { return ESP_OK; }
-    static inline esp_err_t nvs_get_u8(nvs_handle_t, const char *, unsigned char *) { return ESP_OK; }
+    esp_err_t nvs_get_u8(nvs_handle_t, const char *, unsigned char *);
     static inline esp_err_t nvs_get_u16(nvs_handle_t, const char *, unsigned short *) { return ESP_OK; }
 
     static inline esp_err_t nvs_set_blob(nvs_handle_t, const char *, const void *, size_t) { return ESP_OK; }
-    static inline esp_err_t nvs_get_blob(nvs_handle_t, const char *, void *, size_t *) { return ESP_OK; }
-
-    static inline esp_err_t nvs_get_str(nvs_handle_t, const char *, char *, size_t *) { return ESP_OK; }
+    esp_err_t nvs_get_blob(nvs_handle_t, const char *, void *, size_t *);
+    esp_err_t nvs_get_str(nvs_handle_t, const char *, char *, size_t *);
 
 #ifdef __cplusplus
 }
+
+// Function pointers for test overrides
+extern esp_err_t (*nvs_get_u8_ptr)(nvs_handle_t, const char *, unsigned char *);
+extern esp_err_t (*nvs_get_str_ptr)(nvs_handle_t, const char *, char *, size_t *);
+extern esp_err_t (*nvs_get_blob_ptr)(nvs_handle_t, const char *, void *, size_t *);
 #endif

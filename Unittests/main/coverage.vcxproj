@@ -241,6 +241,15 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <None Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\CMakeFiles\coverage">
     </None>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\ZERO_CHECK.vcxproj">
+      <Project>{A8F1B6C0-5FF7-3175-9942-185198A9B6B0}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

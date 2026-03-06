@@ -254,7 +254,6 @@ void FootSwitch::handleConfigUpdate(QueueHandle_t configQueue)
         else
         {
             ESP_LOGW(TAG, "Unknown config event type: %d", static_cast<int>(configEvent.type));
-            throw std::runtime_error("Unknown config event type");
         }
     }
 }

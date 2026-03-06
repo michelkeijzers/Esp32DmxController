@@ -41,7 +41,6 @@ void NvStorage::taskLoop()
     {
         if (xQueueReceive(getEventQueue(), &event, portMAX_DELAY) == pdTRUE)
         {
-            ESP_LOGI(pcTaskGetName(nullptr), "NvStorage event received: %d", event.type);
             switch (event.type)
             {
             case Messages::EventType::LOAD_CONFIGURATION:
