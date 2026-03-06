@@ -14,6 +14,7 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/queue.h>
 #include <freertos/task.h>
+#include <stdexcept>
 #include <stdio.h>
 
 static const char *TAG = "FootSwitch";
@@ -253,6 +254,7 @@ void FootSwitch::handleConfigUpdate(QueueHandle_t configQueue)
         else
         {
             ESP_LOGW(TAG, "Unknown config event type: %d", static_cast<int>(configEvent.type));
+            throw std::runtime_error("Unknown config event type");
         }
     }
 }

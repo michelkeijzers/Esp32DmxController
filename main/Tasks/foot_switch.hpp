@@ -26,8 +26,8 @@ class FootSwitch : public RtosTask
     enum class State
     {
         IDLE,             // Released and stable
+        PRESSED,          // Pressed and stable
         DEBOUNCE_PRESS,   // Detected press, waiting for stability
-        PRESSED,          // Press confirmed, waiting for release
         DEBOUNCE_RELEASE, // Detected release, waiting for stability
         RELEASED          // Release confirmed, evaluating duration
     };
@@ -47,7 +47,7 @@ class FootSwitch : public RtosTask
     void taskEntry(void *param) override;
     gpio_num_t getPin() const { return pin_; }
 
-  private:
+  protected:
     Configuration &configuration_;
     IAssert *assert_;
 
