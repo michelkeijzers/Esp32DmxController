@@ -63,7 +63,7 @@ void DmxPresets::addPreset(uint8_t presetNumber, const char *name, const uint8_t
     presets_[presetNumber].setDmxValues(dmxValues);
 
     ESP_LOGI(LOG_TAG, "Added preset at index %d: %s", presetNumber, name);
-    numberOfFilledPresets_++;
+    numberOfFilledPresets_++; // TODO: Check if ok (what if overwritten by nvram and this is called, double increment?)
 }
 
 DmxPreset &DmxPresets::getPreset(uint8_t index)

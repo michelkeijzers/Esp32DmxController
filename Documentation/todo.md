@@ -4,7 +4,12 @@
 
 # DMX Controller
 
-- When the number of filled presets is lower than the curren preset index, adjust it accordingly and send around.
+- When the number of filled presets is lower than the current preset index, adjust it accordingly and send around.
+
+# RTOS Related
+
+- Split Assert in Assert and AssertRtos (?)
+- Remove assert from assert*.assertNotNull(..), change to assert*.notNull, for all assert methods.
 
 # Foot Switch
 
@@ -24,7 +29,7 @@
 
 # NvStorage
 
-- Reading presets and configuration from NVRAM, analyze blocking/asynchronous mechanism.
+- (Done) Reading presets and configuration from NVRAM, analyze blocking/asynchronous mechanism.
 - Store presets and configuration in NVRAM, analyze blocking/asynchronous mechanism.
 
 # OTA Update
@@ -43,7 +48,7 @@
 
 ## System Testing
 
-- Think how to test the system.
+- (Done) Think how to test the system. Google mock system testing.
 
 ## Unit Testing
 

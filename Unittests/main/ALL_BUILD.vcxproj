@@ -167,18 +167,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   <ItemGroup>
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\ZERO_CHECK.vcxproj">
-      <Project>{A8F1B6C0-5FF7-3175-9942-185198A9B6B0}</Project>
-      <Name>ZERO_CHECK</Name>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </ProjectReference>
-    <ProjectReference Include="C:\Users\i4studio\Esp32Test\Esp32DmxController\Unittests\main\run_tests.vcxproj">
-      <Project>{9BE74AEB-C73C-36A7-BFE7-D6B9894810FC}</Project>
-      <Name>run_tests</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
