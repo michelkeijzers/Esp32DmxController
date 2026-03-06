@@ -8,7 +8,9 @@ extern "C"
 // Minimal FreeRTOS task stub for unit testing
 #include "FreeRTOS.h"
 
+#include <stdint.h>
     static inline TickType_t xTaskGetTickCount(void) { return 0; }
+    static inline TickType_t xTaskGetTickCountFromISR(void) { return 0; }
     static inline void vTaskDelay(TickType_t) {}
     static inline void vTaskDelete(void *) {}
     typedef void (*TaskFunction_t)(void *);

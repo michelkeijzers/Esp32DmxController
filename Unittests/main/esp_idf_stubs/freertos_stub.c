@@ -56,6 +56,12 @@ extern "C"
         return ++tick;
     }
 
+    TickType_t xTaskGetTickCountFromISR(void)
+    {
+        static TickType_t tick_isr = 1000;
+        return ++tick_isr;
+    }
+
     // Conversion macro stub
     TickType_t pdMS_TO_TICKS(uint32_t ms) { return ms; }
 

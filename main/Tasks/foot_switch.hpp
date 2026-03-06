@@ -1,3 +1,4 @@
+// foot_switch.hpp
 #pragma once
 
 #include "../Data/configuration.hpp"
@@ -5,7 +6,7 @@
 #include <../Base/assert.hpp>
 #include <driver/gpio.h>
 #include <freertos/FreeRTOS.h>
-#include <freertos/timers.h>
+#include <freertos/queue.h>
 
 enum InterruptEventType
 {
@@ -19,6 +20,16 @@ class FootSwitch : public RtosTask
     struct InterruptEvent
     {
         InterruptEventType type;
+        TickType_t timestamp;
+    };
+
+    enum class State
+    {
+        IDLE,             // Released and stable
+        DEBOUNCE_PRESS,   // Detected press, waiting for stability
+        PRESSED,          // Press confirmed, waiting for release
+        DEBOUNCE_RELEASE, // Detected release, waiting for stability
+        RELEASED          // Release confirmed, evaluating duration
     };
 
     FootSwitch(IAssert *assert, Configuration &configuration);
@@ -31,10 +42,9 @@ class FootSwitch : public RtosTask
 
     uint16_t getLongPressThresholdMs();
     bool getPolarityNormallyOpen();
+    State getState() const { return state_; }
 
     void taskEntry(void *param) override;
-
-  public:
     gpio_num_t getPin() const { return pin_; }
 
   private:
@@ -43,12 +53,27 @@ class FootSwitch : public RtosTask
 
     gpio_num_t pin_;
 
-    bool lastPinState_;
-    TickType_t pressStartTime_;
-    uint32_t longPressTimeMs_;
+    // State machine
+    State state_;
+    TickType_t stateEntryTime_;
 
+    // Timing
+    TickType_t pressStartTime_;
+    uint32_t debounceDelayMs_;
+    uint32_t longPressThresholdMs_;
+
+    // Configuration
     bool polarityNormallyOpen_;
-    uint16_t longPressThresholdMs_;
+
+    // State machine methods
+    void transitionTo(State newState);
+    const char *stateToString(State state) const;
+
+    // Event handlers
+    void handleInterruptEvent(const InterruptEvent &event);
+    void handleTimeout();
+    void handleConfigUpdate(QueueHandle_t configEventQueue);
+    TickType_t calculateBlockTime() const;
 
     void taskLoop();
 
